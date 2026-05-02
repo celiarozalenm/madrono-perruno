@@ -110,6 +110,27 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
         </div>
       </section>
 
+      {/* Photo banner */}
+      <section className="px-4 sm:px-6 pb-2 max-w-5xl mx-auto">
+        <figure className="relative rounded-3xl overflow-hidden shadow-xl">
+          <img
+            src="/hero.jpg"
+            alt={
+              locale === 'es'
+                ? 'Persona con perro recogiendo una bolsa de una papelera con dispensador en una calle de Madrid'
+                : 'Person with dog taking a bag from a dispenser bin on a Madrid street'
+            }
+            className="w-full h-[260px] sm:h-[380px] object-cover"
+            loading="lazy"
+          />
+          <figcaption className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent text-white px-5 sm:px-8 py-5 sm:py-6">
+            <p className="text-sm sm:text-base font-medium leading-snug max-w-2xl">
+              {t(locale, 'landing.photo.caption')}
+            </p>
+          </figcaption>
+        </figure>
+      </section>
+
       {/* Features */}
       <section className="px-4 sm:px-6 py-12 max-w-5xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold text-stone-900 text-center mb-10">
