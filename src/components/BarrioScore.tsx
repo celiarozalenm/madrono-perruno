@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Search, MapPin, Loader2, AlertCircle, Lock, Wind } from 'lucide-react'
+import { Search, MapPin, Loader2, AlertCircle, Lock, Wind, Share2, Download } from 'lucide-react'
 import type { Datasets, Locale } from '../types'
 import { t } from '../i18n'
 import { scoreBarrio } from '../services/scoring'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { assessStation, nearestStation, AIR_LEVEL_COLORS, AIR_LEVEL_LABELS } from '../services/air'
+import { generateShareCard } from '../services/shareCard'
 
 interface Props {
   data: Datasets
@@ -138,7 +139,14 @@ export default function BarrioScore({ data, locale, onLocate }: Props) {
 
       {point && main && score5 && score15 && (
         <div className="space-y-4">
-          <div className="text-sm text-stone-600 truncate">{point.label}</div>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="text-sm text-stone-600 truncate flex-1 min-w-0">{point.label}</div>
+            <ShareButton
+              address={point.label}
+              score={main}
+              locale={locale}
+            />
+          </div>
 
           <div
             className="rounded-2xl p-5 text-white shadow-lg"
@@ -245,5 +253,88 @@ function Row({ n, label, dot }: { n: number; label: string; dot: string }) {
       <span className="font-medium tabular-nums w-8 text-right">{n}</span>
       <span className="text-stone-600 truncate">{label}</span>
     </div>
+  )
+}
+
+function ShareButton({
+  address,
+  score,
+  locale,
+}: {
+  address: string
+  score: import('../types').BarrioScore
+  locale: Locale
+}) {
+  const [busy, setBusy] = useState(false)
+  const [done, setDone] = useState<'shared' | 'downloaded' | null>(null)
+
+  async function handleShare() {
+    setBusy(true)
+    setDone(null)
+    try {
+      const blob = await generateShareCard({ address, score, locale })
+      const file = new File([blob], 'mi-barrio-canino.png', { type: 'image/png' })
+      const text =
+        locale === 'es'
+          ? `Mi barrio canino en Madrid: ${score.scoreOver100}/100 — ${score.papeleras} papeleras, ${score.areasCaninas} áreas caninas, ${score.parques} parques cerca. https://madrono-perruno.vercel.app`
+          : `My Madrid dog neighborhood: ${score.scoreOver100}/100 — ${score.papeleras} bins, ${score.areasCaninas} dog areas, ${score.parques} parks nearby. https://madrono-perruno.vercel.app`
+      const nav = navigator as Navigator & {
+        canShare?: (data: ShareData) => boolean
+        share?: (data: ShareData) => Promise<void>
+      }
+      if (nav.canShare?.({ files: [file] }) && nav.share) {
+        await nav.share({
+          files: [file],
+          title: 'Madroño Perruno',
+          text,
+        })
+        setDone('shared')
+      } else {
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'mi-barrio-canino.png'
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        URL.revokeObjectURL(url)
+        setDone('downloaded')
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setBusy(false)
+      setTimeout(() => setDone(null), 3000)
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleShare}
+      disabled={busy}
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border border-stone-300 hover:bg-stone-100 text-stone-700 disabled:opacity-50"
+    >
+      {busy ? (
+        <Loader2 size={14} className="animate-spin" />
+      ) : done === 'downloaded' ? (
+        <Download size={14} />
+      ) : (
+        <Share2 size={14} />
+      )}
+      <span>
+        {done === 'shared'
+          ? locale === 'es'
+            ? '¡Compartido!'
+            : 'Shared!'
+          : done === 'downloaded'
+          ? locale === 'es'
+            ? 'Descargado'
+            : 'Downloaded'
+          : locale === 'es'
+          ? 'Compartir'
+          : 'Share'}
+      </span>
+    </button>
   )
 }
