@@ -21,16 +21,20 @@
 
 ## Resumen ejecutivo
 
-**Madroño Perruno** es una aplicación web (PWA) que cruza datos abiertos del Ayuntamiento de Madrid sobre infraestructura canina para resolver preguntas que ninguna herramienta existente responde. Reutiliza cuatro conjuntos de datos del Portal de Datos Abiertos —papeleras con dispensador de bolsas (≈6.000 registros), áreas caninas (≈150), parques y jardines (≈210) y centros veterinarios inspeccionados (≈615)— y los combina en un mapa interactivo y dos utilidades originales:
+**Madroño Perruno** es una aplicación web (PWA) que reutiliza cuatro conjuntos de datos abiertos del Ayuntamiento de Madrid sobre infraestructura canina y los enriquece con una capa colaborativa para resolver el problema que ninguna app oficial ha resuelto: **saber si una papelera tiene bolsas o no en este momento**.
 
-- **Mi barrio canino**: el ciudadano introduce una dirección y obtiene una puntuación 0-100 sobre la infraestructura canina disponible a 5, 10 y 15 minutos andando. Útil para decisiones de mudanza, paseo y planificación.
-- **Ruta bolsa-amigable**: dada una ubicación de partida y una duración, genera un paseo en bucle por calles reales (OSRM) que pasa por papeleras y áreas caninas cercanas. Una utilidad inédita en el catálogo de aplicaciones existentes sobre datos caninos de Madrid.
+Reutiliza papeleras con dispensador de bolsas (≈6.000 registros), áreas caninas (≈150), parques y jardines (≈210) y centros veterinarios inspeccionados (≈615) y los combina en cuatro funcionalidades:
 
-El proyecto se diferencia explícitamente de **BolsaCan** (app oficial del Ayuntamiento, 2017) y **BolsaDog** (terceros, iOS): ambas se limitan a localizar la papelera más cercana. Madroño Perruno aporta capacidad analítica cruzada, bilingüismo ES/EN para visitantes, código abierto y arquitectura PWA que funciona sin tienda, sin instalación y sin tracking.
+1. **Reportes colaborativos en tiempo real** *(característica estrella, sin precedentes)*: cualquier vecino puede reportar en un solo clic si una papelera concreta tiene bolsas. La app muestra el último reporte y el balance de los últimos días. Sin registro y sin tracking. Resuelve la queja n.º 1 de los usuarios actuales: el dato municipal indica que la papelera existe, pero no si está dotada.
+2. **Mi barrio canino**: el ciudadano introduce una dirección y obtiene una puntuación 0-100 sobre la infraestructura canina disponible a 5, 10 y 15 minutos andando. Útil para decisiones de mudanza y paseo.
+3. **Ruta bolsa-amigable**: dada una ubicación de partida y una duración, genera un paseo en bucle por calles reales (OSRM) que pasa por papeleras y áreas caninas cercanas.
+4. **Comparativa por distrito**: ranking visual de los 21 distritos de Madrid en cada categoría de infraestructura.
 
-**Impacto principal:** democratizar el acceso a datos municipales sobre infraestructura canina mediante visualizaciones inmediatas, accesibles a personas no técnicas y a periodistas de datos, asociaciones vecinales y planificadores urbanos.
+El proyecto se diferencia explícitamente de **BolsaCan** (app oficial del Ayuntamiento, 2017) y **BolsaDog** (terceros, iOS): ambas se limitan a localizar la papelera más cercana sin verificar si está operativa. Madroño Perruno añade verificación ciudadana en vivo, capacidad analítica cruzada, bilingüismo ES/EN, código abierto y arquitectura PWA que funciona sin tienda, sin instalación y sin tracking.
 
-**Resultados clave:** 4 conjuntos de datos reutilizados, ≈7.000 puntos georreferenciados servidos en cliente, 2 utilidades novedosas no disponibles previamente, 21 distritos comparados.
+**Impacto principal:** convertir el dataset estático de papeleras en un servicio público vivo, alimentado por la propia ciudadanía, mientras democratiza el acceso a datos municipales sobre infraestructura canina.
+
+**Resultados clave:** 4 conjuntos de datos reutilizados, ≈7.000 puntos georreferenciados servidos en cliente, 4 funcionalidades novedosas no disponibles previamente, 21 distritos comparados, sistema colaborativo con verificación anti-spam por IP.
 
 ---
 
@@ -151,6 +155,7 @@ Innovación frente al estado del arte:
 | Característica | BolsaCan / BolsaDog | Madroño Perruno |
 |---|---|---|
 | Mapa de papeleras | ✅ | ✅ |
+| **Verificación ciudadana en vivo de bolsas** | ❌ | ✅ |
 | Áreas caninas | ❌ | ✅ |
 | Parques y veterinarios | ❌ | ✅ |
 | Mapa de calor | ❌ | ✅ |
@@ -160,9 +165,11 @@ Innovación frente al estado del arte:
 | Bilingüe ES/EN | ❌ | ✅ |
 | Open source (MIT) | ❌ | ✅ |
 | PWA sin tienda | ❌ | ✅ |
-| Privacidad: sin servidor, sin tracking | ❌ | ✅ |
+| Privacidad: sin tracking | ❌ | ✅ |
 
-La **ruta bolsa-amigable** es, hasta donde se ha podido verificar, una funcionalidad sin precedentes en el catálogo de aplicaciones publicadas sobre infraestructura canina de Madrid.
+**La innovación más relevante: reportes ciudadanos en tiempo real.** El dataset municipal indica que las ≈6.000 papeleras existen, pero no si están dotadas de bolsas. Es la queja unánime de los usuarios actuales de BolsaCan en las reseñas de Google Play. Madroño Perruno cierra ese hueco permitiendo que la ciudadanía verifique en un clic, **sin registrarse**, si una papelera concreta tiene bolsas. La app muestra el último reporte, el recuento "con bolsas" vs "sin bolsas" y el tiempo transcurrido. Cada IP está limitada a 20 reportes/hora para prevenir manipulación. Los datos se almacenan cifrados en una base Redis serverless y los reportes expiran automáticamente a los 30 días. Esto convierte un dataset estático en un servicio vivo y mejora exponencialmente su utilidad real.
+
+La **ruta bolsa-amigable** es, complementariamente, otra funcionalidad sin precedentes en el catálogo de aplicaciones publicadas sobre datos caninos de Madrid.
 
 ### Variedad de conjuntos de datos utilizados del Portal de Datos Abiertos de Madrid
 

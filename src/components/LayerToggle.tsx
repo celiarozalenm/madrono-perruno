@@ -26,11 +26,14 @@ export default function LayerToggle({
   data,
   locale,
 }: Props) {
+  const vetsWithCoords = data.vets.filter(
+    (v) => typeof v.lat === 'number' && typeof v.lng === 'number',
+  ).length
   const items: { key: LayerKey; icon: React.ReactNode; count: number }[] = [
     { key: 'papeleras', icon: <Trash2 size={16} />, count: data.papeleras.length },
     { key: 'areas', icon: <Dog size={16} />, count: data.areas.length },
     { key: 'parques', icon: <Trees size={16} />, count: data.parques.length },
-    { key: 'vets', icon: <Stethoscope size={16} />, count: data.vets.length },
+    { key: 'vets', icon: <Stethoscope size={16} />, count: vetsWithCoords },
   ]
   return (
     <div className="absolute top-3 left-3 bg-white/95 backdrop-blur rounded-xl shadow-lg border border-stone-200 p-2 z-10 max-w-[260px]">
@@ -40,7 +43,7 @@ export default function LayerToggle({
       <ul className="flex flex-col gap-0.5">
         {items.map((item) => {
           const labelKey = `layer.${item.key}` as const
-          const disabled = item.key === 'vets'
+          const disabled = false
           return (
             <li key={item.key}>
               <button

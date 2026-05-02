@@ -113,6 +113,7 @@ export default function Map({
       setLayerVis(map, 'areas-points', visibleLayers.areas)
       setLayerVis(map, 'areas-labels', visibleLayers.areas)
       setLayerVis(map, 'parques-points', visibleLayers.parques)
+      setLayerVis(map, 'vets-points', visibleLayers.vets)
       setLayerVis(map, 'heat', showHeat && visibleLayers.papeleras)
     }
     if (map.isStyleLoaded()) apply()
@@ -235,6 +236,26 @@ export default function Map({
         )
         .addTo(map)
     }
+    const onVetClick = (e: maplibregl.MapLayerMouseEvent) => {
+      const f = e.features?.[0]
+      if (!f) return
+      const props = f.properties as Record<string, string>
+      if (popupRef.current) popupRef.current.remove()
+      popupRef.current = new maplibregl.Popup({ offset: 12 })
+        .setLngLat(e.lngLat)
+        .setHTML(
+          renderPopupHtml('parque', {
+            title: locale === 'es' ? 'Centro veterinario' : 'Vet centre',
+            address: props.direccion ?? '',
+            district: props.distrito ?? '',
+            extra: props.epigrafe ?? '',
+            lat: e.lngLat.lat,
+            lng: e.lngLat.lng,
+            locale,
+          }),
+        )
+        .addTo(map)
+    }
     const onParqueClick = (e: maplibregl.MapLayerMouseEvent) => {
       const f = e.features?.[0]
       if (!f) return
@@ -271,8 +292,9 @@ export default function Map({
     map.on('click', 'papeleras-points', onPapeleraClick)
     map.on('click', 'areas-points', onAreaClick)
     map.on('click', 'parques-points', onParqueClick)
+    map.on('click', 'vets-points', onVetClick)
     map.on('click', 'papeleras-cluster', onClusterClick)
-    for (const layer of ['papeleras-points', 'areas-points', 'parques-points', 'papeleras-cluster']) {
+    for (const layer of ['papeleras-points', 'areas-points', 'parques-points', 'vets-points', 'papeleras-cluster']) {
       map.on('mouseenter', layer, setPointer(true))
       map.on('mouseleave', layer, setPointer(false))
     }
@@ -281,6 +303,7 @@ export default function Map({
       map.off('click', 'papeleras-points', onPapeleraClick)
       map.off('click', 'areas-points', onAreaClick)
       map.off('click', 'parques-points', onParqueClick)
+      map.off('click', 'vets-points', onVetClick)
       map.off('click', 'papeleras-cluster', onClusterClick)
     }
   }, [locale])
@@ -336,6 +359,25 @@ function parquesGeoJson(data: Datasets) {
   }
 }
 
+function vetsGeoJson(data: Datasets) {
+  return {
+    type: 'FeatureCollection' as const,
+    features: data.vets
+      .filter((v) => typeof v.lat === 'number' && typeof v.lng === 'number')
+      .map((v) => ({
+        type: 'Feature' as const,
+        properties: {
+          id: v.id,
+          direccion: v.direccion,
+          distrito: v.distrito,
+          epigrafe: v.epigrafe,
+          fechaInspeccion: v.fechaInspeccion,
+        },
+        geometry: { type: 'Point' as const, coordinates: [v.lng as number, v.lat as number] },
+      })),
+  }
+}
+
 function addSources(map: MlMap, data: Datasets) {
   map.addSource('papeleras', {
     type: 'geojson',
@@ -346,12 +388,14 @@ function addSources(map: MlMap, data: Datasets) {
   })
   map.addSource('areas', { type: 'geojson', data: areasGeoJson(data) })
   map.addSource('parques', { type: 'geojson', data: parquesGeoJson(data) })
+  map.addSource('vets', { type: 'geojson', data: vetsGeoJson(data) })
 }
 
 function updateSources(map: MlMap, data: Datasets) {
   ;(map.getSource('papeleras') as GeoJSONSource | undefined)?.setData(papelerasGeoJson(data))
   ;(map.getSource('areas') as GeoJSONSource | undefined)?.setData(areasGeoJson(data))
   ;(map.getSource('parques') as GeoJSONSource | undefined)?.setData(parquesGeoJson(data))
+  ;(map.getSource('vets') as GeoJSONSource | undefined)?.setData(vetsGeoJson(data))
 }
 
 function addLayers(map: MlMap) {
@@ -444,5 +488,18 @@ function addLayers(map: MlMap) {
       'circle-stroke-width': 1.5,
       'circle-stroke-color': '#fff',
     },
+  })
+
+  map.addLayer({
+    id: 'vets-points',
+    type: 'circle',
+    source: 'vets',
+    paint: {
+      'circle-color': '#0e7490',
+      'circle-radius': 5,
+      'circle-stroke-width': 1.5,
+      'circle-stroke-color': '#fff',
+    },
+    layout: { visibility: 'none' },
   })
 }
