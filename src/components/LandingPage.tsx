@@ -11,6 +11,7 @@ import {
   Download,
   ExternalLink,
   Users,
+  Globe,
 } from 'lucide-react'
 import type { Locale } from '../types'
 import { t } from '../i18n'
@@ -68,9 +69,11 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
         <button
           type="button"
           onClick={toggleLocale}
-          className="text-sm text-stone-700 hover:bg-white px-3 py-1.5 rounded-lg font-mono uppercase border border-stone-200"
+          className="text-sm text-stone-700 hover:bg-white px-3 py-1.5 rounded-lg border border-stone-200 flex items-center gap-1.5"
+          aria-label={locale === 'es' ? 'Switch to English' : 'Cambiar a español'}
         >
-          {locale === 'es' ? 'EN' : 'ES'}
+          <Globe size={16} />
+          <span className="font-mono uppercase">{locale === 'es' ? 'EN' : 'ES'}</span>
         </button>
       </header>
 
