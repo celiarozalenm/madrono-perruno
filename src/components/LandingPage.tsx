@@ -81,9 +81,6 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
 
       {/* Hero */}
       <section className="px-4 sm:px-6 pt-6 pb-12 max-w-4xl mx-auto text-center">
-        <div className="inline-block bg-brand-100 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full mb-5 tracking-wide uppercase">
-          {t(locale, 'landing.hero.tag')}
-        </div>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-stone-900 leading-tight tracking-tight">
           {t(locale, 'app.title')}
           <span className="block text-brand-500 mt-1">{t(locale, 'app.subtitle')}</span>

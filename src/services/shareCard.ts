@@ -17,13 +17,13 @@ const COLOR = {
   bg: '#faf7f2',
   brand: '#ed731f',
   brandDark: '#b84314',
-  green: '#2a6f35',
+  green: '#2f7d3a',
   brown: '#5b3a1e',
   cyan: '#0e7490',
   text: '#1a1a1a',
   textDim: '#4b5563',
   textFaint: '#6b7280',
-  madrid: '#1c4988',
+  madrid: '#003df6',
 } as const
 
 const SCORE_COLOR: Record<BarrioScore['scoreLabel'], string> = {

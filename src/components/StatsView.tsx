@@ -4,13 +4,16 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  Legend,
+  Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts'
 import { Map as MapIcon, BarChart3 } from 'lucide-react'
-import type { Datasets, DistrictAggregate, Locale } from '../types'
+import type { Datasets, DistrictAggregate, Locale, ProteccionAnimalEntry } from '../types'
 import { t } from '../i18n'
 import { aggregateByDistrict } from '../services/scoring'
 import DistrictChoropleth from './DistrictChoropleth'
@@ -20,7 +23,7 @@ interface Props {
   locale: Locale
 }
 
-type Metric = 'papeleras' | 'areasCaninas' | 'parques'
+type Metric = 'papeleras' | 'areasCaninas' | 'parques' | 'perros'
 type NeedsField = 'papeleras' | 'areasCaninas' | 'parques'
 
 type DisplayMode = 'map' | 'bars'
@@ -49,11 +52,13 @@ export default function StatsView({ data, locale }: Props) {
     papeleras: '#ed731f',
     areasCaninas: '#2f7d3a',
     parques: '#5b3a1e',
+    perros: '#1f4d7a',
   }
   const labelByMetric: Record<Metric, string> = {
     papeleras: t(locale, 'stats.papelerasRanking'),
     areasCaninas: t(locale, 'stats.areasRanking'),
     parques: t(locale, 'stats.parquesRanking'),
+    perros: t(locale, 'stats.perrosRanking'),
   }
 
   const totalPapeleras = aggregates.reduce((s, a) => s + a.papeleras, 0)
@@ -81,7 +86,7 @@ export default function StatsView({ data, locale }: Props) {
         <KPICard
           label={t(locale, 'stats.perros')}
           value={totalPerros}
-          color="#1f4d7a"
+          color="#003df6"
         />
         <KPICard
           label={t(locale, 'layer.papeleras')}
@@ -98,7 +103,7 @@ export default function StatsView({ data, locale }: Props) {
             {labelByMetric[metric]}
           </h2>
           <div className="flex bg-stone-100 rounded-lg p-1 text-xs">
-            {(['papeleras', 'areasCaninas', 'parques'] as Metric[]).map((m) => (
+            {(['perros', 'papeleras', 'areasCaninas', 'parques'] as Metric[]).map((m) => (
               <button
                 key={m}
                 type="button"
@@ -110,7 +115,11 @@ export default function StatsView({ data, locale }: Props) {
                     : 'text-stone-600 hover:text-stone-900'
                 }`}
               >
-                {m === 'papeleras'
+                {m === 'perros'
+                  ? locale === 'es'
+                    ? 'Perros'
+                    : 'Dogs'
+                  : m === 'papeleras'
                   ? locale === 'es'
                     ? 'Papeleras'
                     : 'Bins'
@@ -211,6 +220,8 @@ export default function StatsView({ data, locale }: Props) {
         locale={locale}
         numFmt={numFmt}
       />
+
+      <ProteccionPanel data={data.proteccionAnimal} locale={locale} />
     </div>
   )
 }
@@ -414,6 +425,100 @@ function quantile(values: number[], q: number): number {
     return arr[base] + rest * (arr[base + 1] - arr[base])
   }
   return arr[base]
+}
+
+function ProteccionPanel({
+  data,
+  locale,
+}: {
+  data: ProteccionAnimalEntry[]
+  locale: Locale
+}) {
+  if (!data.length) {
+    return (
+      <div className="bg-white rounded-xl border border-stone-200 p-4 sm:p-5">
+        <h2 className="font-semibold text-stone-900 text-sm sm:text-base">
+          {t(locale, 'stats.proteccion.title')}
+        </h2>
+        <p className="text-sm text-stone-500 mt-2">{t(locale, 'stats.proteccion.empty')}</p>
+      </div>
+    )
+  }
+
+  const seriesColors = {
+    dogIntakes: '#b91c1c',
+    catIntakes: '#7c3aed',
+    dogAdoptions: '#2f7d3a',
+    catAdoptions: '#0e7490',
+  }
+  const seriesLabels: Record<keyof typeof seriesColors, string> = {
+    dogIntakes: t(locale, 'stats.proteccion.dogIntakes'),
+    catIntakes: t(locale, 'stats.proteccion.catIntakes'),
+    dogAdoptions: t(locale, 'stats.proteccion.dogAdoptions'),
+    catAdoptions: t(locale, 'stats.proteccion.catAdoptions'),
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-stone-200 p-4 sm:p-5 space-y-4">
+      <div>
+        <h2 className="font-semibold text-stone-900 text-sm sm:text-base">
+          {t(locale, 'stats.proteccion.title')}
+        </h2>
+        <p className="text-sm text-stone-600 mt-1">{t(locale, 'stats.proteccion.lede')}</p>
+      </div>
+
+      <div className="h-72">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={{ top: 8, right: 16, bottom: 8, left: 8 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
+            <XAxis
+              dataKey="year"
+              tick={{ fontSize: 11 }}
+              label={{
+                value: t(locale, 'stats.proteccion.year'),
+                position: 'insideBottom',
+                offset: -2,
+                fontSize: 11,
+                fill: '#78716c',
+              }}
+            />
+            <YAxis tick={{ fontSize: 11 }} width={48} />
+            <Tooltip
+              contentStyle={{
+                borderRadius: 8,
+                border: '1px solid #e7e5e4',
+                fontSize: 13,
+              }}
+              formatter={(value, name) => [
+                Number(value).toLocaleString(locale === 'es' ? 'es-ES' : 'en-US'),
+                seriesLabels[name as keyof typeof seriesColors] ?? String(name),
+              ]}
+              labelFormatter={(label) => `${t(locale, 'stats.proteccion.year')} ${label}`}
+            />
+            <Legend
+              wrapperStyle={{ fontSize: 12 }}
+              formatter={(value) =>
+                seriesLabels[value as keyof typeof seriesColors] ?? value
+              }
+            />
+            {(Object.keys(seriesColors) as (keyof typeof seriesColors)[]).map((k) => (
+              <Line
+                key={k}
+                type="monotone"
+                dataKey={k}
+                stroke={seriesColors[k]}
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 4 }}
+              />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      <p className="text-xs text-stone-500">{t(locale, 'stats.proteccion.note')}</p>
+    </div>
+  )
 }
 
 function KPICard({ label, value, color }: { label: string; value: number; color: string }) {
