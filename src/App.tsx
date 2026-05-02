@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Loader2, AlertCircle } from 'lucide-react'
-import Header, { type View } from './components/Header'
+import { Loader2, AlertCircle, Menu } from 'lucide-react'
+import Sidebar, { type View } from './components/Sidebar'
 import LayerToggle from './components/LayerToggle'
 import Map from './components/Map'
 import BarrioScore from './components/BarrioScore'
@@ -34,6 +34,7 @@ function App() {
   const [highlight, setHighlight] = useState<{ lat: number; lng: number } | null>(null)
   const [route, setRoute] = useState<RouteResult | null>(null)
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     try {
@@ -80,10 +81,34 @@ function App() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-stone-50">
-      <Header view={view} setView={setView} locale={locale} toggleLocale={toggleLocale} />
+    <div className="h-full flex bg-stone-50">
+      <Sidebar
+        view={view}
+        setView={setView}
+        locale={locale}
+        toggleLocale={toggleLocale}
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-      <main className="flex-1 relative overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile top bar with hamburger */}
+        <div className="md:hidden bg-white border-b border-stone-200 px-3 py-2 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-md hover:bg-stone-100"
+            aria-label={locale === 'es' ? 'Abrir menú' : 'Open menu'}
+          >
+            <Menu size={20} />
+          </button>
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <img src="/icon.svg" alt="" className="w-7 h-7 shrink-0" />
+            <div className="font-bold text-stone-900 truncate">{t(locale, 'app.title')}</div>
+          </div>
+        </div>
+
+        <main className="flex-1 relative overflow-hidden">
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white z-20">
             <div className="flex items-center gap-3 text-stone-700">
@@ -165,7 +190,8 @@ function App() {
             )}
           </>
         )}
-      </main>
+        </main>
+      </div>
 
       {showOnboarding && <Onboarding locale={locale} onClose={dismissOnboarding} />}
     </div>
