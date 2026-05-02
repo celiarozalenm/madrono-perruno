@@ -1,6 +1,6 @@
 export type Locale = 'es' | 'en'
 
-export type LayerKey = 'papeleras' | 'areas' | 'parques' | 'vets'
+export type LayerKey = 'papeleras' | 'areas' | 'parques' | 'vets' | 'air'
 
 export interface Papelera {
   id: string
@@ -44,11 +44,46 @@ export interface Veterinario {
   fechaInspeccion: string
 }
 
+export interface AirReading {
+  value: number
+  hour: number
+  label: string
+  units: string
+}
+
+export interface AirStation {
+  id: string
+  name: string
+  address: string
+  lat: number
+  lng: number
+  readings: {
+    no2?: AirReading
+    pm25?: AirReading
+    pm10?: AirReading
+    o3?: AirReading
+  }
+  lastUpdate: string | null
+}
+
+export interface DistritoPerros {
+  distrito: string
+  perros: number
+  gatos: number
+}
+
+export interface PerrosCensus {
+  year: number | null
+  distritos: DistritoPerros[]
+}
+
 export interface Datasets {
   papeleras: Papelera[]
   areas: AreaCanina[]
   parques: Parque[]
   vets: Veterinario[]
+  air: AirStation[]
+  perros: PerrosCensus
 }
 
 export interface BarrioScore {
@@ -67,4 +102,5 @@ export interface DistrictAggregate {
   parques: number
   veterinarios: number
   superficieAreasM2: number
+  perros: number
 }

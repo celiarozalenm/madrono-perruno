@@ -1,4 +1,4 @@
-import { Trash2, Dog, Trees, Stethoscope, Flame } from 'lucide-react'
+import { Trash2, Dog, Trees, Stethoscope, Flame, Wind } from 'lucide-react'
 import type { Datasets, LayerKey, Locale } from '../types'
 import { t } from '../i18n'
 
@@ -16,6 +16,7 @@ const LAYER_COLOR: Record<LayerKey, string> = {
   areas: '#2f7d3a',
   parques: '#5b3a1e',
   vets: '#0e7490',
+  air: '#7c3aed',
 }
 
 export default function LayerToggle({
@@ -34,6 +35,7 @@ export default function LayerToggle({
     { key: 'areas', icon: <Dog size={16} />, count: data.areas.length },
     { key: 'parques', icon: <Trees size={16} />, count: data.parques.length },
     { key: 'vets', icon: <Stethoscope size={16} />, count: vetsWithCoords },
+    { key: 'air', icon: <Wind size={16} />, count: data.air?.length ?? 0 },
   ]
   return (
     <div className="absolute top-3 left-3 bg-white/95 backdrop-blur rounded-xl shadow-lg border border-stone-200 p-2 z-10 max-w-[260px]">

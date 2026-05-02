@@ -12,6 +12,8 @@ import {
   ExternalLink,
   Users,
   Globe,
+  MapPin,
+  MessageSquare,
 } from 'lucide-react'
 import type { Locale } from '../types'
 import { t } from '../i18n'
@@ -182,6 +184,55 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
             title={t(locale, 'landing.what.f4.title')}
             body={t(locale, 'landing.what.f4.body')}
           />
+        </div>
+      </section>
+
+      {/* Help your neighborhood — civic loop */}
+      <section className="px-4 sm:px-6 py-12 max-w-4xl mx-auto">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 sm:p-10">
+          <h2 className="text-2xl sm:text-3xl font-bold text-stone-900 text-center">
+            {t(locale, 'landing.help.title')}
+          </h2>
+          <p className="text-stone-700 text-center mt-3 max-w-2xl mx-auto leading-relaxed">
+            {t(locale, 'landing.help.lede')}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+            <div className="bg-white rounded-xl border border-amber-200 p-5">
+              <div className="w-10 h-10 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center mb-3">
+                <MapPin size={20} />
+              </div>
+              <h3 className="font-semibold text-stone-900">
+                {t(locale, 'landing.help.bags.title')}
+              </h3>
+              <p className="text-sm text-stone-600 mt-1 leading-relaxed">
+                {t(locale, 'landing.help.bags.body')}
+              </p>
+            </div>
+            <div className="bg-white rounded-xl border border-amber-200 p-5">
+              <div className="w-10 h-10 rounded-lg bg-green-100 text-green-700 flex items-center justify-center mb-3">
+                <MessageSquare size={20} />
+              </div>
+              <h3 className="font-semibold text-stone-900">
+                {t(locale, 'landing.help.parks.title')}
+              </h3>
+              <p className="text-sm text-stone-600 mt-1 leading-relaxed">
+                {t(locale, 'landing.help.parks.body')}
+              </p>
+            </div>
+          </div>
+          <p className="text-xs sm:text-sm text-madrid-600 text-center mt-6 max-w-2xl mx-auto leading-relaxed font-medium">
+            {t(locale, 'landing.help.loop')}
+          </p>
+          <div className="flex justify-center mt-7">
+            <button
+              type="button"
+              onClick={onEnter}
+              className="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-xl text-base font-semibold flex items-center gap-2 shadow-lg shadow-brand-500/30"
+            >
+              {t(locale, 'landing.help.cta')}
+              <ArrowRight size={18} />
+            </button>
+          </div>
         </div>
       </section>
 

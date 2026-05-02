@@ -6,6 +6,7 @@ import type { RouteResult } from '../services/routing'
 import { renderPopupHtml } from './MarkerPopup'
 import { buildPapeleraPopupContent } from './PapeleraPopup'
 import { buildEntityPopupContent } from './EntityPopup'
+import { assessStation, AIR_LEVEL_COLORS, AIR_LEVEL_LABELS } from '../services/air'
 
 const MADRID_CENTER: [number, number] = [-3.7038, 40.4168]
 // CARTO Voyager raster tiles — warm cream base, discreet labels, fits the
@@ -127,6 +128,7 @@ export default function Map({
       setLayerVis(map, 'areas-labels', visibleLayers.areas)
       setLayerVis(map, 'parques-points', visibleLayers.parques)
       setLayerVis(map, 'vets-points', visibleLayers.vets)
+      setLayerVis(map, 'air-points', visibleLayers.air)
       setLayerVis(map, 'heat', showHeat && visibleLayers.papeleras)
     }
     if (map.isStyleLoaded()) apply()
@@ -250,6 +252,40 @@ export default function Map({
         .setDOMContent(node)
         .addTo(map)
     }
+    const onAirClick = (e: maplibregl.MapLayerMouseEvent) => {
+      const f = e.features?.[0]
+      if (!f) return
+      const props = f.properties as Record<string, string>
+      const lvl = (props.level as keyof typeof AIR_LEVEL_LABELS) || 'good'
+      const levelLabel = AIR_LEVEL_LABELS[lvl][locale]
+      const driverText = props.driverLabel
+        ? `${props.driverLabel}: ${props.driverValue} ${props.driverUnits}`
+        : ''
+      const hour =
+        props.hour && props.hour !== ''
+          ? ` · ${locale === 'es' ? 'medido a las' : 'measured at'} ${String(props.hour).padStart(2, '0')}:00 h`
+          : ''
+      const message = locale === 'es' ? props.message : props.messageEn
+      if (popupRef.current) popupRef.current.remove()
+      popupRef.current = new maplibregl.Popup({ offset: 18, maxWidth: '280px' })
+        .setLngLat(e.lngLat)
+        .setHTML(
+          `<div class="mp-popup">
+            <div class="mp-popup-bar" style="background:${props.color}"></div>
+            <div class="mp-popup-body">
+              <div class="mp-popup-title">${escapeText(props.name || 'Estación')}</div>
+              ${props.address ? `<div class="mp-popup-row">${escapeText(props.address)}</div>` : ''}
+              <div class="mp-popup-row mp-popup-meta" style="color:${props.color};font-weight:700">
+                ${locale === 'es' ? 'Calidad del aire' : 'Air quality'}: ${levelLabel}
+              </div>
+              ${driverText ? `<div class="mp-popup-row mp-popup-meta">${driverText}${hour}</div>` : ''}
+              <div class="mp-popup-row" style="margin-top:8px">${escapeText(message)}</div>
+            </div>
+          </div>`,
+        )
+        .addTo(map)
+    }
+
     const onVetClick = (e: maplibregl.MapLayerMouseEvent) => {
       const f = e.features?.[0]
       if (!f) return
@@ -308,8 +344,9 @@ export default function Map({
     map.on('click', 'areas-points', onAreaClick)
     map.on('click', 'parques-points', onParqueClick)
     map.on('click', 'vets-points', onVetClick)
+    map.on('click', 'air-points', onAirClick)
     map.on('click', 'papeleras-cluster', onClusterClick)
-    for (const layer of ['papeleras-points', 'areas-points', 'parques-points', 'vets-points', 'papeleras-cluster']) {
+    for (const layer of ['papeleras-points', 'areas-points', 'parques-points', 'vets-points', 'air-points', 'papeleras-cluster']) {
       map.on('mouseenter', layer, setPointer(true))
       map.on('mouseleave', layer, setPointer(false))
     }
@@ -319,6 +356,7 @@ export default function Map({
       map.off('click', 'areas-points', onAreaClick)
       map.off('click', 'parques-points', onParqueClick)
       map.off('click', 'vets-points', onVetClick)
+      map.off('click', 'air-points', onAirClick)
       map.off('click', 'papeleras-cluster', onClusterClick)
     }
   }, [locale])
@@ -331,6 +369,13 @@ export default function Map({
       aria-label="Mapa de Madrid"
     />
   )
+}
+
+function escapeText(s: string): string {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
 }
 
 function setLayerVis(map: MlMap, id: string, visible: boolean) {
@@ -400,6 +445,33 @@ function vetsGeoJson(data: Datasets) {
   }
 }
 
+function airGeoJson(data: Datasets) {
+  return {
+    type: 'FeatureCollection' as const,
+    features: (data.air ?? []).map((s) => {
+      const a = assessStation(s)
+      return {
+        type: 'Feature' as const,
+        properties: {
+          id: s.id,
+          name: s.name,
+          address: s.address,
+          level: a.level,
+          color: AIR_LEVEL_COLORS[a.level],
+          driver: a.driver,
+          driverValue: a.driverValue,
+          driverLabel: a.driverLabel,
+          driverUnits: a.driverUnits,
+          hour: a.hour ?? '',
+          message: a.message,
+          messageEn: a.messageEn,
+        },
+        geometry: { type: 'Point' as const, coordinates: [s.lng, s.lat] },
+      }
+    }),
+  }
+}
+
 function addSources(map: MlMap, data: Datasets) {
   map.addSource('papeleras', {
     type: 'geojson',
@@ -411,6 +483,7 @@ function addSources(map: MlMap, data: Datasets) {
   map.addSource('areas', { type: 'geojson', data: areasGeoJson(data) })
   map.addSource('parques', { type: 'geojson', data: parquesGeoJson(data) })
   map.addSource('vets', { type: 'geojson', data: vetsGeoJson(data) })
+  map.addSource('air', { type: 'geojson', data: airGeoJson(data) })
 }
 
 function updateSources(map: MlMap, data: Datasets) {
@@ -418,6 +491,7 @@ function updateSources(map: MlMap, data: Datasets) {
   ;(map.getSource('areas') as GeoJSONSource | undefined)?.setData(areasGeoJson(data))
   ;(map.getSource('parques') as GeoJSONSource | undefined)?.setData(parquesGeoJson(data))
   ;(map.getSource('vets') as GeoJSONSource | undefined)?.setData(vetsGeoJson(data))
+  ;(map.getSource('air') as GeoJSONSource | undefined)?.setData(airGeoJson(data))
 }
 
 function addLayers(map: MlMap) {
@@ -535,6 +609,22 @@ function addLayers(map: MlMap) {
       'circle-radius': 5,
       'circle-stroke-width': 1.5,
       'circle-stroke-color': '#fff',
+    },
+    layout: { visibility: 'none' },
+  })
+
+  // Air-quality stations: large coloured discs whose colour reflects the
+  // current worst-pollutant level (good/fair/poor/bad).
+  map.addLayer({
+    id: 'air-points',
+    type: 'circle',
+    source: 'air',
+    paint: {
+      'circle-color': ['get', 'color'],
+      'circle-radius': 14,
+      'circle-stroke-width': 3,
+      'circle-stroke-color': '#fff',
+      'circle-opacity': 0.92,
     },
     layout: { visibility: 'none' },
   })

@@ -9,9 +9,11 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import { Map as MapIcon, BarChart3 } from 'lucide-react'
 import type { Datasets, Locale } from '../types'
 import { t } from '../i18n'
 import { aggregateByDistrict } from '../services/scoring'
+import DistrictChoropleth from './DistrictChoropleth'
 
 interface Props {
   data: Datasets
@@ -20,9 +22,12 @@ interface Props {
 
 type Metric = 'papeleras' | 'areasCaninas' | 'parques'
 
+type DisplayMode = 'map' | 'bars'
+
 export default function StatsView({ data, locale }: Props) {
   const aggregates = useMemo(() => aggregateByDistrict(data), [data])
   const [metric, setMetric] = useState<Metric>('papeleras')
+  const [mode, setMode] = useState<DisplayMode>('map')
 
   const sorted = useMemo(
     () => [...aggregates].sort((a, b) => b[metric] - a[metric]),
@@ -97,8 +102,46 @@ export default function StatsView({ data, locale }: Props) {
               </button>
             ))}
           </div>
+          <div className="flex bg-stone-100 rounded-lg p-1 text-xs">
+            <button
+              type="button"
+              onClick={() => setMode('map')}
+              aria-pressed={mode === 'map'}
+              className={`px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 transition-colors ${
+                mode === 'map'
+                  ? 'bg-white text-stone-900 shadow-sm'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <MapIcon size={13} />
+              {locale === 'es' ? 'Mapa' : 'Map'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode('bars')}
+              aria-pressed={mode === 'bars'}
+              className={`px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 transition-colors ${
+                mode === 'bars'
+                  ? 'bg-white text-stone-900 shadow-sm'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <BarChart3 size={13} />
+              {locale === 'es' ? 'Lista' : 'List'}
+            </button>
+          </div>
         </div>
 
+        {mode === 'map' && (
+          <DistrictChoropleth
+            metric={metric}
+            aggregates={aggregates}
+            locale={locale}
+            metricLabel={labelByMetric[metric]}
+          />
+        )}
+
+        {mode === 'bars' && (
         <div className="h-[460px] -mx-2">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
@@ -135,6 +178,7 @@ export default function StatsView({ data, locale }: Props) {
             </BarChart>
           </ResponsiveContainer>
         </div>
+        )}
       </div>
     </div>
   )
