@@ -21,10 +21,13 @@ const COLOR: Record<Kind, string> = {
 
 export function renderPopupHtml(kind: Kind, d: PopupData): string {
   const navText = d.locale === 'es' ? 'Cómo llegar' : 'Directions'
+  const googleText = d.locale === 'es' ? 'Ver en Google Maps' : 'View on Google Maps'
   const districtLabel = d.locale === 'es' ? 'Distrito' : 'District'
   const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${d.lat},${d.lng}&travelmode=walking`
   const escape = (s: string) =>
     s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  const placeQuery = encodeURIComponent(`${d.title} ${d.address}`.trim())
+  const placeUrl = `https://www.google.com/maps/search/?api=1&query=${placeQuery}`
   const externalUrl = d.url
     ? `<a href="${escape(d.url)}" target="_blank" rel="noopener" class="mp-popup-link">${
         d.locale === 'es' ? 'Más información' : 'More info'
@@ -40,6 +43,7 @@ export function renderPopupHtml(kind: Kind, d: PopupData): string {
     ${d.extra ? `<div class="mp-popup-row mp-popup-meta">${escape(d.extra)}</div>` : ''}
     <div class="mp-popup-actions">
       <a href="${navUrl}" target="_blank" rel="noopener" class="mp-popup-btn">${navText}</a>
+      <a href="${placeUrl}" target="_blank" rel="noopener" class="mp-popup-link">${googleText}</a>
       ${externalUrl}
     </div>
   </div>

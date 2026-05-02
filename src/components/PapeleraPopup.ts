@@ -3,7 +3,8 @@
 //
 // Returns the DOM node ready to be passed to popup.setDOMContent(node).
 
-import { fetchReports, submitReport, formatRelativeTime, type BinReport } from '../services/reports'
+import { fetchReports, submitReport, type BinReport } from '../services/reports'
+import { formatRelativeTime } from './reportsTime'
 import type { Locale } from '../types'
 
 interface Args {
