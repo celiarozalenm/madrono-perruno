@@ -159,25 +159,25 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FeatureCard
             icon={<MapIcon size={24} />}
-            color="#ed731f"
+            color="#d9641a"
             title={t(locale, 'landing.what.f1.title')}
             body={t(locale, 'landing.what.f1.body')}
           />
           <FeatureCard
             icon={<Compass size={24} />}
-            color="#2f7d3a"
+            color="#2a6f35"
             title={t(locale, 'landing.what.f2.title')}
             body={t(locale, 'landing.what.f2.body')}
           />
           <FeatureCard
             icon={<Footprints size={24} />}
-            color="#5b3a1e"
+            color="#5a3f2a"
             title={t(locale, 'landing.what.f3.title')}
             body={t(locale, 'landing.what.f3.body')}
           />
           <FeatureCard
             icon={<BarChart3 size={24} />}
-            color="#0e7490"
+            color="#44403c"
             title={t(locale, 'landing.what.f4.title')}
             body={t(locale, 'landing.what.f4.body')}
           />
@@ -186,7 +186,7 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
 
       {/* Help your neighborhood — civic loop */}
       <section className="px-4 sm:px-6 py-12 max-w-4xl mx-auto">
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 sm:p-10">
+        <div className="bg-verde-50 border border-verde-100 rounded-2xl p-6 sm:p-10">
           <h2 className="text-2xl sm:text-3xl font-bold text-stone-900 text-center">
             {t(locale, 'landing.help.title')}
           </h2>
@@ -194,7 +194,7 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
             {t(locale, 'landing.help.lede')}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
-            <div className="bg-white rounded-xl border border-amber-200 p-5">
+            <div className="bg-white rounded-xl border border-verde-100 p-5">
               <div className="w-10 h-10 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center mb-3">
                 <MapPin size={20} />
               </div>
@@ -205,8 +205,8 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
                 {t(locale, 'landing.help.bags.body')}
               </p>
             </div>
-            <div className="bg-white rounded-xl border border-amber-200 p-5">
-              <div className="w-10 h-10 rounded-lg bg-green-100 text-green-700 flex items-center justify-center mb-3">
+            <div className="bg-white rounded-xl border border-verde-100 p-5">
+              <div className="w-10 h-10 rounded-lg bg-verde-100 text-verde-700 flex items-center justify-center mb-3">
                 <MessageSquare size={20} />
               </div>
               <h3 className="font-semibold text-stone-900">

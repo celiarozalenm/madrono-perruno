@@ -75,16 +75,24 @@ export default function DistrictChoropleth({ metric, aggregates, locale, metricL
   const max = Math.max(1, ...Array.from(valueByDistrito.values()))
 
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return
+    const container = containerRef.current
+    if (!container || mapRef.current) return
     const map = new maplibregl.Map({
-      container: containerRef.current,
+      container,
       style: STYLE,
       center: MADRID_CENTER,
       zoom: 10.2,
       attributionControl: { compact: true },
     })
     mapRef.current = map
+    // Container can settle to its final size after MapLibre measures it
+    // (sidebar/page transitions, fonts loading, etc.). A ResizeObserver
+    // keeps the canvas in sync; otherwise the map stays at 0×0 and nothing
+    // is painted.
+    const ro = new ResizeObserver(() => map.resize())
+    ro.observe(container)
     return () => {
+      ro.disconnect()
       map.remove()
       mapRef.current = null
     }

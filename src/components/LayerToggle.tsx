@@ -1,30 +1,26 @@
-import { Trash2, Dog, Trees, Stethoscope, Flame, Wind } from 'lucide-react'
+import { Trash2, Dog, Trees, Stethoscope, Wind } from 'lucide-react'
 import type { Datasets, LayerKey, Locale } from '../types'
 import { t } from '../i18n'
 
 interface Props {
   visible: Record<LayerKey, boolean>
   toggle: (k: LayerKey) => void
-  showHeat: boolean
-  toggleHeat: () => void
   data: Datasets
   locale: Locale
 }
 
 const LAYER_COLOR: Record<LayerKey, string> = {
-  papeleras: '#ed731f',
-  areas: '#2f7d3a',
-  parques: '#5b3a1e',
-  vets: '#0e7490',
-  air: '#7c3aed',
-  perros: '#1f4d7a',
+  papeleras: '#d9641a',
+  areas: '#2a6f35',
+  parques: '#5a3f2a',
+  vets: '#c8252b',
+  air: '#78716c',
+  perros: '#9a3412',
 }
 
 export default function LayerToggle({
   visible,
   toggle,
-  showHeat,
-  toggleHeat,
   data,
   locale,
 }: Props) {
@@ -75,30 +71,6 @@ export default function LayerToggle({
             </li>
           )
         })}
-        <li className="mt-1 border-t border-stone-100 pt-1">
-          <div
-            role="presentation"
-            onClick={toggleHeat}
-            className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm cursor-pointer transition-colors ${
-              showHeat ? 'text-stone-900' : 'text-stone-600 hover:bg-stone-50'
-            }`}
-          >
-            <Flame size={16} className="shrink-0 text-stone-500" />
-            <span className="flex-1 text-left leading-tight">
-              <span className="block">{t(locale, 'layer.heat')}</span>
-              <span className="block text-[10px] text-stone-500">
-                {locale === 'es'
-                  ? 'Resalta zonas con más papeleras'
-                  : 'Highlights areas with more bins'}
-              </span>
-            </span>
-            <ToggleSwitch
-              checked={showHeat}
-              onChange={toggleHeat}
-              ariaLabel={t(locale, 'layer.heat')}
-            />
-          </div>
-        </li>
       </ul>
     </div>
   )

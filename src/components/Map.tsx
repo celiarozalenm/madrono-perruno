@@ -9,15 +9,16 @@ import { buildEntityPopupContent } from './EntityPopup'
 import { assessStation, AIR_LEVEL_COLORS, AIR_LEVEL_LABELS } from '../services/air'
 import { normaliseDistrito } from '../services/scoring'
 
+// Escala marrón tronco (color del logo) para el coropleta de densidad canina.
 const PERROS_RAMP = [
-  '#dbeafe',
-  '#bfdbfe',
-  '#93c5fd',
-  '#60a5fa',
-  '#3b82f6',
-  '#2563eb',
-  '#1d4ed8',
-  '#1e3a8a',
+  '#f5f0eb',
+  '#e3d5c4',
+  '#c9b095',
+  '#a98968',
+  '#8a6648',
+  '#6f4f33',
+  '#5a3f2a',
+  '#382617',
 ] as const
 
 const MADRID_CENTER: [number, number] = [-3.7038, 40.4168]
@@ -47,7 +48,6 @@ const MAP_STYLE: maplibregl.StyleSpecification = {
 interface Props {
   data: Datasets
   visibleLayers: Record<LayerKey, boolean>
-  showHeat: boolean
   highlight: { lat: number; lng: number } | null
   route: RouteResult | null
   locale: Locale
@@ -57,7 +57,6 @@ interface Props {
 export default function Map({
   data,
   visibleLayers,
-  showHeat,
   highlight,
   route,
   locale,
@@ -139,24 +138,20 @@ export default function Map({
     const map = mapRef.current
     if (!map) return
     const apply = () => {
-      // When the heat map is on, hide the papelera markers so the heat is
-      // legible (otherwise the orange dots blend into the orange gradient).
-      const showPapeleraMarkers = visibleLayers.papeleras && !showHeat
-      setLayerVis(map, 'papeleras-cluster', showPapeleraMarkers)
-      setLayerVis(map, 'papeleras-cluster-count', showPapeleraMarkers)
-      setLayerVis(map, 'papeleras-points', showPapeleraMarkers)
+      setLayerVis(map, 'papeleras-cluster', visibleLayers.papeleras)
+      setLayerVis(map, 'papeleras-cluster-count', visibleLayers.papeleras)
+      setLayerVis(map, 'papeleras-points', visibleLayers.papeleras)
       setLayerVis(map, 'areas-points', visibleLayers.areas)
       setLayerVis(map, 'areas-labels', visibleLayers.areas)
       setLayerVis(map, 'parques-points', visibleLayers.parques)
       setLayerVis(map, 'vets-points', visibleLayers.vets)
       setLayerVis(map, 'air-points', visibleLayers.air)
-      setLayerVis(map, 'heat', showHeat && visibleLayers.papeleras)
       setLayerVis(map, 'distritos-perros-fill', visibleLayers.perros)
       setLayerVis(map, 'distritos-perros-line', visibleLayers.perros)
     }
     if (map.isStyleLoaded()) apply()
     else map.once('load', apply)
-  }, [visibleLayers, showHeat])
+  }, [visibleLayers])
 
   // Dog-density choropleth (distritos polygons coloured by perros count).
   useEffect(() => {
@@ -602,49 +597,6 @@ function updateSources(map: MlMap, data: Datasets) {
 }
 
 function addLayers(map: MlMap) {
-  map.addLayer({
-    id: 'heat',
-    type: 'heatmap',
-    source: 'papeleras',
-    maxzoom: 16,
-    paint: {
-      'heatmap-weight': 0.6,
-      'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 8, 1, 12, 1.4, 16, 2.5],
-      // Larger radii so individual points blend into proper density zones
-      // instead of rendering as isolated blobs at city / district zoom.
-      'heatmap-radius': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        8, 12,
-        11, 30,
-        13, 55,
-        15, 90,
-        17, 140,
-      ],
-      'heatmap-opacity': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        8, 0.85,
-        13, 0.75,
-        15, 0.5,
-        17, 0.2,
-      ],
-      'heatmap-color': [
-        'interpolate',
-        ['linear'],
-        ['heatmap-density'],
-        0, 'rgba(237,115,31,0)',
-        0.15, 'rgba(253,236,214,0.55)',
-        0.4, 'rgba(246,184,120,0.7)',
-        0.7, 'rgba(237,115,31,0.85)',
-        1, 'rgba(184,67,20,0.95)',
-      ],
-    },
-    layout: { visibility: 'none' },
-  })
-
   map.addLayer({
     id: 'papeleras-cluster',
     type: 'circle',

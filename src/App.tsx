@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Loader2, AlertCircle, Menu } from 'lucide-react'
-import Sidebar, { type View } from './components/Sidebar'
+import Sidebar, { type View, type StatsSection } from './components/Sidebar'
 import LayerToggle from './components/LayerToggle'
 import Map from './components/Map'
 import BarrioScore from './components/BarrioScore'
 import StatsView from './components/StatsView'
 import RouteBuilder from './components/RouteBuilder'
 import AboutView from './components/AboutView'
+import ParticiparView from './components/ParticiparView'
 import Onboarding from './components/Onboarding'
 import LandingPage from './components/LandingPage'
 import { useDatasets } from './hooks/useDataset'
@@ -24,6 +25,7 @@ function App() {
   // of the value proposition; users decide to enter the atlas explicitly.
   const [showLanding, setShowLanding] = useState<boolean>(true)
   const [view, setView] = useState<View>('map')
+  const [statsSection, setStatsSection] = useState<StatsSection>('overview')
   const [visibleLayers, setVisibleLayers] = useState<Record<LayerKey, boolean>>({
     papeleras: true,
     areas: true,
@@ -32,7 +34,6 @@ function App() {
     air: false,
     perros: false,
   })
-  const [showHeat, setShowHeat] = useState(false)
   const [highlight, setHighlight] = useState<{ lat: number; lng: number } | null>(null)
   const [route, setRoute] = useState<RouteResult | null>(null)
   const [showOnboarding, setShowOnboarding] = useState(false)
@@ -87,6 +88,8 @@ function App() {
       <Sidebar
         view={view}
         setView={setView}
+        statsSection={statsSection}
+        setStatsSection={setStatsSection}
         locale={locale}
         toggleLocale={toggleLocale}
         open={sidebarOpen}
@@ -148,7 +151,6 @@ function App() {
               <Map
                 data={data}
                 visibleLayers={visibleLayers}
-                showHeat={showHeat}
                 highlight={highlight}
                 route={route}
                 locale={locale}
@@ -157,8 +159,6 @@ function App() {
                 <LayerToggle
                   visible={visibleLayers}
                   toggle={toggleLayer}
-                  showHeat={showHeat}
-                  toggleHeat={() => setShowHeat((s) => !s)}
                   data={data}
                   locale={locale}
                 />
@@ -182,7 +182,16 @@ function App() {
             )}
             {view === 'stats' && (
               <div className="absolute inset-0 overflow-y-auto bg-stone-50">
-                <StatsView data={data} locale={locale} />
+                <StatsView data={data} locale={locale} section={statsSection} />
+              </div>
+            )}
+            {view === 'participar' && (
+              <div className="absolute inset-0 overflow-y-auto bg-white">
+                <ParticiparView
+                  data={data}
+                  locale={locale}
+                  onLocateOnMap={(lat, lng) => handleLocate({ lat, lng })}
+                />
               </div>
             )}
             {view === 'about' && (
