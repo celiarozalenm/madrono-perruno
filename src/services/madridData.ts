@@ -48,8 +48,8 @@ export const DATASETS = {
   },
 } as const
 
-async function loadJson<T>(name: string): Promise<T> {
-  const res = await fetch(`/data/${name}.json`, { cache: 'force-cache' })
+async function loadJson<T>(name: string, version: string): Promise<T> {
+  const res = await fetch(`/data/${name}.json?v=${version}`, { cache: 'force-cache' })
   if (!res.ok) throw new Error(`HTTP ${res.status} loading /data/${name}.json`)
   return (await res.json()) as T
 }
@@ -57,14 +57,17 @@ async function loadJson<T>(name: string): Promise<T> {
 const EMPTY_PERROS: PerrosCensus = { year: null, distritos: [], years: [], entries: [] }
 
 export async function loadAllDatasets(): Promise<Datasets> {
+  const manifestRes = await fetch('/data/manifest.json', { cache: 'no-cache' })
+  const manifest = manifestRes.ok ? await manifestRes.json() : {}
+  const version = encodeURIComponent(manifest.generatedAt ?? Date.now().toString())
   const [papeleras, areas, parques, vets, air, perros, proteccionAnimal] = await Promise.all([
-    loadJson<Papelera[]>('papeleras'),
-    loadJson<AreaCanina[]>('areas'),
-    loadJson<Parque[]>('parques'),
-    loadJson<Veterinario[]>('vets'),
-    loadJson<AirStation[]>('air').catch(() => [] as AirStation[]),
-    loadJson<PerrosCensus>('perros').catch(() => EMPTY_PERROS),
-    loadJson<ProteccionAnimalEntry[]>('proteccionAnimal').catch(
+    loadJson<Papelera[]>('papeleras', version),
+    loadJson<AreaCanina[]>('areas', version),
+    loadJson<Parque[]>('parques', version),
+    loadJson<Veterinario[]>('vets', version),
+    loadJson<AirStation[]>('air', version).catch(() => [] as AirStation[]),
+    loadJson<PerrosCensus>('perros', version).catch(() => EMPTY_PERROS),
+    loadJson<ProteccionAnimalEntry[]>('proteccionAnimal', version).catch(
       () => [] as ProteccionAnimalEntry[],
     ),
   ])

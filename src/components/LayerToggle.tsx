@@ -10,12 +10,12 @@ interface Props {
 }
 
 const LAYER_COLOR: Record<LayerKey, string> = {
-  papeleras: '#d9641a',
-  areas: '#2a6f35',
-  parques: '#5a3f2a',
-  vets: '#c8252b',
+  papeleras: '#ed731f',
+  areas: '#2f7d3a',
+  parques: '#5b3a1e',
+  vets: '#0e7490',
   air: '#78716c',
-  perros: '#9a3412',
+  perros: '#7a3b14',
 }
 
 export default function LayerToggle({
