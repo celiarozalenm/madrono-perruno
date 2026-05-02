@@ -4,6 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import type { Datasets, LayerKey, Locale } from '../types'
 import type { RouteResult } from '../services/routing'
 import { renderPopupHtml } from './MarkerPopup'
+import { buildPapeleraPopupContent } from './PapeleraPopup'
 
 const MADRID_CENTER: [number, number] = [-3.7038, 40.4168]
 const OSM_STYLE: maplibregl.StyleSpecification = {
@@ -192,19 +193,19 @@ export default function Map({
       if (!f) return
       const props = f.properties as Record<string, string>
       if (popupRef.current) popupRef.current.remove()
-      popupRef.current = new maplibregl.Popup({ offset: 12 })
+      const node = buildPapeleraPopupContent({
+        binId: props.id ?? `unknown-${e.lngLat.lng.toFixed(5)}-${e.lngLat.lat.toFixed(5)}`,
+        title: locale === 'es' ? 'Papelera con bolsas' : 'Bag dispenser',
+        address: props.direccion ?? '',
+        district: props.distrito ?? '',
+        modelo: props.modelo ?? '',
+        lat: e.lngLat.lat,
+        lng: e.lngLat.lng,
+        locale,
+      })
+      popupRef.current = new maplibregl.Popup({ offset: 12, maxWidth: '320px' })
         .setLngLat(e.lngLat)
-        .setHTML(
-          renderPopupHtml('papelera', {
-            title: locale === 'es' ? 'Papelera con bolsas' : 'Bag dispenser',
-            address: props.direccion ?? '',
-            district: props.distrito ?? '',
-            extra: props.modelo ?? '',
-            lat: e.lngLat.lat,
-            lng: e.lngLat.lng,
-            locale,
-          }),
-        )
+        .setDOMContent(node)
         .addTo(map)
     }
     const onAreaClick = (e: maplibregl.MapLayerMouseEvent) => {

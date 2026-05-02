@@ -10,6 +10,7 @@ import {
   Monitor,
   Download,
   ExternalLink,
+  Users,
 } from 'lucide-react'
 import type { Locale } from '../types'
 import { t } from '../i18n'
@@ -111,6 +112,27 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
         <h2 className="text-2xl sm:text-3xl font-bold text-stone-900 text-center mb-10">
           {t(locale, 'landing.what.title')}
         </h2>
+
+        {/* Hero feature: collaborative reports */}
+        <div className="bg-gradient-to-br from-brand-500 to-brand-700 rounded-2xl p-6 sm:p-8 text-white mb-4 shadow-xl shadow-brand-500/20">
+          <div className="flex items-start gap-4">
+            <div className="bg-white/20 backdrop-blur p-3 rounded-xl shrink-0">
+              <Users size={28} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="inline-block bg-white/20 backdrop-blur text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-2">
+                {t(locale, 'landing.what.f5.badge')}
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold leading-tight">
+                {t(locale, 'landing.what.f5.title')}
+              </h3>
+              <p className="text-sm sm:text-base text-white/90 mt-2 leading-relaxed">
+                {t(locale, 'landing.what.f5.body')}
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FeatureCard
             icon={<MapIcon size={24} />}

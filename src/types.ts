@@ -36,6 +36,8 @@ export interface Parque {
 
 export interface Veterinario {
   id: string
+  lat?: number
+  lng?: number
   direccion: string
   distrito: string
   epigrafe: string

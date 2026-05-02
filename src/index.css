@@ -110,3 +110,106 @@ body {
   border-radius: 50%;
   background: #fff;
 }
+
+.mp-popup-pap { width: 280px; }
+
+.mp-popup-reports {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #f3f4f6;
+}
+.mp-popup-reports-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+.mp-popup-reports-content {
+  font-size: 0.82rem;
+  color: #374151;
+}
+.mp-popup-empty {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+.mp-popup-latest {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+.mp-popup-latest.mp-r-yes {
+  background: #ecfdf5;
+  color: #065f46;
+}
+.mp-popup-latest.mp-r-no {
+  background: #fef2f2;
+  color: #991b1b;
+}
+.mp-popup-rel {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.mp-popup-state {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.mp-popup-tally {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.78rem;
+}
+.mp-popup-tally .mp-r-yes { color: #059669; font-weight: 600; }
+.mp-popup-tally .mp-r-no { color: #dc2626; font-weight: 600; }
+
+.mp-popup-vote {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 12px;
+}
+.mp-popup-vote button {
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 7px 8px;
+  border-radius: 8px;
+  border: 1.5px solid;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mp-popup-vote .mp-vote-yes {
+  border-color: #059669;
+  color: #065f46;
+}
+.mp-popup-vote .mp-vote-yes:hover:not(:disabled) {
+  background: #ecfdf5;
+}
+.mp-popup-vote .mp-vote-no {
+  border-color: #dc2626;
+  color: #991b1b;
+}
+.mp-popup-vote .mp-vote-no:hover:not(:disabled) {
+  background: #fef2f2;
+}
+.mp-popup-vote button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mp-popup-flash {
+  font-size: 0.75rem;
+  margin-top: 8px;
+  text-align: center;
+  min-height: 1em;
+}
+.mp-popup-flash.ok { color: #059669; }
+.mp-popup-flash.error { color: #dc2626; }
