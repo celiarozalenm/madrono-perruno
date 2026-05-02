@@ -61,14 +61,13 @@ export default function AboutView({ locale }: Props) {
             <div className="text-xs uppercase tracking-wide text-stone-500 font-semibold">
               {t(locale, 'about.author')}
             </div>
-            <div className="text-sm text-stone-900 font-medium">Celia Rozalén Maquedano</div>
             <a
               href="https://celiarozalenm.com"
               target="_blank"
               rel="noopener"
-              className="text-xs text-brand-600 hover:underline inline-flex items-center gap-1"
+              className="text-sm text-stone-900 font-medium hover:text-brand-600 inline-flex items-center gap-1"
             >
-              celiarozalenm.com <ExternalLink size={10} />
+              celiarozalenm <ExternalLink size={12} />
             </a>
           </div>
         </div>

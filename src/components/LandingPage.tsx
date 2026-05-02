@@ -169,6 +169,21 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
         </ul>
       </section>
 
+      {/* Privacy */}
+      <section className="px-4 sm:px-6 py-10 max-w-3xl mx-auto">
+        <div className="bg-stone-100 border border-stone-200 rounded-2xl p-6 sm:p-7 text-center">
+          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-brand-700 bg-brand-100 px-3 py-1 rounded-full mb-3">
+            🔒 {locale === 'es' ? 'Privacidad' : 'Privacy'}
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-stone-900">
+            {t(locale, 'landing.privacy.title')}
+          </h2>
+          <p className="text-sm text-stone-700 mt-3 leading-relaxed">
+            {t(locale, 'landing.privacy.body')}
+          </p>
+        </div>
+      </section>
+
       {/* Install instructions */}
       <section className="px-4 sm:px-6 py-12 bg-stone-900 text-stone-100">
         <div className="max-w-4xl mx-auto">
@@ -237,7 +252,7 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
             rel="noopener"
             className="text-brand-600 hover:underline"
           >
-            Celia Rozalén Maquedano
+            celiarozalenm
           </a>
           {' · '}
           <a
