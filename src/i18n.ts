@@ -155,6 +155,7 @@ const dict = {
     'landing.hero.cta': 'Open atlas',
     'landing.hero.cta2': 'View code on GitHub',
     'landing.hero.lede': 'A citizen observatory built on four open datasets from Madrid City Council, answering questions no official app does about life with a dog in the city.',
+    'landing.photo.caption': '6,000 bag dispensers across Madrid. Knowing which ones still have bags today: now also possible.',
     'landing.what.title': 'What you will find',
     'landing.what.f1.title': 'Multi-layer map',
     'landing.what.f1.body': 'Over 6,000 bag dispensers, 150 off-leash dog areas, 200 parks and 600 inspected vet centres in a single map with clustering and heat overlay.',
