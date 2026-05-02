@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-02T18:06:17.616Z",
+  "generatedAt": "2026-05-02T18:13:27.579Z",
   "counts": {
     "papeleras": 6042,
     "areas": 156,
@@ -7,6 +7,8 @@
     "vets": 615,
     "perros": 21,
     "perrosYear": 2024,
+    "proteccionAnimal": 22,
+    "proteccionAnimalLatestYear": 2025,
     "distritos": 21,
     "barrios": 131,
     "airStations": 24,

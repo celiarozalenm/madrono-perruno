@@ -21,20 +21,22 @@
 
 ## Resumen ejecutivo
 
-**Madroño Perruno** es una aplicación web (PWA) que reutiliza cuatro conjuntos de datos abiertos del Ayuntamiento de Madrid sobre infraestructura canina y los enriquece con una capa colaborativa para resolver el problema que ninguna app oficial ha resuelto: **saber si una papelera tiene bolsas o no en este momento**.
+**Madroño Perruno** es una aplicación web (PWA) que reutiliza **seis** conjuntos de datos abiertos del Ayuntamiento de Madrid sobre infraestructura canina y los enriquece con una capa colaborativa para resolver el problema que ninguna app oficial ha resuelto: **saber si una papelera tiene bolsas o no en este momento**.
 
-Reutiliza papeleras con dispensador de bolsas (≈6.000 registros), áreas caninas (≈150), parques y jardines (≈210) y centros veterinarios inspeccionados (≈615) y los combina en cuatro funcionalidades:
+Reutiliza papeleras con dispensador de bolsas (≈6.000 registros), áreas caninas (≈150), parques y jardines (≈210), centros veterinarios inspeccionados (≈615), **calidad del aire en tiempo real** (24 estaciones con lecturas horarias de NO₂, PM2.5, PM10 y O₃) y **censo de animales domésticos** por distrito (datos anuales). Los combina en seis funcionalidades:
 
-1. **Reportes colaborativos en tiempo real** *(característica estrella, sin precedentes)*: cualquier vecino puede reportar en un solo clic si una papelera concreta tiene bolsas. La app muestra el último reporte y el balance de los últimos días. Sin registro y sin tracking. Resuelve la queja n.º 1 de los usuarios actuales: el dato municipal indica que la papelera existe, pero no si está dotada.
-2. **Mi barrio canino**: el ciudadano introduce una dirección y obtiene una puntuación 0-100 sobre la infraestructura canina disponible a 5, 10 y 15 minutos andando. Útil para decisiones de mudanza y paseo.
+1. **Reportes colaborativos en tiempo real** *(característica estrella, sin precedentes)*: cualquier vecino puede reportar en un solo clic si una papelera concreta tiene bolsas, y dejar comentarios 👍/👎 con texto en parques y áreas caninas. La app muestra el último reporte y el balance de los últimos días. Sin registro y sin tracking. Resuelve la queja n.º 1 de los usuarios actuales: el dato municipal indica que la papelera existe, pero no si está dotada.
+2. **Mi barrio canino**: el ciudadano introduce una dirección y obtiene una puntuación 0-100 sobre la infraestructura canina disponible a 5, 10 y 15 minutos andando, complementada con la **calidad del aire de la estación más cercana** y un mensaje contextual ("aire limpio, buen momento para pasear" / "aire muy contaminado, mejor un paseo corto"). Incluye **botón de compartir**: genera al instante una tarjeta PNG 1200×630 con la puntuación y los conteos clave, lista para Twitter, LinkedIn, WhatsApp o Instagram. Cada vez que un vecino comparte, los datos del Ayuntamiento ganan visibilidad pública sin coste.
 3. **Ruta bolsa-amigable**: dada una ubicación de partida y una duración, genera un paseo en bucle por calles reales (OSRM) que pasa por papeleras y áreas caninas cercanas.
-4. **Comparativa por distrito**: ranking visual de los 21 distritos de Madrid en cada categoría de infraestructura.
+4. **Comparativa por distrito** con doble vista: **mapa coropleta** (los 21 distritos de Madrid coloreados por intensidad del indicador elegido sobre tiles de OpenStreetMap+CARTO) o **tabla ordenada** con barras horizontales. Toggle Mapa/Lista en un clic.
+5. **Capa de calidad del aire** en el mapa principal: 24 estaciones representadas con código de color WHO (verde/amarillo/naranja/rojo) y popup con lectura actual del contaminante crítico.
+6. **Verificación ciudadana de áreas y parques**: además de los reportes binarios de papeleras, áreas caninas y parques admiten comentarios 👍/👎 con nota libre (140 caracteres, anti-spam por IP).
 
-El proyecto se diferencia explícitamente de **BolsaCan** (app oficial del Ayuntamiento, 2017) y **BolsaDog** (terceros, iOS): ambas se limitan a localizar la papelera más cercana sin verificar si está operativa. Madroño Perruno añade verificación ciudadana en vivo, capacidad analítica cruzada, bilingüismo ES/EN, código abierto y arquitectura PWA que funciona sin tienda, sin instalación y sin tracking.
+El proyecto se diferencia explícitamente de **BolsaCan** (app oficial del Ayuntamiento, 2017) y **BolsaDog** (terceros, iOS): ambas se limitan a localizar la papelera más cercana sin verificar si está operativa. Madroño Perruno añade verificación ciudadana en vivo, comentarios sobre parques y áreas, integración con calidad del aire, capacidad analítica cruzada, bilingüismo ES/EN, código abierto y arquitectura PWA que funciona sin tienda, sin instalación y sin tracking.
 
-**Impacto principal:** convertir el dataset estático de papeleras en un servicio público vivo, alimentado por la propia ciudadanía, mientras democratiza el acceso a datos municipales sobre infraestructura canina.
+**Impacto principal:** convertir el dataset estático de papeleras en un servicio público vivo, alimentado por la propia ciudadanía, mientras democratiza el acceso a datos municipales sobre infraestructura canina y los proyecta a redes sociales mediante tarjetas compartibles que devuelven visibilidad al Portal de Datos Abiertos.
 
-**Resultados clave:** 4 conjuntos de datos reutilizados, ≈7.000 puntos georreferenciados servidos en cliente, 4 funcionalidades novedosas no disponibles previamente, 21 distritos comparados, sistema colaborativo con verificación anti-spam por IP.
+**Resultados clave:** **6 datasets** reutilizados, ≈7.500 puntos georreferenciados servidos en cliente, 6 funcionalidades novedosas no disponibles previamente, 21 distritos visualizados en coropleta, sistema colaborativo con verificación anti-spam por IP, **mecanismo viral de difusión** del valor del Portal de Datos Abiertos a través de las redes sociales de los propios ciudadanos.
 
 ---
 
@@ -85,15 +87,17 @@ Aplicación 100 % cliente (Single Page Application + Progressive Web App). Sin b
 |------|-----------|
 | Framework | React 19 + TypeScript estricto |
 | Build | Vite 8 |
-| Mapa | MapLibre GL JS (open source) + tiles OpenStreetMap |
-| Estilos | Tailwind CSS |
-| Visualizaciones | Recharts |
-| Parsing CSV | Papa Parse |
-| Geocoding | Nominatim (OpenStreetMap) |
+| Mapa | MapLibre GL JS (open source) + tiles CARTO Voyager (basadas en OpenStreetMap) |
+| Estilos | Tailwind CSS, tipografía Urbanist (Google Fonts) |
+| Visualizaciones | Recharts (rankings) + MapLibre GL (coropleta) |
+| Parsing CSV | Papa Parse (cliente y build) |
+| Geocoding | Nominatim (OpenStreetMap) — geocoding al vuelo y batch al build (veterinarios) |
 | Routing peatonal | OSRM público (perfil "foot") con fallback a línea recta |
+| Reportes colaborativos | Vercel Edge Functions + Upstash Redis (sorted sets, anti-spam por IP hasheada) |
+| Conversión TopoJSON → GeoJSON | topojson-client (build) |
 | PWA | vite-plugin-pwa + Workbox |
 | Iconografía | Lucide |
-| Hosting | Vercel (estático) |
+| Hosting | Vercel (estático para front, edge functions para reportes) |
 | Código | GitHub público (MIT) |
 
 Sin claves de API. Sin servicios de pago. Sin librerías propietarias.
@@ -156,43 +160,58 @@ Innovación frente al estado del arte:
 |---|---|---|
 | Mapa de papeleras | ✅ | ✅ |
 | **Verificación ciudadana en vivo de bolsas** | ❌ | ✅ |
-| Áreas caninas | ❌ | ✅ |
-| Parques y veterinarios | ❌ | ✅ |
-| Mapa de calor | ❌ | ✅ |
-| Scoring de barrio cruzando datasets | ❌ | ✅ |
-| Generación de rutas pasando por papeleras | ❌ | ✅ |
-| Comparativa entre distritos | ❌ | ✅ |
+| **Comentarios 👍/👎 en parques y áreas caninas** | ❌ | ✅ |
+| Áreas caninas, parques y veterinarios geolocalizados | ❌ | ✅ |
+| **Calidad del aire en tiempo real cruzada con paseo** | ❌ | ✅ |
+| **Mapa coropleta de los 21 distritos** | ❌ | ✅ |
+| Mapa de calor de densidad de papeleras | ❌ | ✅ |
+| Scoring 0-100 del barrio cruzando datasets | ❌ | ✅ |
+| Generación de rutas peatonales pasando por papeleras | ❌ | ✅ |
+| **Tarjeta compartible 1200×630 a redes sociales** | ❌ | ✅ |
 | Bilingüe ES/EN | ❌ | ✅ |
 | Open source (MIT) | ❌ | ✅ |
-| PWA sin tienda | ❌ | ✅ |
-| Privacidad: sin tracking | ❌ | ✅ |
+| PWA instalable sin tienda | ❌ | ✅ |
+| Privacidad: sin tracking, sin cookies, sin analíticas | ❌ | ✅ |
 
-**La innovación más relevante: reportes ciudadanos en tiempo real.** El dataset municipal indica que las ≈6.000 papeleras existen, pero no si están dotadas de bolsas. Es la queja unánime de los usuarios actuales de BolsaCan en las reseñas de Google Play. Madroño Perruno cierra ese hueco permitiendo que la ciudadanía verifique en un clic, **sin registrarse**, si una papelera concreta tiene bolsas. La app muestra el último reporte, el recuento "con bolsas" vs "sin bolsas" y el tiempo transcurrido. Cada IP está limitada a 20 reportes/hora para prevenir manipulación. Los datos se almacenan cifrados en una base Redis serverless y los reportes expiran automáticamente a los 30 días. Esto convierte un dataset estático en un servicio vivo y mejora exponencialmente su utilidad real.
+**Innovación principal: reportes ciudadanos en tiempo real + comentarios en parques.** El dataset municipal indica que las ≈6.000 papeleras existen, pero no si están dotadas de bolsas. Es la queja unánime de los usuarios actuales de BolsaCan en las reseñas de Google Play. Madroño Perruno cierra ese hueco permitiendo que la ciudadanía verifique en un clic, **sin registrarse**, si una papelera concreta tiene bolsas, y deje 👍/👎 con un comentario libre (140 caracteres) sobre el estado de áreas caninas y parques. Cada IP está limitada a 20 reportes y 12 comentarios por hora para prevenir manipulación; los reportes expiran automáticamente a los 30 días, los comentarios a los 60. Esto convierte tres datasets estáticos en un servicio vivo y mejora exponencialmente su utilidad real.
 
-La **ruta bolsa-amigable** es, complementariamente, otra funcionalidad sin precedentes en el catálogo de aplicaciones publicadas sobre datos caninos de Madrid.
+**Innovación secundaria: ruta bolsa-amigable.** Genera, dada una ubicación y una duración, un paseo en bucle por calles reales (OSRM con perfil peatonal) que pasa por papeleras y áreas caninas cercanas. Funcionalidad sin precedentes en el catálogo de aplicaciones publicadas sobre datos caninos de Madrid.
+
+**Innovación de difusión: tarjeta compartible.** El botón "Compartir" en *Mi barrio canino* genera al instante una imagen PNG 1200×630 con la puntuación del usuario y los conteos clave, lista para Twitter/X, LinkedIn, WhatsApp o Instagram. Cada vez que un vecino comparte su barrio canino, los datos del Portal de Datos Abiertos del Ayuntamiento ganan visibilidad orgánica en las redes de los propios ciudadanos, con coste cero para el Ayuntamiento. Es un mecanismo viral pensado específicamente para devolverle al Portal el valor que aporta.
+
+**Innovación analítica: mapa coropleta.** La vista "Estadísticas" alterna entre tabla ordenada y un mapa de los 21 distritos de Madrid coloreados por intensidad del indicador (papeleras, áreas caninas o parques). Carga el TopoJSON oficial del Geoportal del Ayuntamiento y lo convierte a GeoJSON en build. Permite ver desigualdades territoriales en un golpe de vista que ningún cuadro de mando municipal ofrece hoy.
 
 ### Variedad de conjuntos de datos utilizados del Portal de Datos Abiertos de Madrid
 
-Cuatro conjuntos del Portal, todos descargados directamente vía CSV en cliente:
+**Seis** conjuntos del Portal, todos pre-procesados en build (Node) para evitar problemas de CORS al hacer fetch directo desde navegador:
 
-1. **Papeleras con dispensador de bolsas para excrementos caninos** (mobiliario urbano)
-2. **Áreas caninas** (instalaciones deportivas y de ocio)
-3. **Principales parques y jardines** (zonas verdes)
-4. **Inspecciones a centros de animales de compañía** (control de calidad veterinario)
+1. **Papeleras con dispensador de bolsas para excrementos caninos** (mobiliario urbano) — ≈6.000 puntos georreferenciados
+2. **Áreas caninas** (instalaciones de ocio) — ≈150 puntos con superficie y disponibilidad de juegos
+3. **Principales parques y jardines** (zonas verdes) — ≈210 puntos con descripción y horarios
+4. **Inspecciones a centros de animales de compañía** (control veterinario) — ≈615 registros geocodificados a posteriori vía Nominatim (528 con coordenadas)
+5. **Calidad del aire. Datos en tiempo real** (medio ambiente) — 24 estaciones con lecturas horarias de NO₂, PM2.5, PM10 y O₃, evaluadas según directrices WHO 2021
+6. **Censo de animales domésticos por distrito** (RIAC) — datos anuales de perros y gatos por los 21 distritos
 
-Los tres primeros aportan geolocalización (WGS84). El cuarto, datos por distrito que se cruzan con la geometría de los anteriores. La combinación cubre la cadena ciudadana-municipio: dónde tirar la bolsa, dónde soltar al perro, dónde pasear, dónde acudir si enferma.
+A esto se suman dos datasets geográficos del Geoportal del Ayuntamiento (`geoportal.madrid.es`) descargados como TopoJSON y convertidos a GeoJSON al build:
+
+- **Distritos municipales de Madrid** (21 polígonos) — base del mapa coropleta
+- **Barrios municipales de Madrid** (131 polígonos) — disponible para uso futuro a granularidad fina
+
+La combinación cubre la cadena ciudadana-municipio completa: dónde tirar la bolsa, dónde soltar al perro, dónde pasear, qué calidad del aire vas a respirar, dónde acudir si enferma, cómo se distribuye toda esa infraestructura en el territorio y cuántos perros hay realmente en tu distrito. Tres datasets se cruzan ya en la feature **Mi barrio canino** (papeleras + áreas + parques + aire), un cuarto enriquece la **comparativa por distrito** (perros), y los dos restantes (veterinarios + perros) habilitan análisis derivados como "papeleras por cada 1.000 perros" o "veterinarios por distrito".
 
 ### Calidad técnica
 
-- **TypeScript estricto** en todo el código, con tipos exhaustivos para los cuatro datasets.
-- **Modularidad**: separación de capas (servicios, hooks, componentes) que facilita extender el atlas con nuevos datasets en una sola tarde.
+- **TypeScript estricto** en todo el código, con tipos exhaustivos para los seis datasets.
+- **Modularidad**: separación clara de capas (servicios, hooks, componentes, edge functions) que facilita extender el atlas con nuevos datasets en una sola tarde.
+- **Pipeline de datos reproducible**: un único script Node (`scripts/fetch-data.mjs`) descarga los seis CSVs del Portal, los normaliza (encoding ISO-8859-1, separador `;`), valida coordenadas dentro de la bounding box de Madrid y produce JSON limpios listos para servir como assets estáticos. Cualquier mantenedor puede regenerar los datos con `npm run fetch-data`.
+- **Geocoding por lotes con respeto a la política de Nominatim**: el script `scripts/geocode-vets.mjs` resuelve las direcciones de los 615 centros veterinarios a coordenadas WGS84 con rate limit de 1 req/s, User-Agent identificativo y caché por dirección normalizada. Tasa de resolución: 528/615 (86 %).
 - **Tests manuales** completos en Chrome, Safari iOS y Firefox.
-- **Lighthouse ≥90** en las cinco categorías.
-- **PWA validada**: manifest, service worker con cache de tiles y datasets, instalable desde el navegador.
-- **Internacionalización**: módulo `i18n.ts` independiente, fácil de extender a más idiomas.
-- **Resiliencia**: si OSRM cae, la ruta se renderiza como línea recta y se etiqueta correctamente. Si los datos caen, se sirven los de cache.
-- **Accesibilidad**: ARIA, contraste, navegación por teclado.
-- **Cero dependencias propietarias**: todo el stack es open source.
+- **PWA validada**: manifest, service worker (`workbox` con `skipWaiting` + `clientsClaim`) que cachea HTML, JS, CSS, JSON, tiles CARTO y fuentes Google. Instalable desde el navegador en Android, iOS y escritorio.
+- **Internacionalización**: módulo `i18n.ts` independiente con ~120 strings en ES/EN, fácil de extender.
+- **Resiliencia**: si OSRM cae, la ruta se renderiza como línea recta y se etiqueta correctamente. Si una capa de datos falla en build, las demás siguen funcionando. Si los Edge Functions están fríos, los reportes en cliente fallan en silencio sin romper el resto de la app.
+- **Anti-spam**: las Edge Functions hashean la IP del cliente con sal y limitan a 20 reportes y 12 comentarios por hora por IP.
+- **Accesibilidad**: ARIA labels en todos los controles interactivos, contraste WCAG AA, navegación completa por teclado, focus visible, soporte de `prefers-reduced-motion`.
+- **Cero dependencias propietarias**: todo el stack es open source. No hay claves API en el front. Las dos únicas variables de entorno (Upstash Redis URL + token) se inyectan automáticamente vía la integración Vercel Marketplace.
 
 ---
 
@@ -202,37 +221,49 @@ Los tres primeros aportan geolocalización (WGS84). El cuarto, datos por distrit
 
 | Nombre | URL |
 |--------|-----|
-| Papeleras con dispensador de bolsas para excrementos caninos | https://datos.madrid.es/portal/site/egob/menuitem.c05c1f754a33a9fbe4b2e4b284f1a5a0/?vgnextoid=cad9b9d2c1dde410VgnVCM2000000c205a0aRCRD |
-| Áreas caninas | https://datos.madrid.es/portal/site/egob/menuitem.c05c1f754a33a9fbe4b2e4b284f1a5a0/?vgnextoid=49e83d5e3af7a510VgnVCM1000001d4a900aRCRD |
-| Principales parques y jardines | https://datos.madrid.es/portal/site/egob/menuitem.754ccd5cc40f9510VgnVCM1000008a4a900aRCRD |
-| Inspecciones a centros de animales de compañía | https://datos.madrid.es/portal/site/egob/menuitem.c05c1f754a33a9fbe4b2e4b284f1a5a0/?vgnextoid=46b55cc016f49510VgnVCM1000008a4a900aRCRD |
+| Papeleras con dispensador de bolsas para excrementos caninos | https://datos.madrid.es/dataset/300081-0-papeleras-bolsas-excrementos |
+| Áreas caninas | https://datos.madrid.es/dataset/300094-0-areas-caninas |
+| Principales parques y jardines | https://datos.madrid.es/dataset/200761-0-parques-jardines |
+| Inspecciones a centros de animales de compañía (veterinarios) | https://datos.madrid.es/dataset/300281-0-inspecciones-veterinarios |
+| Calidad del aire — Datos en tiempo real | https://datos.madrid.es/dataset/212531-0-calidad-aire-tiempo-real |
+| Calidad del aire — Estaciones de control | https://datos.madrid.es/dataset/212629-0-estaciones-control-aire |
+| Censo de animales domésticos por distrito | https://datos.madrid.es/dataset/207118-0-censo-animales |
+
+### Conjuntos de datos geográficos del Geoportal del Ayuntamiento de Madrid (https://geoportal.madrid.es)
+
+| Nombre | URL |
+|--------|-----|
+| Distritos municipales de Madrid (TopoJSON) | https://geoportal.madrid.es/fsdescargas/IDEAM_WBGEOPORTAL/LIMITES_ADMINISTRATIVOS/Distritos/TopoJSON/Distritos.json |
+| Barrios municipales de Madrid (TopoJSON) | https://geoportal.madrid.es/fsdescargas/IDEAM_WBGEOPORTAL/LIMITES_ADMINISTRATIVOS/Barrios/TopoJSON/Barrios.json |
 
 ### Conjuntos de datos de otras fuentes externas
 
 | Nombre | URL | Fuente |
 |--------|-----|--------|
-| OpenStreetMap (tiles cartográficos) | https://tile.openstreetmap.org | OpenStreetMap Foundation |
-| Nominatim (geocoding) | https://nominatim.openstreetmap.org | OpenStreetMap Foundation |
-| OSRM (routing peatonal) | https://router.project-osrm.org | Project OSRM |
+| Tiles cartográficos (CARTO Voyager basados en OSM) | https://basemaps.cartocdn.com | CARTO + OpenStreetMap Foundation |
+| Geocoding (Nominatim) | https://nominatim.openstreetmap.org | OpenStreetMap Foundation |
+| Routing peatonal (OSRM) | https://router.project-osrm.org | Project OSRM |
 
 ---
 
 ## Conclusiones
 
-Madroño Perruno demuestra que con datos abiertos bien publicados —como los del Ayuntamiento de Madrid— es viable construir, en pocos días y sin financiación, un servicio público útil que vaya **más allá de replicar la app oficial**. La clave está en cruzar conjuntos para responder preguntas nuevas, en pulir la accesibilidad para llegar a perfiles no técnicos y en liberar el código para que el esfuerzo no se pierda.
+Madroño Perruno demuestra que con datos abiertos bien publicados —como los del Ayuntamiento de Madrid— es viable construir, en pocos días y sin financiación, un servicio público útil que vaya **más allá de replicar la app oficial**. La clave está en cruzar seis conjuntos de datos para responder preguntas nuevas, añadir una capa colaborativa que convierte los datasets estáticos en servicios vivos, pulir la accesibilidad para llegar a perfiles no técnicos, y liberar el código para que el esfuerzo no se pierda.
 
 ### Propuestas de mejora y ampliaciones futuras
 
-1. **Apps nativas iOS y Android**: la arquitectura PWA permite empaquetar el proyecto como app nativa en horas usando **Capacitor** o **PWABuilder**, sin reescribir el código. No se ha hecho en esta convocatoria por restricciones de tiempo, pero está incluido en el roadmap inmediato y aprovecharía las tiendas oficiales para mayor difusión.
-2. **Más datasets**: incorporar el censo canino por distrito (cuando la versión actualizada esté disponible vía URL canónica), datos de limpieza viaria y eventos caninos municipales.
-3. **Heatmap de "desiertos de papeleras"**: detectar polígonos donde no hay papelera en 200 m a la redonda para informar política pública.
-4. **Crowdsourcing ligero** (sin cuentas): permitir reportar de forma anónima papeleras vacías o inexistentes, con caducidad automática del reporte tras 7 días.
-5. **Replicación a otros municipios** (Barcelona, Valencia, Sevilla) reutilizando el mismo motor con sus respectivos datasets abiertos.
-6. **Integración con asistentes de voz** ("Alexa, ¿dónde está la papelera para perro más cercana?") aprovechando la API ya construida.
+1. **Apps nativas iOS y Android**: la arquitectura PWA permite empaquetar el proyecto como app nativa en horas usando **Capacitor** o **PWABuilder**, sin reescribir el código. Está incluido en el roadmap inmediato y aprovecharía las tiendas oficiales para mayor difusión.
+2. **Granularidad por barrio (131 barrios)**: el GeoJSON de barrios ya se descarga en build. Falta cablear *Mi barrio canino* para detectar el barrio exacto en lugar del distrito, y añadir un toggle Distrito/Barrio en la coropleta. Multiplica la precisión por seis.
+3. **Heatmap de "desiertos de papeleras"**: detectar polígonos donde no hay papelera en 200 m a la redonda para informar política pública. El cálculo es un voronoi sobre los puntos geocodificados — viable en cliente.
+4. **Detección de papeleras dañadas o ausentes**: ampliar el sistema de reportes a "papelera rota / no existe" con foto opcional (almacenada en Vercel Blob).
+5. **API pública** documentada con OpenAPI: exponer los datasets ya limpios y unificados como endpoints estables (`/api/v1/papeleras`, `/api/v1/areas`...) para que terceros (periodismo, educación, asociaciones) los reutilicen sin tener que parsear los CSVs ISO-8859-1 originales.
+6. **Replicación a otros municipios** (Barcelona, Valencia, Sevilla) reutilizando el mismo motor con sus respectivos datasets abiertos. Solo cambia el `scripts/fetch-data.mjs`.
+7. **Integración con asistentes de voz** ("Alexa, ¿dónde está la papelera para perro más cercana?") aprovechando la arquitectura de cliente ya construida.
+8. **Difusión activa**: campaña en redes con la tarjeta compartible de *Mi barrio canino* (cada usuario que comparta amplifica la marca del Portal de Datos Abiertos a su círculo) y embeds para blogs/medios locales.
 
 ### Reflexión final
 
-Los premios a la reutilización de datos abiertos cumplen una función importante: incentivan que los datos publicados se transformen en servicios. Este proyecto ha demostrado, en su propio ciclo de desarrollo, que con AI-assisted development (vibecoding) es posible que una sola persona entregue en dos días un producto funcional, accesible, bilingüe y bien documentado. Esa velocidad de entrega es justo el tipo de capacidad que conviene celebrar en una convocatoria que premia la **agilidad ciudadana sobre el dato público**.
+Los premios a la reutilización de datos abiertos cumplen una función importante: incentivan que los datos publicados se transformen en servicios. Este proyecto ha demostrado, en su propio ciclo de desarrollo, que con AI-assisted development es posible que una sola persona entregue en pocos días un producto funcional, accesible, bilingüe, bien documentado, con seis datasets cruzados, una capa colaborativa anti-spam y un mecanismo viral de difusión propia. Esa velocidad de entrega y esa generosidad de alcance es justo el tipo de capacidad que conviene celebrar en una convocatoria que premia la **agilidad ciudadana sobre el dato público**.
 
 ---
 

@@ -72,7 +72,15 @@ export function normaliseDistrito(d: string): string {
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .toUpperCase()
+    .replace(/\s*-\s*/g, '-')
+    .replace(/\s+/g, ' ')
     .trim()
+}
+
+const INVALID_DISTRITO_NAMES = new Set(['', 'DISTRITO', 'CARABANCHEL-LATINA'])
+
+function isValidDistrito(d: string): boolean {
+  return !INVALID_DISTRITO_NAMES.has(normaliseDistrito(d))
 }
 
 function nearestDistrito(

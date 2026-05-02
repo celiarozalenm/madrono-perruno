@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import maplibregl, { Map as MlMap, type GeoJSONSource } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { Datasets, LayerKey, Locale } from '../types'
@@ -7,6 +7,18 @@ import { renderPopupHtml } from './MarkerPopup'
 import { buildPapeleraPopupContent } from './PapeleraPopup'
 import { buildEntityPopupContent } from './EntityPopup'
 import { assessStation, AIR_LEVEL_COLORS, AIR_LEVEL_LABELS } from '../services/air'
+import { normaliseDistrito } from '../services/scoring'
+
+const PERROS_RAMP = [
+  '#dbeafe',
+  '#bfdbfe',
+  '#93c5fd',
+  '#60a5fa',
+  '#3b82f6',
+  '#2563eb',
+  '#1d4ed8',
+  '#1e3a8a',
+] as const
 
 const MADRID_CENTER: [number, number] = [-3.7038, 40.4168]
 // CARTO Voyager raster tiles — warm cream base, discreet labels, fits the
@@ -55,6 +67,15 @@ export default function Map({
   const mapRef = useRef<MlMap | null>(null)
   const popupRef = useRef<maplibregl.Popup | null>(null)
   const highlightMarkerRef = useRef<maplibregl.Marker | null>(null)
+  const [distritosGeo, setDistritosGeo] = useState<GeoJSON.FeatureCollection | null>(null)
+
+  // Fetch district polygons once (used by the dog-density choropleth layer).
+  useEffect(() => {
+    fetch('/data/distritos.geojson')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((g) => setDistritosGeo(g))
+      .catch(() => setDistritosGeo(null))
+  }, [])
 
   // Init map once
   useEffect(() => {
@@ -130,10 +151,96 @@ export default function Map({
       setLayerVis(map, 'vets-points', visibleLayers.vets)
       setLayerVis(map, 'air-points', visibleLayers.air)
       setLayerVis(map, 'heat', showHeat && visibleLayers.papeleras)
+      setLayerVis(map, 'distritos-perros-fill', visibleLayers.perros)
+      setLayerVis(map, 'distritos-perros-line', visibleLayers.perros)
     }
     if (map.isStyleLoaded()) apply()
     else map.once('load', apply)
   }, [visibleLayers, showHeat])
+
+  // Dog-density choropleth (distritos polygons coloured by perros count).
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !distritosGeo) return
+    const apply = () => {
+      const valueByDistrito: Record<string, number> = {}
+      for (const d of data.perros?.distritos ?? []) {
+        valueByDistrito[normaliseDistrito(d.distrito)] = d.perros
+      }
+      const values = Object.values(valueByDistrito)
+      const max = Math.max(1, ...values)
+      const enriched = {
+        ...distritosGeo,
+        features: distritosGeo.features.map((f) => {
+          const props = (f.properties ?? {}) as Record<string, unknown>
+          const name = String(props.NOMBRE ?? props.nombre ?? props.NOM_DIS ?? '').trim()
+          const value = valueByDistrito[normaliseDistrito(name)] ?? 0
+          const ratio = value / max
+          const colorIdx = Math.min(
+            PERROS_RAMP.length - 1,
+            Math.max(0, Math.floor(ratio * PERROS_RAMP.length)),
+          )
+          return {
+            ...f,
+            properties: { name, value, color: PERROS_RAMP[colorIdx] },
+          }
+        }),
+      }
+      const src = map.getSource('distritos-perros') as GeoJSONSource | undefined
+      if (src) {
+        src.setData(enriched as GeoJSON.FeatureCollection)
+        return
+      }
+      // Insert below the first point layer so markers stay clickable on top.
+      const beforeId = map.getLayer('papeleras-cluster') ? 'papeleras-cluster' : undefined
+      map.addSource('distritos-perros', {
+        type: 'geojson',
+        data: enriched as GeoJSON.FeatureCollection,
+      })
+      map.addLayer(
+        {
+          id: 'distritos-perros-fill',
+          type: 'fill',
+          source: 'distritos-perros',
+          paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.6 },
+          layout: { visibility: visibleLayers.perros ? 'visible' : 'none' },
+        },
+        beforeId,
+      )
+      map.addLayer(
+        {
+          id: 'distritos-perros-line',
+          type: 'line',
+          source: 'distritos-perros',
+          paint: { 'line-color': '#ffffff', 'line-width': 1.2 },
+          layout: { visibility: visibleLayers.perros ? 'visible' : 'none' },
+        },
+        beforeId,
+      )
+
+      map.on('click', 'distritos-perros-fill', (e) => {
+        const f = e.features?.[0]
+        if (!f) return
+        const p = f.properties as { name: string; value: number }
+        if (popupRef.current) popupRef.current.remove()
+        const label = locale === 'es' ? 'Perros censados' : 'Registered dogs'
+        popupRef.current = new maplibregl.Popup({ offset: 6, maxWidth: '260px' })
+          .setLngLat(e.lngLat)
+          .setHTML(
+            `<div class="mp-popup"><div class="mp-popup-bar" style="background:#1f4d7a"></div><div class="mp-popup-body" style="padding:8px 10px"><div style="font-weight:600;font-size:0.9rem">${escapeText(
+              p.name,
+            )}</div><div style="font-size:0.8rem;color:#6b7280;margin-top:2px">${escapeText(
+              label,
+            )}: <b style="color:#1a1a1a">${p.value.toLocaleString(
+              locale === 'es' ? 'es-ES' : 'en-US',
+            )}</b></div></div></div>`,
+          )
+          .addTo(map)
+      })
+    }
+    if (map.isStyleLoaded()) apply()
+    else map.once('load', apply)
+  }, [distritosGeo, data.perros, visibleLayers.perros, locale])
 
   // Highlight marker
   useEffect(() => {
