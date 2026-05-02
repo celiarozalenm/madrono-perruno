@@ -18,7 +18,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Urbanist"', 'system-ui', '-apple-system', 'sans-serif'],
       },
     },
   },
