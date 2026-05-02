@@ -44,9 +44,10 @@ export default function AboutView({ locale }: Props) {
                   href={ds.portalUrl}
                   target="_blank"
                   rel="noopener"
-                  className="text-xs text-brand-600 hover:underline truncate inline-flex items-center gap-1"
+                  className="text-xs text-madrid-500 hover:text-madrid-600 hover:underline truncate inline-flex items-center gap-1.5"
                 >
-                  {locale === 'es' ? 'Ver en datos.madrid.es' : 'View on datos.madrid.es'}
+                  <span className="w-1.5 h-1.5 rounded-full bg-madrid-500 shrink-0" aria-hidden />
+                  {locale === 'es' ? 'datos.madrid.es' : 'datos.madrid.es'}
                   <ExternalLink size={11} />
                 </a>
               </div>
