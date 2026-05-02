@@ -8,18 +8,27 @@ import { buildPapeleraPopupContent } from './PapeleraPopup'
 import { buildEntityPopupContent } from './EntityPopup'
 
 const MADRID_CENTER: [number, number] = [-3.7038, 40.4168]
-const OSM_STYLE: maplibregl.StyleSpecification = {
+// CARTO Voyager raster tiles — warm cream base, discreet labels, fits the
+// madroño / civic-tech palette better than vanilla OSM.
+// Free for non-commercial use; OSM + CARTO attribution required.
+const MAP_STYLE: maplibregl.StyleSpecification = {
   version: 8,
   sources: {
-    osm: {
+    base: {
       type: 'raster',
-      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      tiles: [
+        'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+        'https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+        'https://c.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+        'https://d.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+      ],
       tileSize: 256,
-      attribution: '© OpenStreetMap contributors',
+      attribution:
+        '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
       maxzoom: 19,
     },
   },
-  layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
+  layers: [{ id: 'base', type: 'raster', source: 'base' }],
 }
 
 interface Props {
@@ -52,7 +61,7 @@ export default function Map({
     if (!container || mapRef.current) return
     const map = new maplibregl.Map({
       container,
-      style: OSM_STYLE,
+      style: MAP_STYLE,
       center: MADRID_CENTER,
       zoom: 12,
       attributionControl: { compact: true },
