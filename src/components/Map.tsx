@@ -46,9 +46,10 @@ export default function Map({
 
   // Init map once
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return
+    const container = containerRef.current
+    if (!container || mapRef.current) return
     const map = new maplibregl.Map({
-      container: containerRef.current,
+      container,
       style: OSM_STYLE,
       center: MADRID_CENTER,
       zoom: 12,
@@ -67,11 +68,13 @@ export default function Map({
     map.on('load', () => {
       addSources(map, data)
       addLayers(map)
+      // Force a resize after first paint in case the container was hidden
+      // when MapLibre initialised (visibility:hidden, display:none, etc.).
+      requestAnimationFrame(() => map.resize())
     })
 
     if (onMapClick) {
       map.on('click', (e) => {
-        // Avoid firing when clicking on an interactive feature
         const features = map.queryRenderedFeatures(e.point, {
           layers: ['papeleras-points', 'areas-points', 'parques-points', 'clusters'],
         })
@@ -81,7 +84,11 @@ export default function Map({
       })
     }
 
+    const ro = new ResizeObserver(() => map.resize())
+    ro.observe(container)
+
     return () => {
+      ro.disconnect()
       map.remove()
       mapRef.current = null
     }
