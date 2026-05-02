@@ -29,6 +29,7 @@ function App() {
     areas: true,
     parques: true,
     vets: false,
+    air: false,
   })
   const [showHeat, setShowHeat] = useState(false)
   const [highlight, setHighlight] = useState<{ lat: number; lng: number } | null>(null)

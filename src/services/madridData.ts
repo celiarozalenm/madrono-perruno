@@ -1,4 +1,12 @@
-import type { AreaCanina, Datasets, Papelera, Parque, Veterinario } from '../types'
+import type {
+  AirStation,
+  AreaCanina,
+  Datasets,
+  Papelera,
+  Parque,
+  PerrosCensus,
+  Veterinario,
+} from '../types'
 
 // Datasets are pre-fetched at build time (scripts/fetch-data.mjs) and served from
 // /data/*.json on the same origin to avoid CORS on the redirected download URLs of
@@ -25,6 +33,14 @@ export const DATASETS = {
     portalUrl:
       'https://datos.madrid.es/portal/site/egob/menuitem.c05c1f754a33a9fbe4b2e4b284f1a5a0/?vgnextoid=46b55cc016f49510VgnVCM1000008a4a900aRCRD',
   },
+  perros: {
+    label: 'Censo de animales domésticos por distrito',
+    portalUrl: 'https://datos.madrid.es/dataset/207118-0-censo-animales',
+  },
+  air: {
+    label: 'Calidad del aire en tiempo real',
+    portalUrl: 'https://datos.madrid.es/dataset/212531-0-calidad-aire-tiempo-real',
+  },
 } as const
 
 async function loadJson<T>(name: string): Promise<T> {
@@ -33,12 +49,16 @@ async function loadJson<T>(name: string): Promise<T> {
   return (await res.json()) as T
 }
 
+const EMPTY_PERROS: PerrosCensus = { year: null, distritos: [] }
+
 export async function loadAllDatasets(): Promise<Datasets> {
-  const [papeleras, areas, parques, vets] = await Promise.all([
+  const [papeleras, areas, parques, vets, air, perros] = await Promise.all([
     loadJson<Papelera[]>('papeleras'),
     loadJson<AreaCanina[]>('areas'),
     loadJson<Parque[]>('parques'),
     loadJson<Veterinario[]>('vets'),
+    loadJson<AirStation[]>('air').catch(() => [] as AirStation[]),
+    loadJson<PerrosCensus>('perros').catch(() => EMPTY_PERROS),
   ])
-  return { papeleras, areas, parques, vets }
+  return { papeleras, areas, parques, vets, air, perros }
 }

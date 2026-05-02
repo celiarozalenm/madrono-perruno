@@ -23,8 +23,9 @@ export default function Sidebar({ view, setView, locale, toggleLocale, open, onC
       icon: <Footprints size={18} />,
     },
     { key: 'stats', label: t(locale, 'nav.stats'), icon: <BarChart3 size={18} /> },
-    { key: 'about', label: t(locale, 'nav.about'), icon: <Info size={18} /> },
   ]
+
+  const aboutTab = { key: 'about' as View, label: t(locale, 'nav.about'), icon: <Info size={18} /> }
 
   function handleNavClick(key: View) {
     setView(key)
@@ -86,7 +87,20 @@ export default function Sidebar({ view, setView, locale, toggleLocale, open, onC
           </ul>
         </nav>
 
-        <div className="p-3 border-t border-stone-100">
+        <div className="p-3 border-t border-stone-100 flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={() => handleNavClick(aboutTab.key)}
+            aria-current={view === aboutTab.key ? 'page' : undefined}
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              view === aboutTab.key
+                ? 'bg-brand-500 text-white'
+                : 'text-stone-700 hover:bg-stone-100'
+            }`}
+          >
+            <span className="shrink-0">{aboutTab.icon}</span>
+            <span className="flex-1 text-left">{aboutTab.label}</span>
+          </button>
           <button
             type="button"
             onClick={toggleLocale}

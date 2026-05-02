@@ -103,6 +103,7 @@ export function aggregateByDistrict(data: Datasets): DistrictAggregate[] {
         parques: 0,
         veterinarios: 0,
         superficieAreasM2: 0,
+        perros: 0,
       })
     }
     return map.get(key)!
@@ -124,6 +125,10 @@ export function aggregateByDistrict(data: Datasets): DistrictAggregate[] {
   for (const v of data.vets) {
     if (!v.distrito) continue
     ensure(v.distrito).veterinarios += 1
+  }
+  for (const dp of data.perros.distritos) {
+    if (!dp.distrito) continue
+    ensure(dp.distrito).perros = dp.perros
   }
   return Array.from(map.values()).sort(
     (a, b) => b.papeleras - a.papeleras,

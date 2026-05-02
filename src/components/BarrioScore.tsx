@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Search, MapPin, Loader2, AlertCircle, Lock } from 'lucide-react'
+import { Search, MapPin, Loader2, AlertCircle, Lock, Wind } from 'lucide-react'
 import type { Datasets, Locale } from '../types'
 import { t } from '../i18n'
 import { scoreBarrio } from '../services/scoring'
 import { useGeolocation } from '../hooks/useGeolocation'
+import { assessStation, nearestStation, AIR_LEVEL_COLORS, AIR_LEVEL_LABELS } from '../services/air'
 
 interface Props {
   data: Datasets
@@ -179,6 +180,54 @@ export default function BarrioScore({ data, locale, onLocate }: Props) {
               <span>{t(locale, 'barrio.vets')}</span>
             </div>
           </div>
+
+          {/* Air quality at the nearest station to the searched point */}
+          {(() => {
+            const station = nearestStation(point, data.air)
+            if (!station) return null
+            const a = assessStation(station)
+            return (
+              <div
+                className="rounded-xl border p-4 text-sm flex items-start gap-3"
+                style={{
+                  background: AIR_LEVEL_COLORS[a.level] + '14',
+                  borderColor: AIR_LEVEL_COLORS[a.level] + '55',
+                }}
+              >
+                <div
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white shrink-0"
+                  style={{ background: AIR_LEVEL_COLORS[a.level] }}
+                >
+                  <Wind size={18} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <span className="font-semibold text-stone-900">
+                      {locale === 'es' ? 'Calidad del aire' : 'Air quality'}:
+                    </span>
+                    <span
+                      className="font-bold"
+                      style={{ color: AIR_LEVEL_COLORS[a.level] }}
+                    >
+                      {AIR_LEVEL_LABELS[a.level][locale]}
+                    </span>
+                    {a.driverLabel && (
+                      <span className="text-xs text-stone-600">
+                        ({a.driverLabel} {a.driverValue} {a.driverUnits})
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-stone-700 mt-1">
+                    {locale === 'es' ? a.message : a.messageEn}
+                  </div>
+                  <div className="text-xs text-stone-500 mt-1.5">
+                    {locale === 'es' ? 'Estación más cercana: ' : 'Nearest station: '}
+                    {station.name}
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
         </div>
       )}
     </div>
