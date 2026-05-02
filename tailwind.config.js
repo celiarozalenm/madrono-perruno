@@ -18,7 +18,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"Urbanist"', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Outfit"', 'system-ui', '-apple-system', 'sans-serif'],
       },
     },
   },
