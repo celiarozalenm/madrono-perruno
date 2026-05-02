@@ -16,17 +16,17 @@ export default {
           800: '#933618',
           900: '#762e16',
         },
-        // Rojo institucional Ayuntamiento de Madrid (Pantone 485 ≈ #DA291C),
-        // mismo tono que la bandera de la ciudad. Se usa como sello de
-        // "denominación de origen" en enlaces a datos.madrid.es, chips de
-        // datasets y badges institucionales — nunca como CTA principal, para
-        // no competir con el naranja `brand`.
+        // Azul institucional Ayuntamiento de Madrid — el color corporativo del
+        // wordmark "Madrid" en madrid.es. Se usa como sello de "denominación
+        // de origen" en enlaces a datos.madrid.es, chips de datasets y badges
+        // institucionales — nunca como CTA principal, para no competir con el
+        // naranja `brand`.
         madrid: {
-          50: '#fdecea',
-          100: '#fbd0cd',
-          500: '#da291c',
-          600: '#b41f15',
-          700: '#8a1810',
+          50: '#eef3fa',
+          100: '#d6e1f1',
+          500: '#1c4988',
+          600: '#163a6f',
+          700: '#0e2851',
         },
       },
       fontFamily: {
