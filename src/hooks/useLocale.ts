@@ -10,11 +10,7 @@ function detect(): Locale {
   } catch {
     // ignore
   }
-  if (typeof navigator !== 'undefined') {
-    const lang = navigator.language?.toLowerCase() ?? ''
-    if (lang.startsWith('es')) return 'es'
-  }
-  return 'en'
+  return 'es'
 }
 
 export function useLocale(): { locale: Locale; setLocale: (l: Locale) => void; toggle: () => void } {
