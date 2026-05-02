@@ -308,7 +308,14 @@ export default function Map({
     }
   }, [locale])
 
-  return <div ref={containerRef} className="absolute inset-0" aria-label="Mapa de Madrid" />
+  return (
+    <div
+      ref={containerRef}
+      className="absolute inset-0"
+      style={{ width: '100%', height: '100%', minHeight: '300px' }}
+      aria-label="Mapa de Madrid"
+    />
+  )
 }
 
 function setLayerVis(map: MlMap, id: string, visible: boolean) {
