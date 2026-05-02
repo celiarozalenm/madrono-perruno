@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Search, MapPin, Loader2, AlertCircle, Footprints, RotateCcw, Trash2, Dog } from 'lucide-react'
+import { Search, MapPin, Loader2, AlertCircle, Footprints, RotateCcw, Trash2, Dog, Lock } from 'lucide-react'
 import type { Datasets, Locale } from '../types'
+import { t } from '../i18n'
 import { buildBagFriendlyRoute, type RouteResult } from '../services/routing'
 import { useGeolocation } from '../hooks/useGeolocation'
 
@@ -120,6 +121,10 @@ export default function RouteBuilder({ data, locale, onRoute, onLocate }: Props)
             ? 'Genera un paseo en bucle que pasa por papeleras y áreas caninas cercanas. Ideal para sacar al perro sin acabar a oscuras lejos de casa.'
             : 'Generate a loop walk passing through nearby bins and dog areas. Perfect for an evening walk without ending far from home.'}
         </p>
+        <div className="text-xs text-stone-500 mt-2 flex items-start gap-1.5">
+          <Lock size={12} className="mt-0.5 shrink-0" />
+          <span>{t(locale, 'barrio.privacy')}</span>
+        </div>
       </div>
 
       <form onSubmit={handleBuild} className="space-y-3">
