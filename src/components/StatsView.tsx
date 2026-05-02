@@ -44,7 +44,10 @@ export default function StatsView({ data, locale }: Props) {
   const [needsField, setNeedsField] = useState<NeedsField>('papeleras')
 
   const sorted = useMemo(
-    () => [...aggregates].sort((a, b) => b[metric] - a[metric]),
+    () =>
+      aggregates
+        .filter((a) => a[metric] > 0)
+        .sort((a, b) => b[metric] - a[metric]),
     [aggregates, metric],
   )
 
@@ -52,7 +55,7 @@ export default function StatsView({ data, locale }: Props) {
     papeleras: '#ed731f',
     areasCaninas: '#2f7d3a',
     parques: '#5b3a1e',
-    perros: '#1f4d7a',
+    perros: '#003df6',
   }
   const labelByMetric: Record<Metric, string> = {
     papeleras: t(locale, 'stats.papelerasRanking'),
