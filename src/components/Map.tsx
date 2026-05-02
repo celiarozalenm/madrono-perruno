@@ -5,6 +5,7 @@ import type { Datasets, LayerKey, Locale } from '../types'
 import type { RouteResult } from '../services/routing'
 import { renderPopupHtml } from './MarkerPopup'
 import { buildPapeleraPopupContent } from './PapeleraPopup'
+import { buildEntityPopupContent } from './EntityPopup'
 
 const MADRID_CENTER: [number, number] = [-3.7038, 40.4168]
 const OSM_STYLE: maplibregl.StyleSpecification = {
@@ -217,26 +218,27 @@ export default function Map({
       if (!f) return
       const props = f.properties as Record<string, string>
       if (popupRef.current) popupRef.current.remove()
-      popupRef.current = new maplibregl.Popup({ offset: 12 })
+      const node = buildEntityPopupContent({
+        entityType: 'area',
+        entityId: props.id ?? `area-${e.lngLat.lng.toFixed(5)}-${e.lngLat.lat.toFixed(5)}`,
+        title: locale === 'es' ? 'Área canina' : 'Dog area',
+        address: props.direccion ?? '',
+        district: props.distrito ?? '',
+        extra:
+          (locale === 'es' ? 'Superficie: ' : 'Area: ') +
+          `${props.superficie ?? '?'} m²` +
+          (props.juegos === 'true'
+            ? locale === 'es'
+              ? ' · con juegos'
+              : ' · with playground'
+            : ''),
+        lat: e.lngLat.lat,
+        lng: e.lngLat.lng,
+        locale,
+      })
+      popupRef.current = new maplibregl.Popup({ offset: 12, maxWidth: '320px' })
         .setLngLat(e.lngLat)
-        .setHTML(
-          renderPopupHtml('area', {
-            title: locale === 'es' ? 'Área canina' : 'Dog area',
-            address: props.direccion ?? '',
-            district: props.distrito ?? '',
-            extra:
-              (locale === 'es' ? 'Superficie: ' : 'Area: ') +
-              `${props.superficie ?? '?'} m²` +
-              (props.juegos === 'true'
-                ? locale === 'es'
-                  ? ' · con juegos'
-                  : ' · with playground'
-                : ''),
-            lat: e.lngLat.lat,
-            lng: e.lngLat.lng,
-            locale,
-          }),
-        )
+        .setDOMContent(node)
         .addTo(map)
     }
     const onVetClick = (e: maplibregl.MapLayerMouseEvent) => {
@@ -264,20 +266,21 @@ export default function Map({
       if (!f) return
       const props = f.properties as Record<string, string>
       if (popupRef.current) popupRef.current.remove()
-      popupRef.current = new maplibregl.Popup({ offset: 12, maxWidth: '300px' })
+      const node = buildEntityPopupContent({
+        entityType: 'parque',
+        entityId: props.id ?? `parque-${e.lngLat.lng.toFixed(5)}-${e.lngLat.lat.toFixed(5)}`,
+        title: props.nombre || (locale === 'es' ? 'Parque' : 'Park'),
+        address: props.direccion ?? '',
+        district: props.distrito ?? '',
+        extra: '',
+        url: props.url || undefined,
+        lat: e.lngLat.lat,
+        lng: e.lngLat.lng,
+        locale,
+      })
+      popupRef.current = new maplibregl.Popup({ offset: 12, maxWidth: '320px' })
         .setLngLat(e.lngLat)
-        .setHTML(
-          renderPopupHtml('parque', {
-            title: props.nombre || (locale === 'es' ? 'Parque' : 'Park'),
-            address: props.direccion ?? '',
-            district: props.distrito ?? '',
-            extra: '',
-            url: props.url || undefined,
-            lat: e.lngLat.lat,
-            lng: e.lngLat.lng,
-            locale,
-          }),
-        )
+        .setDOMContent(node)
         .addTo(map)
     }
     const onClusterClick = async (e: maplibregl.MapLayerMouseEvent) => {
