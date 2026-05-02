@@ -5,6 +5,7 @@ import type {
   Papelera,
   Parque,
   PerrosCensus,
+  ProteccionAnimalEntry,
   Veterinario,
 } from '../types'
 
@@ -37,6 +38,10 @@ export const DATASETS = {
     label: 'Censo de animales domésticos por distrito',
     portalUrl: 'https://datos.madrid.es/dataset/207118-0-censo-animales',
   },
+  proteccionAnimal: {
+    label: 'Estadísticas del Centro de Protección Animal',
+    portalUrl: 'https://datos.madrid.es/dataset/211899-0-estadisticas-animales',
+  },
   air: {
     label: 'Calidad del aire en tiempo real',
     portalUrl: 'https://datos.madrid.es/dataset/212531-0-calidad-aire-tiempo-real',
@@ -52,13 +57,16 @@ async function loadJson<T>(name: string): Promise<T> {
 const EMPTY_PERROS: PerrosCensus = { year: null, distritos: [] }
 
 export async function loadAllDatasets(): Promise<Datasets> {
-  const [papeleras, areas, parques, vets, air, perros] = await Promise.all([
+  const [papeleras, areas, parques, vets, air, perros, proteccionAnimal] = await Promise.all([
     loadJson<Papelera[]>('papeleras'),
     loadJson<AreaCanina[]>('areas'),
     loadJson<Parque[]>('parques'),
     loadJson<Veterinario[]>('vets'),
     loadJson<AirStation[]>('air').catch(() => [] as AirStation[]),
     loadJson<PerrosCensus>('perros').catch(() => EMPTY_PERROS),
+    loadJson<ProteccionAnimalEntry[]>('proteccionAnimal').catch(
+      () => [] as ProteccionAnimalEntry[],
+    ),
   ])
-  return { papeleras, areas, parques, vets, air, perros }
+  return { papeleras, areas, parques, vets, air, perros, proteccionAnimal }
 }

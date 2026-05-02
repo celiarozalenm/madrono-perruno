@@ -17,6 +17,7 @@ const LAYER_COLOR: Record<LayerKey, string> = {
   parques: '#5b3a1e',
   vets: '#0e7490',
   air: '#7c3aed',
+  perros: '#1f4d7a',
 }
 
 export default function LayerToggle({
@@ -30,12 +31,14 @@ export default function LayerToggle({
   const vetsWithCoords = data.vets.filter(
     (v) => typeof v.lat === 'number' && typeof v.lng === 'number',
   ).length
+  const totalPerros = data.perros?.distritos.reduce((s, d) => s + d.perros, 0) ?? 0
   const items: { key: LayerKey; icon: React.ReactNode; count: number }[] = [
     { key: 'papeleras', icon: <Trash2 size={16} />, count: data.papeleras.length },
     { key: 'areas', icon: <Dog size={16} />, count: data.areas.length },
     { key: 'parques', icon: <Trees size={16} />, count: data.parques.length },
     { key: 'vets', icon: <Stethoscope size={16} />, count: vetsWithCoords },
     { key: 'air', icon: <Wind size={16} />, count: data.air?.length ?? 0 },
+    { key: 'perros', icon: <Dog size={16} />, count: totalPerros },
   ]
   return (
     <div className="absolute top-3 left-3 bg-white/95 backdrop-blur rounded-xl shadow-lg border border-stone-200 p-2 z-10 max-w-[260px]">

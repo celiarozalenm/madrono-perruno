@@ -24,7 +24,7 @@ const STYLE: maplibregl.StyleSpecification = {
 }
 
 interface Props {
-  metric: 'papeleras' | 'areasCaninas' | 'parques'
+  metric: 'papeleras' | 'areasCaninas' | 'parques' | 'perros'
   aggregates: DistrictAggregate[]
   locale: Locale
   metricLabel: string

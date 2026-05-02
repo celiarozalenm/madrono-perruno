@@ -7,6 +7,7 @@ import { writeFile, mkdir } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Papa from 'papaparse'
+import * as XLSX from 'xlsx'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = resolve(__dirname, '..', 'public', 'data')
@@ -19,6 +20,10 @@ const SOURCES = {
   // Annual pet census per district (RIAC, Colegio de Veterinarios). UTF-8 with BOM.
   perros:
     'https://datos.madrid.es/dataset/207118-0-censo-animales/resource/207118-0-censo-animales-csv/download/207118-0-censo-animales-csv.csv',
+  // Madrid Salud — Centro de Protección Animal yearly stats (intakes, adoptions).
+  // Wide pivot XLSX: years as columns, indicator sections in column A.
+  proteccionAnimal:
+    'https://datos.madrid.es/dataset/211899-0-estadisticas-animales/resource/211899-0-estadisticas-animales-xlsx/download/centroproteccionanimal_2_s_2025.xlsx',
   // Air quality: stations metadata (lat/lng + which magnitudes each station measures)
   // and real-time hourly readings per station + magnitude.
   airStations:
@@ -157,6 +162,96 @@ const PERROS_DISTRITO_ALIAS = {
   'SAN BLAS': 'SAN BLAS-CANILLEJAS',
 }
 
+// Strip thousand-separator commas before parsing. The protección animal XLSX
+// uses English number formatting (1,751 = 1751); the comma-to-dot replacement
+// in num() would otherwise turn "1,751" into 1.751.
+function numEn(v) {
+  if (typeof v === 'number') return v
+  if (v === null || v === undefined || v === '') return NaN
+  const s = String(v).trim().replace(/%$/, '').replace(/,/g, '')
+  const n = Number(s)
+  return Number.isFinite(n) ? n : NaN
+}
+
+function parseProteccionAnimal(buf) {
+  const wb = XLSX.read(buf, { type: 'buffer' })
+  const ws = wb.Sheets[wb.SheetNames[0]]
+  const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: null })
+  const yearRow = rows[0] ?? []
+  const subYearRow = rows[1] ?? []
+
+  // Year columns come in two layouts:
+  //   2004–2014: one column per year, sub-header empty.
+  //   2015+:     three columns per year (1º semestre / 2º semestre / Global).
+  // For each year we pick the "Global YYYY" column when present, otherwise the
+  // single column. 1º/2º semestre cells are ignored.
+  const yearToCol = {}
+  let activeYear = null
+  let firstColOfYear = -1
+  const len = Math.max(yearRow.length, subYearRow.length)
+  for (let c = 1; c < len; c++) {
+    const y = num(yearRow[c])
+    if (Number.isFinite(y)) {
+      activeYear = y
+      firstColOfYear = c
+    }
+    if (!activeYear) continue
+    const sub = clean(subYearRow[c]).toLowerCase()
+    if (!sub && firstColOfYear === c) {
+      yearToCol[activeYear] = c
+    } else if (sub.startsWith('global')) {
+      yearToCol[activeYear] = c
+    }
+  }
+
+  function findRow(predicate, startAfter = 0) {
+    for (let i = startAfter; i < rows.length; i++) {
+      const a = clean(rows[i] && rows[i][0]).toLowerCase()
+      if (predicate(a)) return i
+    }
+    return -1
+  }
+  const intakeHeader = findRow((a) => a === 'evolución de ingresos')
+  const intakeDogs = findRow((a) => a === 'perros', intakeHeader + 1)
+  const intakeCats = findRow((a) => a === 'gatos', intakeHeader + 1)
+  const adoptHeader = findRow((a) => a === 'animales adoptados')
+  const adoptDogs = findRow((a) => a === 'perros', adoptHeader + 1)
+  const adoptCats = findRow((a) => a === 'gatos', adoptHeader + 1)
+
+  function readVal(rowIdx, col) {
+    if (rowIdx < 0) return null
+    const raw = rows[rowIdx]?.[col]
+    if (raw === null || raw === undefined || raw === '') return null
+    const n = numEn(raw)
+    return Number.isFinite(n) ? n : null
+  }
+
+  const out = []
+  for (const [yStr, c] of Object.entries(yearToCol)) {
+    const year = Number(yStr)
+    const dogIntakes = readVal(intakeDogs, c)
+    const catIntakes = readVal(intakeCats, c)
+    const dogAdoptions = readVal(adoptDogs, c)
+    const catAdoptions = readVal(adoptCats, c)
+    if (
+      dogIntakes === null &&
+      catIntakes === null &&
+      dogAdoptions === null &&
+      catAdoptions === null
+    )
+      continue
+    out.push({
+      id: `pa-${year}`,
+      year,
+      dogIntakes: dogIntakes ?? 0,
+      catIntakes: catIntakes ?? 0,
+      dogAdoptions: dogAdoptions ?? 0,
+      catAdoptions: catAdoptions ?? 0,
+    })
+  }
+  return out.sort((a, b) => a.year - b.year)
+}
+
 function parsePerros(csv) {
   // Header: AÑO;DISTRITO;ESPECIE CANINA;ESPECIE FELINA + trailing empty cols.
   // Each row is one (year, district). Keep only the most recent year present per district.
@@ -290,6 +385,24 @@ async function main() {
   } catch (err) {
     console.log(` FAILED: ${err.message}`)
     summary.perros = `ERROR: ${err.message}`
+  }
+
+  // Madrid Salud — Centro de Protección Animal (XLSX, wide pivot).
+  process.stdout.write('Fetching proteccionAnimal…')
+  try {
+    const res = await fetch(SOURCES.proteccionAnimal, { redirect: 'follow' })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const buf = Buffer.from(await res.arrayBuffer())
+    const rows = parseProteccionAnimal(buf)
+    await writeFile(resolve(OUT_DIR, 'proteccionAnimal.json'), JSON.stringify(rows))
+    summary.proteccionAnimal = rows.length
+    summary.proteccionAnimalLatestYear = rows.length ? rows[rows.length - 1].year : null
+    console.log(
+      ` ${rows.length} years (${rows[0]?.year}–${rows[rows.length - 1]?.year}) → public/data/proteccionAnimal.json`,
+    )
+  } catch (err) {
+    console.log(` FAILED: ${err.message}`)
+    summary.proteccionAnimal = `ERROR: ${err.message}`
   }
 
   // Distritos boundaries (TopoJSON → GeoJSON for choropleth maps).
