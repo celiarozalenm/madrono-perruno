@@ -8,6 +8,7 @@ import StatsView from './components/StatsView'
 import RouteBuilder from './components/RouteBuilder'
 import AboutView from './components/AboutView'
 import Onboarding from './components/Onboarding'
+import LandingPage from './components/LandingPage'
 import { useDatasets } from './hooks/useDataset'
 import { useLocale } from './hooks/useLocale'
 import { t } from './i18n'
@@ -15,10 +16,18 @@ import type { LayerKey } from './types'
 import type { RouteResult } from './services/routing'
 
 const ONBOARDING_KEY = 'mp-onboarded-v1'
+const ENTERED_KEY = 'mp-entered-v1'
 
 function App() {
   const { locale, toggle: toggleLocale } = useLocale()
   const { data, loading, error, reload } = useDatasets()
+  const [showLanding, setShowLanding] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(ENTERED_KEY) !== '1'
+    } catch {
+      return true
+    }
+  })
   const [view, setView] = useState<View>('map')
   const [visibleLayers, setVisibleLayers] = useState<Record<LayerKey, boolean>>({
     papeleras: true,
@@ -49,6 +58,15 @@ function App() {
     }
   }
 
+  function enterApp() {
+    setShowLanding(false)
+    try {
+      localStorage.setItem(ENTERED_KEY, '1')
+    } catch {
+      // ignore
+    }
+  }
+
   function toggleLayer(k: LayerKey) {
     setVisibleLayers((v) => ({ ...v, [k]: !v[k] }))
   }
@@ -61,6 +79,14 @@ function App() {
   function handleRoute(r: RouteResult | null) {
     setRoute(r)
     if (r) setView('map')
+  }
+
+  if (showLanding) {
+    return (
+      <div className="h-full overflow-y-auto">
+        <LandingPage locale={locale} toggleLocale={toggleLocale} onEnter={enterApp} />
+      </div>
+    )
   }
 
   return (
