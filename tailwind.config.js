@@ -16,18 +16,16 @@ export default {
           800: '#933618',
           900: '#762e16',
         },
-        // Azul institucional Ayuntamiento de Madrid — royal blue saturado,
-        // mismo tono que las tiles de categorías y el botón "Línea Madrid"
-        // en madrid.es. Se usa como sello de "denominación de origen" en
-        // enlaces a datos.madrid.es, chips de datasets y badges
-        // institucionales — nunca como CTA principal, para no competir con el
-        // naranja `brand`.
-        madrid: {
-          50: '#e8eeff',
-          100: '#cdd8fe',
-          500: '#003df6',
-          600: '#0030c4',
-          700: '#002491',
+        // Rojo de los frutos del madroño — uno de los colores del logo.
+        // Se usa como sello "denominación de origen" en enlaces a
+        // datos.madrid.es, chips de datasets, footer y la métrica "perros"
+        // en stats. Mantiene la identidad visual unida al icono.
+        madrono: {
+          50: '#fcecec',
+          100: '#f5c8ca',
+          500: '#c8252b',
+          600: '#a01c21',
+          700: '#751417',
         },
       },
       fontFamily: {

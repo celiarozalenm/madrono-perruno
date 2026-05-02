@@ -13,6 +13,13 @@ interface Props {
   onClose: () => void
 }
 
+const STATS_SUBSECTIONS = [
+  { id: 'stats-overview', labelKey: 'stats.sub.overview' as const },
+  { id: 'stats-ranking', labelKey: 'stats.sub.ranking' as const },
+  { id: 'stats-needs', labelKey: 'stats.sub.needs' as const },
+  { id: 'stats-proteccion', labelKey: 'stats.sub.proteccion' as const },
+]
+
 export default function Sidebar({ view, setView, locale, toggleLocale, open, onClose }: Props) {
   const tabs: { key: View; label: string; icon: React.ReactNode }[] = [
     { key: 'map', label: t(locale, 'nav.map'), icon: <MapIcon size={18} /> },
@@ -27,9 +34,27 @@ export default function Sidebar({ view, setView, locale, toggleLocale, open, onC
 
   const aboutTab = { key: 'about' as View, label: t(locale, 'nav.about'), icon: <Info size={18} /> }
 
+  function maybeCloseMobile() {
+    if (window.matchMedia('(max-width: 767px)').matches) onClose()
+  }
+
   function handleNavClick(key: View) {
     setView(key)
-    if (window.matchMedia('(max-width: 767px)').matches) onClose()
+    maybeCloseMobile()
+  }
+
+  function handleStatsSubClick(id: string) {
+    const scroll = () => {
+      const el = document.getElementById(id)
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+    if (view !== 'stats') {
+      setView('stats')
+      setTimeout(scroll, 80)
+    } else {
+      scroll()
+    }
+    maybeCloseMobile()
   }
 
   return (
@@ -82,6 +107,21 @@ export default function Sidebar({ view, setView, locale, toggleLocale, open, onC
                   <span className="shrink-0">{tab.icon}</span>
                   <span className="flex-1 text-left">{tab.label}</span>
                 </button>
+                {tab.key === 'stats' && view === 'stats' && (
+                  <ul className="mt-1 mb-1 ml-4 pl-3 border-l border-stone-200 flex flex-col gap-0.5">
+                    {STATS_SUBSECTIONS.map((sub) => (
+                      <li key={sub.id}>
+                        <button
+                          type="button"
+                          onClick={() => handleStatsSubClick(sub.id)}
+                          className="w-full text-left px-2.5 py-1.5 rounded-md text-xs text-stone-600 hover:bg-stone-100 hover:text-stone-900 transition-colors"
+                        >
+                          {t(locale, sub.labelKey)}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>

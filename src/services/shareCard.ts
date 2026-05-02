@@ -23,7 +23,7 @@ const COLOR = {
   text: '#1a1a1a',
   textDim: '#4b5563',
   textFaint: '#6b7280',
-  madrid: '#003df6',
+  madrono: '#c8252b',
 } as const
 
 const SCORE_COLOR: Record<BarrioScore['scoreLabel'], string> = {
@@ -132,7 +132,7 @@ export async function generateShareCard(args: Args): Promise<Blob> {
   ctx.fillText(addr, 60, 588)
 
   // Madrid blue badge bottom-right
-  ctx.fillStyle = COLOR.madrid
+  ctx.fillStyle = COLOR.madrono
   roundRect(ctx, W - 360, 558, 300, 44, 22)
   ctx.fill()
   ctx.fillStyle = '#ffffff'
