@@ -107,9 +107,12 @@ export default function Map({
     const map = mapRef.current
     if (!map) return
     const apply = () => {
-      setLayerVis(map, 'papeleras-cluster', visibleLayers.papeleras)
-      setLayerVis(map, 'papeleras-cluster-count', visibleLayers.papeleras)
-      setLayerVis(map, 'papeleras-points', visibleLayers.papeleras)
+      // When the heat map is on, hide the papelera markers so the heat is
+      // legible (otherwise the orange dots blend into the orange gradient).
+      const showPapeleraMarkers = visibleLayers.papeleras && !showHeat
+      setLayerVis(map, 'papeleras-cluster', showPapeleraMarkers)
+      setLayerVis(map, 'papeleras-cluster-count', showPapeleraMarkers)
+      setLayerVis(map, 'papeleras-points', showPapeleraMarkers)
       setLayerVis(map, 'areas-points', visibleLayers.areas)
       setLayerVis(map, 'areas-labels', visibleLayers.areas)
       setLayerVis(map, 'parques-points', visibleLayers.parques)

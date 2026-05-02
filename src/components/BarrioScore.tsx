@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, MapPin, Loader2, AlertCircle } from 'lucide-react'
+import { Search, MapPin, Loader2, AlertCircle, Lock } from 'lucide-react'
 import type { Datasets, Locale } from '../types'
 import { t } from '../i18n'
 import { scoreBarrio } from '../services/scoring'
@@ -82,6 +82,10 @@ export default function BarrioScore({ data, locale, onLocate }: Props) {
       <div>
         <h1 className="text-2xl font-bold text-stone-900">{t(locale, 'barrio.title')}</h1>
         <p className="text-sm text-stone-600 mt-1">{t(locale, 'barrio.intro')}</p>
+        <div className="text-xs text-stone-500 mt-2 flex items-start gap-1.5">
+          <Lock size={12} className="mt-0.5 shrink-0" />
+          <span>{t(locale, 'barrio.privacy')}</span>
+        </div>
       </div>
 
       <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2">
