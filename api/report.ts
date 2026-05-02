@@ -10,7 +10,12 @@ import { Redis } from '@upstash/redis'
 
 export const config = { runtime: 'edge' }
 
-const redis = Redis.fromEnv()
+// Vercel Marketplace integration exposes KV_REST_API_* env vars; Upstash SDK
+// expects UPSTASH_REDIS_REST_*. Read whichever pair is available.
+const redis = new Redis({
+  url: process.env.KV_REST_API_URL ?? process.env.UPSTASH_REDIS_REST_URL ?? '',
+  token: process.env.KV_REST_API_TOKEN ?? process.env.UPSTASH_REDIS_REST_TOKEN ?? '',
+})
 
 const MAX_REPORTS_PER_BIN = 50
 const REPORTS_RETURNED = 10
