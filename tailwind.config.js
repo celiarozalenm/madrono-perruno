@@ -16,9 +16,18 @@ export default {
           800: '#933618',
           900: '#762e16',
         },
+        // Institutional Madrid blue — used as a discreet "denominación de origen"
+        // signal on links to datos.madrid.es and footer institutional text.
+        madrid: {
+          50: '#eef3fa',
+          100: '#d6e1f1',
+          500: '#1c4988',
+          600: '#163a6f',
+          700: '#0e2851',
+        },
       },
       fontFamily: {
-        sans: ['"Urbanist"', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"DM Sans"', 'system-ui', '-apple-system', 'sans-serif'],
       },
     },
   },

@@ -184,14 +184,24 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
                   href={ds.portalUrl}
                   target="_blank"
                   rel="noopener"
-                  className="text-xs text-brand-600 hover:underline inline-flex items-center gap-1 mt-0.5"
+                  className="text-xs text-madrid-500 hover:text-madrid-600 hover:underline inline-flex items-center gap-1.5 mt-0.5"
                 >
-                  datos.madrid.es <ExternalLink size={11} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-madrid-500 shrink-0" aria-hidden />
+                  datos.madrid.es
+                  <ExternalLink size={11} />
                 </a>
               </div>
             </li>
           ))}
         </ul>
+        <div className="mt-5 flex items-center justify-center gap-2 text-xs text-madrid-500 font-medium">
+          <span className="w-2 h-2 rounded-full bg-madrid-500" aria-hidden />
+          <span>
+            {locale === 'es'
+              ? 'Datos: Ayuntamiento de Madrid · Licencia abierta'
+              : 'Data: Madrid City Council · Open licence'}
+          </span>
+        </div>
       </section>
 
       {/* Privacy */}
@@ -267,9 +277,12 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
         </button>
       </section>
 
-      <footer className="px-4 sm:px-6 py-8 border-t border-stone-200 text-center text-xs text-stone-500 space-y-1">
-        <div>{t(locale, 'landing.foot.tag')}</div>
-        <div>
+      <footer className="px-4 sm:px-6 py-8 border-t border-stone-200 text-center space-y-2">
+        <div className="inline-flex items-center gap-2 text-xs text-madrid-500 font-medium">
+          <span className="w-2 h-2 rounded-full bg-madrid-500" aria-hidden />
+          {t(locale, 'landing.foot.tag')}
+        </div>
+        <div className="text-xs text-stone-500">
           {t(locale, 'landing.foot.author')}{' '}
           <a
             href="https://celiarozalenm.com"
