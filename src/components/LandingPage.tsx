@@ -1,0 +1,298 @@
+import { useEffect, useState } from 'react'
+import {
+  ArrowRight,
+  Compass,
+  Footprints,
+  BarChart3,
+  Map as MapIcon,
+  Smartphone,
+  Apple,
+  Monitor,
+  Download,
+  ExternalLink,
+} from 'lucide-react'
+import type { Locale } from '../types'
+import { t } from '../i18n'
+import { DATASETS } from '../services/madridData'
+
+interface Props {
+  locale: Locale
+  toggleLocale: () => void
+  onEnter: () => void
+}
+
+interface InstallPromptEvent extends Event {
+  prompt: () => Promise<void>
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
+}
+
+export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
+  const [installEvt, setInstallEvt] = useState<InstallPromptEvent | null>(null)
+  const [installed, setInstalled] = useState(false)
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault()
+      setInstallEvt(e as InstallPromptEvent)
+    }
+    const onInstalled = () => setInstalled(true)
+    window.addEventListener('beforeinstallprompt', handler)
+    window.addEventListener('appinstalled', onInstalled)
+    if (window.matchMedia('(display-mode: standalone)').matches) setInstalled(true)
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler)
+      window.removeEventListener('appinstalled', onInstalled)
+    }
+  }, [])
+
+  async function triggerInstall() {
+    if (!installEvt) return
+    await installEvt.prompt()
+    const choice = await installEvt.userChoice
+    if (choice.outcome === 'accepted') setInstalled(true)
+    setInstallEvt(null)
+  }
+
+  return (
+    <div className="min-h-full bg-gradient-to-b from-orange-50 via-stone-50 to-white">
+      {/* Top bar */}
+      <header className="px-4 sm:px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <img src="/icon.svg" alt="" className="w-9 h-9" />
+          <div className="leading-tight">
+            <div className="font-bold text-stone-900">{t(locale, 'app.title')}</div>
+            <div className="text-[11px] text-stone-500">{t(locale, 'app.subtitle')}</div>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={toggleLocale}
+          className="text-sm text-stone-700 hover:bg-white px-3 py-1.5 rounded-lg font-mono uppercase border border-stone-200"
+        >
+          {locale === 'es' ? 'EN' : 'ES'}
+        </button>
+      </header>
+
+      {/* Hero */}
+      <section className="px-4 sm:px-6 pt-6 pb-12 max-w-4xl mx-auto text-center">
+        <div className="inline-block bg-brand-100 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full mb-5 tracking-wide uppercase">
+          {t(locale, 'landing.hero.tag')}
+        </div>
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-stone-900 leading-tight tracking-tight">
+          {t(locale, 'app.title')}
+          <span className="block text-brand-500 mt-1">{t(locale, 'app.subtitle')}</span>
+        </h1>
+        <p className="text-base sm:text-lg text-stone-700 mt-5 max-w-2xl mx-auto leading-relaxed">
+          {t(locale, 'landing.hero.lede')}
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
+          <button
+            type="button"
+            onClick={onEnter}
+            className="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-xl text-base font-semibold flex items-center gap-2 shadow-lg shadow-brand-500/30"
+          >
+            {t(locale, 'landing.hero.cta')}
+            <ArrowRight size={18} />
+          </button>
+          <a
+            href="https://github.com/celiarozalenm/madrono-perruno"
+            target="_blank"
+            rel="noopener"
+            className="border border-stone-300 hover:bg-white text-stone-800 px-6 py-3 rounded-xl text-base font-medium flex items-center gap-2"
+          >
+            {t(locale, 'landing.hero.cta2')}
+            <ExternalLink size={16} />
+          </a>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="px-4 sm:px-6 py-12 max-w-5xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-bold text-stone-900 text-center mb-10">
+          {t(locale, 'landing.what.title')}
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FeatureCard
+            icon={<MapIcon size={24} />}
+            color="#ed731f"
+            title={t(locale, 'landing.what.f1.title')}
+            body={t(locale, 'landing.what.f1.body')}
+          />
+          <FeatureCard
+            icon={<Compass size={24} />}
+            color="#2f7d3a"
+            title={t(locale, 'landing.what.f2.title')}
+            body={t(locale, 'landing.what.f2.body')}
+          />
+          <FeatureCard
+            icon={<Footprints size={24} />}
+            color="#5b3a1e"
+            title={t(locale, 'landing.what.f3.title')}
+            body={t(locale, 'landing.what.f3.body')}
+          />
+          <FeatureCard
+            icon={<BarChart3 size={24} />}
+            color="#0e7490"
+            title={t(locale, 'landing.what.f4.title')}
+            body={t(locale, 'landing.what.f4.body')}
+          />
+        </div>
+      </section>
+
+      {/* Datasets */}
+      <section className="px-4 sm:px-6 py-12 max-w-4xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-bold text-stone-900 text-center">
+          {t(locale, 'landing.data.title')}
+        </h2>
+        <p className="text-stone-600 text-center mt-2 max-w-2xl mx-auto">
+          {t(locale, 'landing.data.lede')}
+        </p>
+        <ul className="mt-8 space-y-2">
+          {Object.entries(DATASETS).map(([key, ds]) => (
+            <li
+              key={key}
+              className="bg-white border border-stone-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-stone-900 truncate">{ds.label}</div>
+                <a
+                  href={ds.portalUrl}
+                  target="_blank"
+                  rel="noopener"
+                  className="text-xs text-brand-600 hover:underline inline-flex items-center gap-1 mt-0.5"
+                >
+                  datos.madrid.es <ExternalLink size={11} />
+                </a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Install instructions */}
+      <section className="px-4 sm:px-6 py-12 bg-stone-900 text-stone-100">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center">
+            {t(locale, 'landing.install.title')}
+          </h2>
+          <p className="text-stone-400 text-center mt-2 max-w-2xl mx-auto">
+            {t(locale, 'landing.install.lede')}
+          </p>
+          {installEvt && !installed && (
+            <div className="text-center mt-6">
+              <button
+                type="button"
+                onClick={triggerInstall}
+                className="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-lg font-medium flex items-center gap-2 mx-auto"
+              >
+                <Download size={18} />
+                {locale === 'es' ? 'Instalar ahora' : 'Install now'}
+              </button>
+            </div>
+          )}
+          {installed && (
+            <div className="text-center mt-6 text-green-400 text-sm">
+              {locale === 'es' ? '✓ App instalada' : '✓ App installed'}
+            </div>
+          )}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-10">
+            <InstallCard
+              icon={<Smartphone />}
+              title={t(locale, 'landing.install.android')}
+              body={t(locale, 'landing.install.android.body')}
+            />
+            <InstallCard
+              icon={<Apple />}
+              title={t(locale, 'landing.install.ios')}
+              body={t(locale, 'landing.install.ios.body')}
+            />
+            <InstallCard
+              icon={<Monitor />}
+              title={t(locale, 'landing.install.desktop')}
+              body={t(locale, 'landing.install.desktop.body')}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA + Footer */}
+      <section className="px-4 sm:px-6 py-12 text-center">
+        <button
+          type="button"
+          onClick={onEnter}
+          className="bg-brand-500 hover:bg-brand-600 text-white px-8 py-4 rounded-2xl text-lg font-semibold flex items-center gap-2 shadow-lg shadow-brand-500/30 mx-auto"
+        >
+          {t(locale, 'landing.hero.cta')}
+          <ArrowRight size={20} />
+        </button>
+      </section>
+
+      <footer className="px-4 sm:px-6 py-8 border-t border-stone-200 text-center text-xs text-stone-500 space-y-1">
+        <div>{t(locale, 'landing.foot.tag')}</div>
+        <div>
+          {t(locale, 'landing.foot.author')}{' '}
+          <a
+            href="https://celiarozalenm.com"
+            target="_blank"
+            rel="noopener"
+            className="text-brand-600 hover:underline"
+          >
+            Celia Rozalén Maquedano
+          </a>
+          {' · '}
+          <a
+            href="https://github.com/celiarozalenm/madrono-perruno"
+            target="_blank"
+            rel="noopener"
+            className="text-brand-600 hover:underline"
+          >
+            GitHub
+          </a>
+        </div>
+      </footer>
+    </div>
+  )
+}
+
+function FeatureCard({
+  icon,
+  color,
+  title,
+  body,
+}: {
+  icon: React.ReactNode
+  color: string
+  title: string
+  body: string
+}) {
+  return (
+    <div className="bg-white rounded-2xl border border-stone-200 p-5 hover:border-brand-300 transition-colors">
+      <div
+        className="w-11 h-11 rounded-xl flex items-center justify-center text-white mb-3"
+        style={{ background: color }}
+      >
+        {icon}
+      </div>
+      <h3 className="font-semibold text-lg text-stone-900 mb-1">{title}</h3>
+      <p className="text-sm text-stone-600 leading-relaxed">{body}</p>
+    </div>
+  )
+}
+
+function InstallCard({
+  icon,
+  title,
+  body,
+}: {
+  icon: React.ReactNode
+  title: string
+  body: string
+}) {
+  return (
+    <div className="bg-stone-800 rounded-xl p-4">
+      <div className="text-brand-400 mb-2">{icon}</div>
+      <div className="font-semibold text-stone-100">{title}</div>
+      <div className="text-sm text-stone-400 mt-1">{body}</div>
+    </div>
+  )
+}
