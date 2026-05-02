@@ -14,6 +14,7 @@ import {
 } from 'recharts'
 import { Map as MapIcon, BarChart3, Dog, Trash2, Fence, Trees, type LucideIcon } from 'lucide-react'
 import type { Datasets, DistrictAggregate, Locale, ProteccionAnimalEntry } from '../types'
+import type { StatsSection } from './Sidebar'
 import { t } from '../i18n'
 import { aggregateByDistrict } from '../services/scoring'
 import DistrictChoropleth from './DistrictChoropleth'
@@ -21,6 +22,7 @@ import DistrictChoropleth from './DistrictChoropleth'
 interface Props {
   data: Datasets
   locale: Locale
+  section: StatsSection
 }
 
 type Metric = 'papeleras' | 'areasCaninas' | 'parques' | 'perros'
@@ -37,10 +39,7 @@ const NEEDS_LABEL_KEY: Record<
   parques: 'stats.needs.metric.parques',
 }
 
-export default function StatsView({ data, locale }: Props) {
-  const [metric, setMetric] = useState<Metric>('papeleras')
-  const [mode, setMode] = useState<DisplayMode>('map')
-  const [needsField, setNeedsField] = useState<NeedsField>('papeleras')
+export default function StatsView({ data, locale, section }: Props) {
   const censoYears = data.perros.years ?? []
   const [censoYear, setCensoYear] = useState<number | null>(null)
   const effectiveCensoYear = censoYear ?? data.perros.year ?? null
@@ -49,50 +48,28 @@ export default function StatsView({ data, locale }: Props) {
     [data, effectiveCensoYear],
   )
 
-  const sorted = useMemo(
-    () =>
-      aggregates
-        .filter((a) => a[metric] > 0)
-        .sort((a, b) => b[metric] - a[metric]),
-    [aggregates, metric],
-  )
-
-  const colorByMetric: Record<Metric, string> = {
-    papeleras: '#ed731f',
-    areasCaninas: '#2f7d3a',
-    parques: '#5b3a1e',
-    perros: '#c8252b',
-  }
-  const labelByMetric: Record<Metric, string> = {
-    papeleras: t(locale, 'stats.papelerasRanking'),
-    areasCaninas: t(locale, 'stats.areasRanking'),
-    parques: t(locale, 'stats.parquesRanking'),
-    perros: t(locale, 'stats.perrosRanking'),
-  }
-
-  const totalPapeleras = aggregates.reduce((s, a) => s + a.papeleras, 0)
-  const totalAreas = aggregates.reduce((s, a) => s + a.areasCaninas, 0)
-  const totalParques = aggregates.reduce((s, a) => s + a.parques, 0)
-  const totalPerros = aggregates.reduce((s, a) => s + a.perros, 0)
-
   const numFmt = useMemo(
     () => new Intl.NumberFormat(locale === 'es' ? 'es-ES' : 'en-US'),
     [locale],
   )
 
+  const showCensoSelector =
+    censoYears.length > 1 &&
+    (section === 'overview' || section === 'ranking' || section === 'needs')
+
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-6 space-y-6 scroll-smooth">
-      <div id="stats-overview" className="scroll-mt-4">
+    <div className="max-w-5xl mx-auto p-4 sm:p-6 space-y-6">
+      <header className="space-y-1">
         <h1 className="text-2xl font-bold text-stone-900">{t(locale, 'stats.title')}</h1>
-        <p className="text-sm text-stone-600 mt-1">
+        <p className="text-sm text-stone-600">
           {locale === 'es'
             ? `${aggregates.length} distritos analizados con datos del Portal de Datos Abiertos del Ayuntamiento de Madrid.`
             : `${aggregates.length} districts analysed with data from Madrid City Council Open Data Portal.`}
         </p>
-      </div>
+      </header>
 
-      {censoYears.length > 1 && (
-        <div className="flex items-center gap-2 -mb-2">
+      {showCensoSelector && (
+        <div className="flex items-center gap-2">
           <label
             htmlFor="censo-year-select"
             className="text-xs font-medium uppercase tracking-wide text-stone-500"
@@ -118,112 +95,173 @@ export default function StatsView({ data, locale }: Props) {
         </div>
       )}
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <KPICard
-          label={t(locale, 'stats.perros')}
-          value={totalPerros}
-          color="#c8252b"
-          icon={Dog}
+      {section === 'overview' && <OverviewPanel aggregates={aggregates} locale={locale} />}
+      {section === 'ranking' && <RankingPanel aggregates={aggregates} locale={locale} />}
+      {section === 'needs' && (
+        <NeedsPanel
+          aggregates={aggregates}
+          year={effectiveCensoYear}
+          locale={locale}
+          numFmt={numFmt}
         />
-        <KPICard
-          label={t(locale, 'layer.papeleras')}
-          value={totalPapeleras}
-          color="#ed731f"
-          icon={Trash2}
-        />
-        <KPICard
-          label={t(locale, 'layer.areas')}
-          value={totalAreas}
-          color="#2f7d3a"
-          icon={Fence}
-        />
-        <KPICard
-          label={t(locale, 'layer.parques')}
-          value={totalParques}
-          color="#5b3a1e"
-          icon={Trees}
-        />
+      )}
+      {section === 'proteccion' && (
+        <ProteccionPanel data={data.proteccionAnimal} locale={locale} />
+      )}
+    </div>
+  )
+}
+
+function OverviewPanel({
+  aggregates,
+  locale,
+}: {
+  aggregates: DistrictAggregate[]
+  locale: Locale
+}) {
+  const totalPapeleras = aggregates.reduce((s, a) => s + a.papeleras, 0)
+  const totalAreas = aggregates.reduce((s, a) => s + a.areasCaninas, 0)
+  const totalParques = aggregates.reduce((s, a) => s + a.parques, 0)
+  const totalPerros = aggregates.reduce((s, a) => s + a.perros, 0)
+
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <KPICard
+        label={t(locale, 'stats.perros')}
+        value={totalPerros}
+        color="#c8252b"
+        icon={Dog}
+      />
+      <KPICard
+        label={t(locale, 'layer.papeleras')}
+        value={totalPapeleras}
+        color="#ed731f"
+        icon={Trash2}
+      />
+      <KPICard
+        label={t(locale, 'layer.areas')}
+        value={totalAreas}
+        color="#2f7d3a"
+        icon={Fence}
+      />
+      <KPICard
+        label={t(locale, 'layer.parques')}
+        value={totalParques}
+        color="#5b3a1e"
+        icon={Trees}
+      />
+    </div>
+  )
+}
+
+function RankingPanel({
+  aggregates,
+  locale,
+}: {
+  aggregates: DistrictAggregate[]
+  locale: Locale
+}) {
+  const [metric, setMetric] = useState<Metric>('papeleras')
+  const [mode, setMode] = useState<DisplayMode>('map')
+
+  const sorted = useMemo(
+    () =>
+      aggregates
+        .filter((a) => a[metric] > 0)
+        .sort((a, b) => b[metric] - a[metric]),
+    [aggregates, metric],
+  )
+
+  const colorByMetric: Record<Metric, string> = {
+    papeleras: '#ed731f',
+    areasCaninas: '#2f7d3a',
+    parques: '#5b3a1e',
+    perros: '#c8252b',
+  }
+  const labelByMetric: Record<Metric, string> = {
+    papeleras: t(locale, 'stats.papelerasRanking'),
+    areasCaninas: t(locale, 'stats.areasRanking'),
+    parques: t(locale, 'stats.parquesRanking'),
+    perros: t(locale, 'stats.perrosRanking'),
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-stone-200 p-4 sm:p-5 space-y-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <h2 className="font-semibold text-stone-900 text-sm sm:text-base flex-1">
+          {labelByMetric[metric]}
+        </h2>
+        <div className="flex bg-stone-100 rounded-lg p-1 text-xs">
+          {(['perros', 'papeleras', 'areasCaninas', 'parques'] as Metric[]).map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setMetric(m)}
+              aria-pressed={metric === m}
+              className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
+                metric === m
+                  ? 'bg-white text-stone-900 shadow-sm'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              {m === 'perros'
+                ? locale === 'es'
+                  ? 'Perros'
+                  : 'Dogs'
+                : m === 'papeleras'
+                ? locale === 'es'
+                  ? 'Papeleras'
+                  : 'Bins'
+                : m === 'areasCaninas'
+                ? locale === 'es'
+                  ? 'Áreas'
+                  : 'Areas'
+                : locale === 'es'
+                ? 'Parques'
+                : 'Parks'}
+            </button>
+          ))}
+        </div>
+        <div className="flex bg-stone-100 rounded-lg p-1 text-xs">
+          <button
+            type="button"
+            onClick={() => setMode('map')}
+            aria-pressed={mode === 'map'}
+            className={`px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 transition-colors ${
+              mode === 'map'
+                ? 'bg-white text-stone-900 shadow-sm'
+                : 'text-stone-600 hover:text-stone-900'
+            }`}
+          >
+            <MapIcon size={13} />
+            {locale === 'es' ? 'Mapa' : 'Map'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('bars')}
+            aria-pressed={mode === 'bars'}
+            className={`px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 transition-colors ${
+              mode === 'bars'
+                ? 'bg-white text-stone-900 shadow-sm'
+                : 'text-stone-600 hover:text-stone-900'
+            }`}
+          >
+            <BarChart3 size={13} />
+            {locale === 'es' ? 'Lista' : 'List'}
+          </button>
+        </div>
       </div>
 
-      <div
-        id="stats-ranking"
-        className="bg-white rounded-xl border border-stone-200 p-4 sm:p-5 space-y-4 scroll-mt-4"
-      >
-        <div className="flex flex-wrap items-center gap-2">
-          <h2 className="font-semibold text-stone-900 text-sm sm:text-base flex-1">
-            {labelByMetric[metric]}
-          </h2>
-          <div className="flex bg-stone-100 rounded-lg p-1 text-xs">
-            {(['perros', 'papeleras', 'areasCaninas', 'parques'] as Metric[]).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setMetric(m)}
-                aria-pressed={metric === m}
-                className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
-                  metric === m
-                    ? 'bg-white text-stone-900 shadow-sm'
-                    : 'text-stone-600 hover:text-stone-900'
-                }`}
-              >
-                {m === 'perros'
-                  ? locale === 'es'
-                    ? 'Perros'
-                    : 'Dogs'
-                  : m === 'papeleras'
-                  ? locale === 'es'
-                    ? 'Papeleras'
-                    : 'Bins'
-                  : m === 'areasCaninas'
-                  ? locale === 'es'
-                    ? 'Áreas'
-                    : 'Areas'
-                  : locale === 'es'
-                  ? 'Parques'
-                  : 'Parks'}
-              </button>
-            ))}
-          </div>
-          <div className="flex bg-stone-100 rounded-lg p-1 text-xs">
-            <button
-              type="button"
-              onClick={() => setMode('map')}
-              aria-pressed={mode === 'map'}
-              className={`px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 transition-colors ${
-                mode === 'map'
-                  ? 'bg-white text-stone-900 shadow-sm'
-                  : 'text-stone-600 hover:text-stone-900'
-              }`}
-            >
-              <MapIcon size={13} />
-              {locale === 'es' ? 'Mapa' : 'Map'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode('bars')}
-              aria-pressed={mode === 'bars'}
-              className={`px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 transition-colors ${
-                mode === 'bars'
-                  ? 'bg-white text-stone-900 shadow-sm'
-                  : 'text-stone-600 hover:text-stone-900'
-              }`}
-            >
-              <BarChart3 size={13} />
-              {locale === 'es' ? 'Lista' : 'List'}
-            </button>
-          </div>
-        </div>
+      {mode === 'map' && (
+        <DistrictChoropleth
+          metric={metric}
+          aggregates={aggregates}
+          locale={locale}
+          metricLabel={labelByMetric[metric]}
+        />
+      )}
 
-        {mode === 'map' && (
-          <DistrictChoropleth
-            metric={metric}
-            aggregates={aggregates}
-            locale={locale}
-            metricLabel={labelByMetric[metric]}
-          />
-        )}
-
-        {mode === 'bars' && (
+      {mode === 'bars' && (
         <div className="h-[460px] -mx-2">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
@@ -260,23 +298,7 @@ export default function StatsView({ data, locale }: Props) {
             </BarChart>
           </ResponsiveContainer>
         </div>
-        )}
-      </div>
-
-      <div id="stats-needs" className="scroll-mt-4">
-        <NeedsPanel
-          aggregates={aggregates}
-          year={effectiveCensoYear}
-          field={needsField}
-          onFieldChange={setNeedsField}
-          locale={locale}
-          numFmt={numFmt}
-        />
-      </div>
-
-      <div id="stats-proteccion" className="scroll-mt-4">
-        <ProteccionPanel data={data.proteccionAnimal} locale={locale} />
-      </div>
+      )}
     </div>
   )
 }
@@ -291,18 +313,15 @@ interface NeedsRow {
 function NeedsPanel({
   aggregates,
   year,
-  field,
-  onFieldChange,
   locale,
   numFmt,
 }: {
   aggregates: DistrictAggregate[]
   year: number | null
-  field: NeedsField
-  onFieldChange: (f: NeedsField) => void
   locale: Locale
   numFmt: Intl.NumberFormat
 }) {
+  const [field, setField] = useState<NeedsField>('papeleras')
   const rowsWithPerros = useMemo(
     () => aggregates.filter((a) => a.perros > 0),
     [aggregates],
@@ -363,7 +382,7 @@ function NeedsPanel({
           <button
             key={f}
             type="button"
-            onClick={() => onFieldChange(f)}
+            onClick={() => setField(f)}
             aria-pressed={field === f}
             className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
               field === f

@@ -1,26 +1,38 @@
-import { Map as MapIcon, BarChart3, Compass, Footprints, Info, Globe, X } from 'lucide-react'
+import { Map as MapIcon, BarChart3, Compass, Footprints, MessageSquareHeart, Info, Globe, X } from 'lucide-react'
 import type { Locale } from '../types'
 import { t } from '../i18n'
 
-export type View = 'map' | 'barrio' | 'route' | 'stats' | 'about'
+export type View = 'map' | 'barrio' | 'route' | 'stats' | 'participar' | 'about'
+export type StatsSection = 'overview' | 'ranking' | 'needs' | 'proteccion'
 
 interface Props {
   view: View
   setView: (v: View) => void
+  statsSection: StatsSection
+  setStatsSection: (s: StatsSection) => void
   locale: Locale
   toggleLocale: () => void
   open: boolean
   onClose: () => void
 }
 
-const STATS_SUBSECTIONS = [
-  { id: 'stats-overview', labelKey: 'stats.sub.overview' as const },
-  { id: 'stats-ranking', labelKey: 'stats.sub.ranking' as const },
-  { id: 'stats-needs', labelKey: 'stats.sub.needs' as const },
-  { id: 'stats-proteccion', labelKey: 'stats.sub.proteccion' as const },
+const STATS_SUBSECTIONS: { id: StatsSection; labelKey: 'stats.sub.overview' | 'stats.sub.ranking' | 'stats.sub.needs' | 'stats.sub.proteccion' }[] = [
+  { id: 'overview', labelKey: 'stats.sub.overview' },
+  { id: 'ranking', labelKey: 'stats.sub.ranking' },
+  { id: 'needs', labelKey: 'stats.sub.needs' },
+  { id: 'proteccion', labelKey: 'stats.sub.proteccion' },
 ]
 
-export default function Sidebar({ view, setView, locale, toggleLocale, open, onClose }: Props) {
+export default function Sidebar({
+  view,
+  setView,
+  statsSection,
+  setStatsSection,
+  locale,
+  toggleLocale,
+  open,
+  onClose,
+}: Props) {
   const tabs: { key: View; label: string; icon: React.ReactNode }[] = [
     { key: 'map', label: t(locale, 'nav.map'), icon: <MapIcon size={18} /> },
     { key: 'barrio', label: t(locale, 'nav.barrio'), icon: <Compass size={18} /> },
@@ -30,6 +42,7 @@ export default function Sidebar({ view, setView, locale, toggleLocale, open, onC
       icon: <Footprints size={18} />,
     },
     { key: 'stats', label: t(locale, 'nav.stats'), icon: <BarChart3 size={18} /> },
+    { key: 'participar', label: t(locale, 'nav.participar'), icon: <MessageSquareHeart size={18} /> },
   ]
 
   const aboutTab = { key: 'about' as View, label: t(locale, 'nav.about'), icon: <Info size={18} /> }
@@ -40,20 +53,13 @@ export default function Sidebar({ view, setView, locale, toggleLocale, open, onC
 
   function handleNavClick(key: View) {
     setView(key)
+    if (key === 'stats') setStatsSection('overview')
     maybeCloseMobile()
   }
 
-  function handleStatsSubClick(id: string) {
-    const scroll = () => {
-      const el = document.getElementById(id)
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
-    if (view !== 'stats') {
-      setView('stats')
-      setTimeout(scroll, 80)
-    } else {
-      scroll()
-    }
+  function handleStatsSubClick(id: StatsSection) {
+    if (view !== 'stats') setView('stats')
+    setStatsSection(id)
     maybeCloseMobile()
   }
 
@@ -114,7 +120,12 @@ export default function Sidebar({ view, setView, locale, toggleLocale, open, onC
                         <button
                           type="button"
                           onClick={() => handleStatsSubClick(sub.id)}
-                          className="w-full text-left px-2.5 py-1.5 rounded-md text-xs text-stone-600 hover:bg-stone-100 hover:text-stone-900 transition-colors"
+                          aria-current={statsSection === sub.id ? 'page' : undefined}
+                          className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors ${
+                            statsSection === sub.id
+                              ? 'bg-stone-100 text-stone-900 font-medium'
+                              : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
+                          }`}
                         >
                           {t(locale, sub.labelKey)}
                         </button>

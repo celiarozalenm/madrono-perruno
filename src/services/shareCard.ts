@@ -23,7 +23,7 @@ const COLOR = {
   text: '#1a1a1a',
   textDim: '#4b5563',
   textFaint: '#6b7280',
-  madrono: '#c8252b',
+  madrono: '#5a3f2a',
 } as const
 
 const SCORE_COLOR: Record<BarrioScore['scoreLabel'], string> = {
