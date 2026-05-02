@@ -35,8 +35,12 @@ function normaliseDistrito(d: string): string {
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .toUpperCase()
+    .replace(/\s*-\s*/g, '-')
+    .replace(/\s+/g, ' ')
     .trim()
 }
+
+const NO_DATA_COLOR = '#e7e5e4'
 
 const RAMP = [
   '#fef3c7',
@@ -62,9 +66,12 @@ export default function DistrictChoropleth({ metric, aggregates, locale, metricL
       .catch(() => setGeojson(null))
   }, [])
 
-  // Build a metric → district map for fast lookup.
+  // Build a metric → district map for fast lookup. Skip empty entries so
+  // districts with no data don't dilute the colour ramp or appear coloured.
   const valueByDistrito = new Map<string, number>()
-  for (const a of aggregates) valueByDistrito.set(normaliseDistrito(a.distrito), a[metric])
+  for (const a of aggregates) {
+    if (a[metric] > 0) valueByDistrito.set(normaliseDistrito(a.distrito), a[metric])
+  }
   const max = Math.max(1, ...Array.from(valueByDistrito.values()))
 
   useEffect(() => {
@@ -89,21 +96,25 @@ export default function DistrictChoropleth({ metric, aggregates, locale, metricL
     const apply = () => {
       const enriched = {
         ...geojson,
-        features: geojson.features.map((f) => {
-          const props = (f.properties ?? {}) as Record<string, unknown>
-          const name = String(props.NOMBRE ?? props.nombre ?? props.NOM_DIS ?? '').trim()
-          const value = valueByDistrito.get(normaliseDistrito(name)) ?? 0
-          const ratio = value / max
-          const colorIdx = Math.min(RAMP.length - 1, Math.floor(ratio * RAMP.length))
-          return {
-            ...f,
-            properties: {
-              name,
-              value,
-              color: RAMP[Math.max(0, colorIdx)],
-            },
-          }
-        }),
+        features: geojson.features
+          .map((f) => {
+            const props = (f.properties ?? {}) as Record<string, unknown>
+            const name = String(props.NOMBRE ?? props.nombre ?? props.NOM_DIS ?? '').trim()
+            const rawValue = valueByDistrito.get(normaliseDistrito(name))
+            const hasData = rawValue !== undefined && rawValue > 0
+            const value = rawValue ?? 0
+            const ratio = value / max
+            const colorIdx = Math.min(RAMP.length - 1, Math.floor(ratio * RAMP.length))
+            return {
+              ...f,
+              properties: {
+                name,
+                value,
+                hasData,
+                color: hasData ? RAMP[Math.max(0, colorIdx)] : NO_DATA_COLOR,
+              },
+            }
+          }),
       }
       const src = map.getSource('distritos') as GeoJSONSource | undefined
       if (src) {
@@ -133,8 +144,13 @@ export default function DistrictChoropleth({ metric, aggregates, locale, metricL
           map.getCanvas().style.cursor = 'pointer'
           const f = e.features?.[0]
           if (!f) return
-          const p = f.properties as { name: string; value: number }
+          const p = f.properties as { name: string; value: number; hasData: boolean }
           if (popupRef.current) popupRef.current.remove()
+          const valueText = p.hasData
+            ? p.value.toLocaleString(locale === 'es' ? 'es-ES' : 'en-US')
+            : locale === 'es'
+            ? 'sin datos'
+            : 'no data'
           popupRef.current = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 6 })
             .setLngLat(e.lngLat)
             .setHTML(
@@ -142,9 +158,7 @@ export default function DistrictChoropleth({ metric, aggregates, locale, metricL
                 p.name,
               )}</div><div style="font-size:0.75rem;color:#6b7280;margin-top:2px">${escapeText(
                 metricLabel,
-              )}: <b style="color:#1a1a1a">${p.value.toLocaleString(
-                locale === 'es' ? 'es-ES' : 'en-US',
-              )}</b></div></div></div>`,
+              )}: <b style="color:#1a1a1a">${escapeText(valueText)}</b></div></div></div>`,
             )
             .addTo(map)
         })

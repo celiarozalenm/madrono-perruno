@@ -72,9 +72,15 @@ export interface DistritoPerros {
   gatos: number
 }
 
+export interface PerrosCensusEntry extends DistritoPerros {
+  year: number
+}
+
 export interface PerrosCensus {
   year: number | null
   distritos: DistritoPerros[]
+  years: number[]
+  entries: PerrosCensusEntry[]
 }
 
 export interface ProteccionAnimalEntry {

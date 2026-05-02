@@ -99,7 +99,10 @@ function nearestDistrito(
   return best
 }
 
-export function aggregateByDistrict(data: Datasets): DistrictAggregate[] {
+export function aggregateByDistrict(
+  data: Datasets,
+  perrosYear?: number | null,
+): DistrictAggregate[] {
   const map = new Map<string, DistrictAggregate>()
   const ensure = (d: string): DistrictAggregate => {
     const key = normaliseDistrito(d)
@@ -117,25 +120,32 @@ export function aggregateByDistrict(data: Datasets): DistrictAggregate[] {
     return map.get(key)!
   }
   for (const p of data.papeleras) {
-    if (!p.distrito) continue
+    if (!isValidDistrito(p.distrito)) continue
     ensure(p.distrito).papeleras += 1
   }
   for (const a of data.areas) {
-    if (!a.distrito) continue
+    if (!isValidDistrito(a.distrito)) continue
     const r = ensure(a.distrito)
     r.areasCaninas += 1
     r.superficieAreasM2 += a.superficieM2
   }
   for (const pk of data.parques) {
-    if (!pk.distrito) continue
+    if (!isValidDistrito(pk.distrito)) continue
     ensure(pk.distrito).parques += 1
   }
   for (const v of data.vets) {
-    if (!v.distrito) continue
+    if (!isValidDistrito(v.distrito)) continue
     ensure(v.distrito).veterinarios += 1
   }
-  for (const dp of data.perros.distritos) {
-    if (!dp.distrito) continue
+  // Pick the perros snapshot for the requested year. Falls through to the
+  // pre-computed latest snapshot when the year is omitted, null, or matches it.
+  const useLatest =
+    perrosYear === undefined || perrosYear === null || perrosYear === data.perros.year
+  const perrosRows = useLatest
+    ? data.perros.distritos
+    : data.perros.entries.filter((e) => e.year === perrosYear)
+  for (const dp of perrosRows) {
+    if (!isValidDistrito(dp.distrito)) continue
     ensure(dp.distrito).perros = dp.perros
   }
   return Array.from(map.values()).sort(

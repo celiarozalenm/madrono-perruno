@@ -54,7 +54,7 @@ async function loadJson<T>(name: string): Promise<T> {
   return (await res.json()) as T
 }
 
-const EMPTY_PERROS: PerrosCensus = { year: null, distritos: [] }
+const EMPTY_PERROS: PerrosCensus = { year: null, distritos: [], years: [], entries: [] }
 
 export async function loadAllDatasets(): Promise<Datasets> {
   const [papeleras, areas, parques, vets, air, perros, proteccionAnimal] = await Promise.all([

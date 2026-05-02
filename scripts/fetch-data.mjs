@@ -254,32 +254,38 @@ function parseProteccionAnimal(buf) {
 
 function parsePerros(csv) {
   // Header: AÑO;DISTRITO;ESPECIE CANINA;ESPECIE FELINA + trailing empty cols.
-  // Each row is one (year, district). Keep only the most recent year present per district.
+  // Each row is one (year, district). Emit the full history plus the latest
+  // year as a snapshot (back-compat with consumers that don't filter by year).
   const rows = parseCsv(csv)
-  const latestByDistrito = new Map()
+  const entries = []
+  const yearSet = new Set()
   let latestYear = -Infinity
   for (const r of rows) {
     const year = num(r['AÑO'])
-    if (Number.isFinite(year) && year > latestYear) latestYear = year
-  }
-  for (const r of rows) {
-    const year = num(r['AÑO'])
-    if (year !== latestYear) continue
+    if (!Number.isFinite(year)) continue
     let distrito = clean(r['DISTRITO'])
     if (!distrito) continue
     const upper = distrito.toUpperCase()
     if (PERROS_DISTRITO_ALIAS[upper]) distrito = PERROS_DISTRITO_ALIAS[upper]
     const perros = num(r['ESPECIE CANINA'])
     const gatos = num(r['ESPECIE FELINA'])
-    latestByDistrito.set(distrito, {
+    entries.push({
+      year,
       distrito,
       perros: Number.isFinite(perros) ? perros : 0,
       gatos: Number.isFinite(gatos) ? gatos : 0,
     })
+    yearSet.add(year)
+    if (year > latestYear) latestYear = year
   }
+  const distritos = entries
+    .filter((e) => e.year === latestYear)
+    .map(({ distrito, perros, gatos }) => ({ distrito, perros, gatos }))
   return {
     year: Number.isFinite(latestYear) ? latestYear : null,
-    distritos: Array.from(latestByDistrito.values()),
+    distritos,
+    years: Array.from(yearSet).sort((a, b) => a - b),
+    entries,
   }
 }
 

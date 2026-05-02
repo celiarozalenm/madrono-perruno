@@ -12,7 +12,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { Map as MapIcon, BarChart3 } from 'lucide-react'
+import { Map as MapIcon, BarChart3, Dog, Trash2, Fence, Trees } from 'lucide-react'
 import type { Datasets, DistrictAggregate, Locale, ProteccionAnimalEntry } from '../types'
 import { t } from '../i18n'
 import { aggregateByDistrict } from '../services/scoring'
@@ -38,10 +38,16 @@ const NEEDS_LABEL_KEY: Record<
 }
 
 export default function StatsView({ data, locale }: Props) {
-  const aggregates = useMemo(() => aggregateByDistrict(data), [data])
   const [metric, setMetric] = useState<Metric>('papeleras')
   const [mode, setMode] = useState<DisplayMode>('map')
   const [needsField, setNeedsField] = useState<NeedsField>('papeleras')
+  const censoYears = data.perros.years ?? []
+  const [censoYear, setCensoYear] = useState<number | null>(null)
+  const effectiveCensoYear = censoYear ?? data.perros.year ?? null
+  const aggregates = useMemo(
+    () => aggregateByDistrict(data, effectiveCensoYear),
+    [data, effectiveCensoYear],
+  )
 
   const sorted = useMemo(
     () =>
@@ -85,19 +91,58 @@ export default function StatsView({ data, locale }: Props) {
         </p>
       </div>
 
+      {censoYears.length > 1 && (
+        <div className="flex items-center gap-2 -mb-2">
+          <label
+            htmlFor="censo-year-select"
+            className="text-xs font-medium uppercase tracking-wide text-stone-500"
+          >
+            {t(locale, 'stats.censoYear')}
+          </label>
+          <select
+            id="censo-year-select"
+            value={effectiveCensoYear ?? ''}
+            onChange={(e) => {
+              const v = Number(e.target.value)
+              setCensoYear(Number.isFinite(v) ? v : null)
+            }}
+            className="text-sm bg-white border border-stone-200 rounded-md px-2 py-1 text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          >
+            {[...censoYears].reverse().map((y) => (
+              <option key={y} value={y}>
+                {y}
+                {y === data.perros.year ? ` · ${locale === 'es' ? 'último' : 'latest'}` : ''}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <KPICard
           label={t(locale, 'stats.perros')}
           value={totalPerros}
           color="#003df6"
+          icon={Dog}
         />
         <KPICard
           label={t(locale, 'layer.papeleras')}
           value={totalPapeleras}
           color="#ed731f"
+          icon={Trash2}
         />
-        <KPICard label={t(locale, 'layer.areas')} value={totalAreas} color="#2f7d3a" />
-        <KPICard label={t(locale, 'layer.parques')} value={totalParques} color="#5b3a1e" />
+        <KPICard
+          label={t(locale, 'layer.areas')}
+          value={totalAreas}
+          color="#2f7d3a"
+          icon={Fence}
+        />
+        <KPICard
+          label={t(locale, 'layer.parques')}
+          value={totalParques}
+          color="#5b3a1e"
+          icon={Trees}
+        />
       </div>
 
       <div className="bg-white rounded-xl border border-stone-200 p-4 sm:p-5 space-y-4">
@@ -217,7 +262,7 @@ export default function StatsView({ data, locale }: Props) {
 
       <NeedsPanel
         aggregates={aggregates}
-        year={data.perros.year}
+        year={effectiveCensoYear}
         field={needsField}
         onFieldChange={setNeedsField}
         locale={locale}
@@ -524,14 +569,26 @@ function ProteccionPanel({
   )
 }
 
-function KPICard({ label, value, color }: { label: string; value: number; color: string }) {
+function KPICard({
+  label,
+  value,
+  color,
+  icon: Icon,
+}: {
+  label: string
+  value: number
+  color: string
+  icon: React.ComponentType<{ size?: number | string; color?: string; strokeWidth?: number }>
+}) {
   return (
     <div className="bg-white rounded-xl border border-stone-200 p-4">
       <div
-        className="w-2 h-8 rounded-full mb-2"
-        style={{ background: color }}
+        className="w-9 h-9 rounded-lg flex items-center justify-center mb-2"
+        style={{ background: `${color}15`, color }}
         aria-hidden
-      />
+      >
+        <Icon size={18} strokeWidth={2} />
+      </div>
       <div className="text-2xl sm:text-3xl font-bold tabular-nums text-stone-900">
         {value.toLocaleString()}
       </div>
