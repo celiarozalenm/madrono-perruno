@@ -12,7 +12,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { Map as MapIcon, BarChart3, Dog, Trash2, Fence, Trees } from 'lucide-react'
+import { Map as MapIcon, BarChart3, Dog, Trash2, Fence, Trees, type LucideIcon } from 'lucide-react'
 import type { Datasets, DistrictAggregate, Locale, ProteccionAnimalEntry } from '../types'
 import { t } from '../i18n'
 import { aggregateByDistrict } from '../services/scoring'
@@ -61,7 +61,7 @@ export default function StatsView({ data, locale }: Props) {
     papeleras: '#ed731f',
     areasCaninas: '#2f7d3a',
     parques: '#5b3a1e',
-    perros: '#003df6',
+    perros: '#c8252b',
   }
   const labelByMetric: Record<Metric, string> = {
     papeleras: t(locale, 'stats.papelerasRanking'),
@@ -81,8 +81,8 @@ export default function StatsView({ data, locale }: Props) {
   )
 
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-6 space-y-6">
-      <div>
+    <div className="max-w-5xl mx-auto p-4 sm:p-6 space-y-6 scroll-smooth">
+      <div id="stats-overview" className="scroll-mt-4">
         <h1 className="text-2xl font-bold text-stone-900">{t(locale, 'stats.title')}</h1>
         <p className="text-sm text-stone-600 mt-1">
           {locale === 'es'
@@ -122,7 +122,7 @@ export default function StatsView({ data, locale }: Props) {
         <KPICard
           label={t(locale, 'stats.perros')}
           value={totalPerros}
-          color="#003df6"
+          color="#c8252b"
           icon={Dog}
         />
         <KPICard
@@ -145,7 +145,10 @@ export default function StatsView({ data, locale }: Props) {
         />
       </div>
 
-      <div className="bg-white rounded-xl border border-stone-200 p-4 sm:p-5 space-y-4">
+      <div
+        id="stats-ranking"
+        className="bg-white rounded-xl border border-stone-200 p-4 sm:p-5 space-y-4 scroll-mt-4"
+      >
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="font-semibold text-stone-900 text-sm sm:text-base flex-1">
             {labelByMetric[metric]}
@@ -260,16 +263,20 @@ export default function StatsView({ data, locale }: Props) {
         )}
       </div>
 
-      <NeedsPanel
-        aggregates={aggregates}
-        year={effectiveCensoYear}
-        field={needsField}
-        onFieldChange={setNeedsField}
-        locale={locale}
-        numFmt={numFmt}
-      />
+      <div id="stats-needs" className="scroll-mt-4">
+        <NeedsPanel
+          aggregates={aggregates}
+          year={effectiveCensoYear}
+          field={needsField}
+          onFieldChange={setNeedsField}
+          locale={locale}
+          numFmt={numFmt}
+        />
+      </div>
 
-      <ProteccionPanel data={data.proteccionAnimal} locale={locale} />
+      <div id="stats-proteccion" className="scroll-mt-4">
+        <ProteccionPanel data={data.proteccionAnimal} locale={locale} />
+      </div>
     </div>
   )
 }
@@ -578,7 +585,7 @@ function KPICard({
   label: string
   value: number
   color: string
-  icon: React.ComponentType<{ size?: number | string; color?: string; strokeWidth?: number }>
+  icon: LucideIcon
 }) {
   return (
     <div className="bg-white rounded-xl border border-stone-200 p-4">

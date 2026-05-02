@@ -48,58 +48,91 @@ export default function LayerToggle({
       <ul className="flex flex-col gap-0.5">
         {items.map((item) => {
           const labelKey = `layer.${item.key}` as const
-          const disabled = false
+          const checked = visible[item.key]
           return (
             <li key={item.key}>
-              <button
-                type="button"
-                onClick={() => !disabled && toggle(item.key)}
-                disabled={disabled}
-                aria-pressed={visible[item.key]}
-                title={
-                  disabled
-                    ? locale === 'es'
-                      ? 'Solo distrito (sin coordenadas)'
-                      : 'District only (no coords)'
-                    : undefined
-                }
-                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-colors ${
-                  disabled
-                    ? 'text-stone-400 cursor-not-allowed'
-                    : visible[item.key]
-                    ? 'bg-stone-100 text-stone-900'
-                    : 'text-stone-700 hover:bg-stone-50'
+              <div
+                role="presentation"
+                onClick={() => toggle(item.key)}
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm cursor-pointer transition-colors ${
+                  checked ? 'text-stone-900' : 'text-stone-600 hover:bg-stone-50'
                 }`}
               >
                 <span
-                  className="w-3 h-3 rounded-full shrink-0 border border-white shadow-sm"
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
                   style={{ background: LAYER_COLOR[item.key] }}
                   aria-hidden
                 />
-                <span className="shrink-0">{item.icon}</span>
+                <span className="shrink-0 text-stone-500">{item.icon}</span>
                 <span className="flex-1 text-left truncate">{t(locale, labelKey)}</span>
-                <span className="text-[11px] text-stone-500 tabular-nums">{item.count}</span>
-              </button>
+                <span className="text-[11px] text-stone-500 tabular-nums mr-1">{item.count}</span>
+                <ToggleSwitch
+                  checked={checked}
+                  onChange={() => toggle(item.key)}
+                  ariaLabel={t(locale, labelKey)}
+                />
+              </div>
             </li>
           )
         })}
-        <li>
-          <button
-            type="button"
+        <li className="mt-1 border-t border-stone-100 pt-1">
+          <div
+            role="presentation"
             onClick={toggleHeat}
-            aria-pressed={showHeat}
-            className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-colors mt-1 border-t border-stone-100 pt-2 ${
-              showHeat ? 'bg-stone-100 text-stone-900' : 'text-stone-700 hover:bg-stone-50'
+            className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm cursor-pointer transition-colors ${
+              showHeat ? 'text-stone-900' : 'text-stone-600 hover:bg-stone-50'
             }`}
           >
-            <Flame size={16} className="shrink-0" />
-            <span className="flex-1 text-left">{t(locale, 'layer.heat')}</span>
-            <span className="text-[11px] text-stone-500 uppercase">
-              {showHeat ? (locale === 'es' ? 'on' : 'on') : 'off'}
+            <Flame size={16} className="shrink-0 text-stone-500" />
+            <span className="flex-1 text-left leading-tight">
+              <span className="block">{t(locale, 'layer.heat')}</span>
+              <span className="block text-[10px] text-stone-500">
+                {locale === 'es'
+                  ? 'Resalta zonas con más papeleras'
+                  : 'Highlights areas with more bins'}
+              </span>
             </span>
-          </button>
+            <ToggleSwitch
+              checked={showHeat}
+              onChange={toggleHeat}
+              ariaLabel={t(locale, 'layer.heat')}
+            />
+          </div>
         </li>
       </ul>
     </div>
+  )
+}
+
+function ToggleSwitch({
+  checked,
+  onChange,
+  ariaLabel,
+}: {
+  checked: boolean
+  onChange: () => void
+  ariaLabel: string
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={ariaLabel}
+      onClick={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        onChange()
+      }}
+      className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-300 ${
+        checked ? 'bg-brand-500' : 'bg-stone-300'
+      }`}
+    >
+      <span
+        className={`inline-block h-3 w-3 transform rounded-full bg-white shadow transition-transform ${
+          checked ? 'translate-x-3.5' : 'translate-x-0.5'
+        }`}
+      />
+    </button>
   )
 }
