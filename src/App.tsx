@@ -16,18 +16,13 @@ import type { LayerKey } from './types'
 import type { RouteResult } from './services/routing'
 
 const ONBOARDING_KEY = 'mp-onboarded-v1'
-const ENTERED_KEY = 'mp-entered-v1'
 
 function App() {
   const { locale, toggle: toggleLocale } = useLocale()
   const { data, loading, error, reload } = useDatasets()
-  const [showLanding, setShowLanding] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem(ENTERED_KEY) !== '1'
-    } catch {
-      return true
-    }
-  })
+  // Always start on the landing on every page load — the project framing is part
+  // of the value proposition; users decide to enter the atlas explicitly.
+  const [showLanding, setShowLanding] = useState<boolean>(true)
   const [view, setView] = useState<View>('map')
   const [visibleLayers, setVisibleLayers] = useState<Record<LayerKey, boolean>>({
     papeleras: true,
@@ -60,11 +55,6 @@ function App() {
 
   function enterApp() {
     setShowLanding(false)
-    try {
-      localStorage.setItem(ENTERED_KEY, '1')
-    } catch {
-      // ignore
-    }
   }
 
   function toggleLayer(k: LayerKey) {
