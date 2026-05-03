@@ -53,7 +53,7 @@ Madrid publica desde hace años datos detallados sobre su infraestructura canina
 
 ### Objetivos
 
-1. **Convertir cuatro conjuntos de datos abiertos en un servicio consultable** sin formación técnica.
+1. **Convertir seis conjuntos de datos abiertos en un servicio consultable** sin formación técnica.
 2. **Aportar utilidades nuevas** (no replicar BolsaCan): scoring de barrios y generación de rutas peatonales pasando por puntos de interés canino.
 3. **Promover la transparencia y la equidad territorial** mediante comparativas claras entre distritos.
 4. **Hacer el proyecto bilingüe** (español e inglés) para incluir al colectivo de personas con perro de habla no española que reside o visita Madrid.
@@ -88,7 +88,7 @@ Aplicación 100 % cliente (Single Page Application + Progressive Web App). Sin b
 | Framework | React 19 + TypeScript estricto |
 | Build | Vite 8 |
 | Mapa | MapLibre GL JS (open source) + tiles CARTO Voyager (basadas en OpenStreetMap) |
-| Estilos | Tailwind CSS, tipografía Urbanist (Google Fonts) |
+| Estilos | Tailwind CSS, tipografía DM Sans (Google Fonts) |
 | Visualizaciones | Recharts (rankings) + MapLibre GL (coropleta) |
 | Parsing CSV | Papa Parse (cliente y build) |
 | Geocoding | Nominatim (OpenStreetMap) — geocoding al vuelo y batch al build (veterinarios) |
@@ -164,10 +164,10 @@ Innovación frente al estado del arte:
 | Áreas caninas, parques y veterinarios geolocalizados | ❌ | ✅ |
 | **Calidad del aire en tiempo real cruzada con paseo** | ❌ | ✅ |
 | **Mapa coropleta de los 21 distritos** | ❌ | ✅ |
-| Mapa de calor de densidad de papeleras | ❌ | ✅ |
 | Scoring 0-100 del barrio cruzando datasets | ❌ | ✅ |
 | Generación de rutas peatonales pasando por papeleras | ❌ | ✅ |
 | **Tarjeta compartible 1200×630 a redes sociales** | ❌ | ✅ |
+| **Censo de animales por distrito (serie histórica 2014-2024)** | ❌ | ✅ |
 | Bilingüe ES/EN | ❌ | ✅ |
 | Open source (MIT) | ❌ | ✅ |
 | PWA instalable sin tienda | ❌ | ✅ |

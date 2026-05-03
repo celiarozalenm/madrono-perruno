@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const VETS_PATH = resolve(__dirname, '..', 'public', 'data', 'vets.json')
+const MANIFEST_PATH = resolve(__dirname, '..', 'public', 'data', 'manifest.json')
 
 const USER_AGENT = 'madrono-perruno/0.1 (https://madrono-perruno.vercel.app; hello@celiarozalenm.com)'
 const NOMINATIM = 'https://nominatim.openstreetmap.org/search'
@@ -117,6 +118,19 @@ async function main() {
 
   await writeFile(VETS_PATH, JSON.stringify(vets))
   console.log(`\nGeocoded: ${resolved} resolved, ${failed} failed, ${skipped} already had coords. Cache size: ${cache.size}`)
+
+  // Bump manifest timestamp so the browser cache-key changes and the new
+  // coords get picked up on next page load.
+  if (resolved > 0) {
+    try {
+      const manifest = JSON.parse(await readFile(MANIFEST_PATH, 'utf-8'))
+      manifest.generatedAt = new Date().toISOString()
+      await writeFile(MANIFEST_PATH, JSON.stringify(manifest, null, 2))
+      console.log(`Bumped manifest.generatedAt to ${manifest.generatedAt}`)
+    } catch (err) {
+      console.warn('Could not update manifest:', err.message)
+    }
+  }
 }
 
 main().catch((err) => {

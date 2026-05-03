@@ -40,27 +40,26 @@ export default function LayerToggle({
     { key: 'air', icon: <Wind size={16} />, count: data.air?.length ?? 0 },
     { key: 'perros', icon: <Dog size={16} />, count: totalPerros },
   ]
-  const titleLabel = locale === 'es' ? 'Capas' : 'Layers'
+  const titleLabel = locale === 'es' ? 'En el mapa' : 'On the map'
   const toggleLabel = collapsed
-    ? locale === 'es' ? 'Mostrar capas' : 'Show layers'
-    : locale === 'es' ? 'Ocultar capas' : 'Hide layers'
+    ? locale === 'es' ? 'Mostrar' : 'Show'
+    : locale === 'es' ? 'Ocultar' : 'Hide'
   return (
     <div className="absolute top-3 left-3 bg-white/95 backdrop-blur rounded-xl shadow-lg border border-stone-200 p-2 z-10 max-w-[calc(100vw-1.5rem)] sm:max-w-[260px]">
-      <div className="flex items-center justify-between px-2 pt-1 pb-1">
+      <button
+        type="button"
+        onClick={() => setCollapsed((c) => !c)}
+        aria-expanded={!collapsed}
+        aria-label={`${toggleLabel} ${titleLabel}`}
+        className="w-full flex items-center justify-between gap-2 px-2 pt-1 pb-1 hover:bg-stone-100 rounded transition-colors"
+      >
         <span className="text-[11px] font-semibold uppercase tracking-wide text-stone-500">
           {titleLabel}
         </span>
-        <button
-          type="button"
-          onClick={() => setCollapsed((c) => !c)}
-          aria-expanded={!collapsed}
-          aria-label={toggleLabel}
-          title={toggleLabel}
-          className="text-stone-500 hover:text-stone-800 hover:bg-stone-100 rounded p-1 -m-1 transition-colors"
-        >
+        <span className="text-stone-500">
           {collapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-        </button>
-      </div>
+        </span>
+      </button>
       {!collapsed && (
       <ul className="flex flex-col gap-0.5">
         {items.map((item) => {

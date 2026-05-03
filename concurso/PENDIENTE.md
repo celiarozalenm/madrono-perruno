@@ -1,6 +1,7 @@
 # Pendiente — Madroño Perruno → II Premios Reutilización Datos Abiertos Madrid 2026
 
 **Deadline:** 4 mayo 2026, 23:59 (telemático en sede.madrid.es)
+**Recomendado enviar:** antes de las 18:00 del 4 mayo para evitar caídas de la sede
 
 ---
 
@@ -9,71 +10,71 @@
 - [x] App desplegada en https://madrono-perruno.vercel.app
 - [x] Repo público https://github.com/celiarozalenm/madrono-perruno
 - [x] Landing page con hero, features, datasets, instrucciones PWA
-- [x] Mapa interactivo (papeleras, áreas caninas, parques)
+- [x] Mapa interactivo (papeleras, áreas caninas, parques, veterinarios, calidad del aire)
 - [x] Mi barrio canino (scoring 0-100 con dirección o geolocalización)
 - [x] Ruta bolsa-amigable con OSRM
-- [x] Comparativa por distrito con gráficos
+- [x] Comparativa por distrito con doble vista (coropleta + tabla)
+- [x] Censo histórico 2014-2024 con selector de año
 - [x] PWA instalable + service worker offline
 - [x] Bilingüe ES/EN (defecto español)
 - [x] Datos pre-fetched en build (CORS resuelto)
 - [x] Reportes colaborativos (Vercel Edge Function + Upstash Redis) — feature estrella
 - [x] Geocoding de 528/615 veterinarios (86%)
 - [x] Sección de privacidad explícita "no guardamos datos"
-
----
-
-## 🟡 EN PROCESO
-
-- [ ] **Capa de veterinarios en el mapa** — geocoding terminado, falta:
-  - Code: añadir layer en Map.tsx
-  - LayerToggle: habilitar el toggle de vets
-  - Test
-  - Deploy
+- [x] Memoria (Anexo III) en `concurso/Anexo_III_Memoria.md` — corregida
+- [x] README del repo alineado con la app actual
 
 ---
 
 ## 🔴 PENDIENTE CRÍTICO
 
-### 1. Memoria del proyecto (Anexo III)
-- Ubicación borrador: `concurso/Anexo_III_Memoria.md`
-- Limita: **máximo 10 páginas, fuente Lato 11, interlineado sencillo, A4 una cara**
-- TODO:
-  - [ ] Convertir Markdown a Word/Pages
-  - [ ] Aplicar fuente Lato 11
-  - [ ] Verificar que no excede 10 páginas
-  - [ ] Insertar URL del vídeo demo (cuando esté grabado)
-  - [ ] Exportar a PDF firmado electrónicamente
-
-### 2. Vídeo demo (60-90 segundos)
+### 1. Vídeo demo (hasta 3 min — guion en `concurso/VIDEO_GUION.md`)
 - Sube a YouTube como **unlisted**
-- Pega URL en la memoria (campo "Vídeo (opcional)")
-- Guion sugerido:
-  - 0-10s: Mostrar landing → "Madroño Perruno, atlas canino de Madrid construido con datos abiertos"
-  - 10-25s: Click en "Abrir atlas" → mapa con 3 capas → toggle layers
-  - 25-45s: Click en una papelera → mostrar **reportes en vivo + voto** (este es EL momento clave)
-  - 45-60s: "Mi barrio canino" → introducir dirección → scoring
-  - 60-75s: "Ruta bolsa-amigable" → generar paseo
-  - 75-90s: Comparativa distritos + GitHub + cierre
+- Pega URL en la memoria (línea 16, sustituye `[PENDIENTE]`)
 - Herramientas: Loom o grabador de pantalla nativo Mac (Cmd+Shift+5)
 
-### 3. Documentos sede.madrid.es
-- Necesitas: certificado digital o Cl@ve
-- URL: https://sede.madrid.es/portal/site/tramites/menuitem.62876cb64654a55e2dbd7003a8a409a0/?vgnextoid=4c0731b003027910VgnVCM1000001d4a900aRCRD
-- TODO:
-  - [ ] Localizar y descargar **formulario principal de solicitud** (no es ninguno de los Anexos I/II)
-  - [ ] Localizar y descargar **declaración responsable individual** (los Anexos I/II que tenías son para AGRUPACIONES, no aplican porque te presentas sola)
-  - [ ] Rellenar formulario principal con datos personales + datos del proyecto + URL despliegue + URL repo + URL vídeo
-  - [ ] Rellenar declaración responsable
-  - [ ] Firmar electrónicamente cada documento (certificado digital)
+### 2. Memoria a PDF
+- Convertir `Anexo_III_Memoria.md` a PDF
+  - Fuente: **Lato 11** (Helvetica/Arial son equivalentes aceptados)
+  - Interlineado sencillo
+  - A4, una cara
+  - Máximo **10 páginas**
+- Insertar URL del vídeo en línea 16 antes de exportar
+- Si pasa de 10 págs, recortar primero "Propuestas de mejora y ampliaciones futuras"
+
+### 3. Solicitud de participación (formulario oficial)
+- Descargar **únicamente** el "Solicitud de participación en los premios a la reutilización de datos abiertos del Ayuntamiento de Madrid" desde https://sede.madrid.es
+- ⚠️ NO descargar Anexo I ni Anexo II — son solo para AGRUPACIONES, te presentas sola
+- Las declaraciones responsables (b-g del apartado 8) ya van **dentro de la solicitud**
+- Rellenar con:
+  - Datos personales
+  - Título del proyecto: "Madroño Perruno — Atlas Canino de Madrid"
+  - Categoría: Servicios web, aplicaciones y visualizaciones
+  - URL despliegue: https://madrono-perruno.vercel.app
+  - URL repo: https://github.com/celiarozalenm/madrono-perruno
+  - URL vídeo: (la de YouTube unlisted)
+- Marcar la casilla de **autorización de consulta de datos** (AEAT, TGSS, ATM) — te ahorra adjuntar certificados
+- Firmar electrónicamente con certificado digital o Cl@ve
 
 ### 4. Presentación telemática
 - Plataforma: https://sede.madrid.es
 - Documentos a subir:
-  1. Formulario principal firmado
-  2. Declaración responsable individual firmada
-  3. Anexo III: Memoria del proyecto firmada (PDF)
+  1. **Solicitud de participación** firmada (PDF)
+  2. **Anexo III: Memoria del proyecto** firmada (PDF)
 - Plazo: hasta 4 mayo 2026, 23:59
-- Recomendación: **NO esperar al último día**. Las sedes electrónicas suelen colapsar las últimas horas.
+- Recomendación: **enviar antes de las 18:00** del día 4. Las sedes electrónicas suelen colapsar las últimas horas.
+
+---
+
+## ⚠️ REQUISITOS ADMINISTRATIVOS (apartado 7 de las bases)
+
+Antes de presentar, asegúrate de estar al corriente con:
+- [ ] Hacienda (AEAT)
+- [ ] Seguridad Social (autónomos)
+- [ ] Agencia Tributaria del Ayuntamiento de Madrid (IBI, basuras…)
+- [ ] Sin reintegros pendientes de subvenciones
+
+Si autorizas la consulta en la solicitud, el órgano instructor lo verifica de oficio. Si no, hay que adjuntar certificados vigentes.
 
 ---
 
@@ -90,7 +91,6 @@
 
 ## 💡 OPCIONAL (si sobra tiempo)
 
-- [ ] Diseñar mejora de landing en Pencil
 - [ ] Comprar dominio propio (madroñoperruno.com o subdominio celiarozalenm.com)
 - [ ] Lighthouse audit y screenshot para incluir en memoria
 - [ ] Compartir en redes (LinkedIn, Twitter) tras presentar
