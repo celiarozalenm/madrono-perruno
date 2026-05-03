@@ -1,4 +1,5 @@
-import { Map as MapIcon, BarChart3, Compass, Footprints, MessageSquareHeart, Info, Globe, ArrowLeft, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Map as MapIcon, BarChart3, Compass, Footprints, MessageSquareHeart, Info, Globe, ArrowLeft, ChevronDown, X } from 'lucide-react'
 import type { Locale } from '../types'
 import { t } from '../i18n'
 
@@ -49,6 +50,14 @@ export default function Sidebar({
 
   const aboutTab = { key: 'about' as View, label: t(locale, 'nav.about'), icon: <Info size={18} /> }
 
+  // Subsections of "Estadísticas" can be collapsed by the user. Auto-open
+  // whenever the user lands on a stats page so deep links to /stats/needs
+  // never appear with the parent collapsed.
+  const [statsOpen, setStatsOpen] = useState(view === 'stats')
+  useEffect(() => {
+    if (view === 'stats') setStatsOpen(true)
+  }, [view])
+
   function maybeCloseMobile() {
     if (window.matchMedia('(max-width: 767px)').matches) onClose()
   }
@@ -57,6 +66,7 @@ export default function Sidebar({
     setView(key)
     if (key === 'stats') {
       setStatsSection('overview')
+      setStatsOpen(true)
     }
     maybeCloseMobile()
   }
@@ -112,13 +122,11 @@ export default function Sidebar({
           <ul className="flex flex-col">
             {tabs.map((tab) => {
               const active = view === tab.key
+              const isStats = tab.key === 'stats'
               return (
                 <li key={tab.key}>
-                  <button
-                    type="button"
-                    onClick={() => handleNavClick(tab.key)}
-                    aria-current={active ? 'page' : undefined}
-                    className={`group relative w-full flex items-center gap-2.5 pl-4 pr-3 py-2.5 text-sm font-semibold tracking-tight transition-all duration-200 ${
+                  <div
+                    className={`group relative w-full flex items-stretch text-sm font-semibold tracking-tight transition-all duration-200 ${
                       active
                         ? 'text-stone-900 bg-stone-100'
                         : 'text-stone-700 hover:text-stone-900 hover:bg-stone-100/70'
@@ -130,13 +138,40 @@ export default function Sidebar({
                       }`}
                       aria-hidden
                     />
-                    <span className="shrink-0 text-stone-700 group-hover:text-stone-900">{tab.icon}</span>
-                    <span className="flex-1 text-left">{tab.label}</span>
-                    {active && (
-                      <span className="text-brand-500 text-xs">●</span>
+                    <button
+                      type="button"
+                      onClick={() => handleNavClick(tab.key)}
+                      aria-current={active ? 'page' : undefined}
+                      className="flex-1 flex items-center gap-2.5 pl-4 pr-2 py-2.5 text-left"
+                    >
+                      <span className="shrink-0 text-stone-700 group-hover:text-stone-900">{tab.icon}</span>
+                      <span className="flex-1 text-left">{tab.label}</span>
+                      {active && !isStats && (
+                        <span className="text-brand-500 text-xs">●</span>
+                      )}
+                    </button>
+                    {isStats && (
+                      <button
+                        type="button"
+                        onClick={() => setStatsOpen((o) => !o)}
+                        aria-expanded={statsOpen}
+                        aria-label={
+                          statsOpen
+                            ? locale === 'es' ? 'Ocultar subsecciones' : 'Hide subsections'
+                            : locale === 'es' ? 'Mostrar subsecciones' : 'Show subsections'
+                        }
+                        className="px-2.5 text-stone-500 hover:text-stone-900 transition-colors"
+                      >
+                        <ChevronDown
+                          size={16}
+                          className={`transition-transform duration-200 ${
+                            statsOpen ? '' : '-rotate-90'
+                          }`}
+                        />
+                      </button>
                     )}
-                  </button>
-                  {tab.key === 'stats' && view === 'stats' && (
+                  </div>
+                  {isStats && statsOpen && (
                     <ul className="ml-8 mt-1 mb-2 border-l border-stone-300 flex flex-col">
                       {STATS_SUBSECTIONS.map((sub) => {
                         const subActive = statsSection === sub.id

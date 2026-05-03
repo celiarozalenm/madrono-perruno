@@ -3,7 +3,7 @@
 // Avoids CORS: the portal returns 302 redirects to a CDN that lacks Access-Control-Allow-Origin.
 // We fetch server-side (no CORS) and ship clean JSON.
 
-import { writeFile, mkdir } from 'node:fs/promises'
+import { writeFile, mkdir, readFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Papa from 'papaparse'
@@ -408,6 +408,35 @@ async function fetchAndParseFuentes() {
   return parseFuentes(csv)
 }
 
+async function preserveVetCoords(filePath, freshRows) {
+  let existing
+  try {
+    existing = JSON.parse(await readFile(filePath, 'utf-8'))
+  } catch {
+    return freshRows
+  }
+  const cache = new Map()
+  for (const v of existing) {
+    if (typeof v.lat === 'number' && typeof v.lng === 'number') {
+      cache.set(`${v.direccion}|${v.distrito}`, { lat: v.lat, lng: v.lng })
+    }
+  }
+  if (cache.size === 0) return freshRows
+  let preserved = 0
+  for (const v of freshRows) {
+    const hit = cache.get(`${v.direccion}|${v.distrito}`)
+    if (hit) {
+      v.lat = hit.lat
+      v.lng = hit.lng
+      preserved += 1
+    }
+  }
+  if (preserved > 0) {
+    process.stdout.write(` (preserved ${preserved} geocoded coords)`)
+  }
+  return freshRows
+}
+
 async function main() {
   await mkdir(OUT_DIR, { recursive: true })
   const summary = {}
@@ -418,8 +447,14 @@ async function main() {
     process.stdout.write(`Fetching ${key}…`)
     try {
       const csv = await fetchCsvLatin1(url)
-      const rows = PARSERS[key](csv)
+      let rows = PARSERS[key](csv)
       const filePath = resolve(OUT_DIR, `${key}.json`)
+      // Vets don't have coords in the source CSV — they're populated by
+      // scripts/geocode-vets.mjs. Preserve previously-geocoded lat/lng across
+      // re-fetches by merging on (direccion + distrito).
+      if (key === 'vets') {
+        rows = await preserveVetCoords(filePath, rows)
+      }
       await writeFile(filePath, JSON.stringify(rows))
       summary[key] = rows.length
       console.log(` ${rows.length} records → ${filePath.split('/madrono-perruno/')[1]}`)

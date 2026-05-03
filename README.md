@@ -10,11 +10,11 @@ Proyecto presentado a los **II Premios a la Reutilización de Datos Abiertos del
 
 ## Funcionalidades
 
-- 🗺️ **Mapa interactivo** con 4 capas combinables (papeleras, áreas caninas, parques, veterinarios)
-- 🔥 **Mapa de calor** de densidad de papeleras
-- 🐾 **Mi barrio canino**: introduces una dirección y obtienes una puntuación 0-100 con la infraestructura canina disponible a 5/10/15 min andando
+- 🗺️ **Mapa interactivo** con 5 capas combinables (papeleras, áreas caninas, parques, veterinarios, calidad del aire)
+- 💬 **Reportes ciudadanos en tiempo real**: cualquier vecino puede reportar en un clic si una papelera tiene bolsas, y dejar comentarios 👍/👎 en parques y áreas caninas (sin registro, anti-spam por IP)
+- 🐾 **Mi barrio canino**: introduces una dirección y obtienes una puntuación 0-100 con la infraestructura canina disponible a 5/10/15 min andando, complementada con calidad del aire y tarjeta compartible para redes sociales
 - 👟 **Ruta bolsa-amigable**: genera un paseo en bucle que pasa por papeleras y áreas caninas cercanas, con duración configurable. Usa OSRM para rutas reales por calle
-- 📊 **Comparativa por distrito** con gráficos interactivos
+- 📊 **Comparativa por distrito** con doble vista (mapa coropleta o tabla) y censo histórico 2014-2024
 - 🌐 **Bilingüe ES/EN** (útil para visitantes con perro)
 - 📱 **PWA instalable**, funciona offline tras la primera carga
 - 🆓 **Open source** y **sin tracking**
@@ -27,6 +27,8 @@ Proyecto presentado a los **II Premios a la Reutilización de Datos Abiertos del
 | Áreas caninas | ~150 | [datos.madrid.es](https://datos.madrid.es) |
 | Principales parques y jardines | ~210 | [datos.madrid.es](https://datos.madrid.es) |
 | Inspecciones a centros de animales de compañía (veterinarios) | ~615 | [datos.madrid.es](https://datos.madrid.es) |
+| Calidad del aire — datos en tiempo real | 24 estaciones | [datos.madrid.es](https://datos.madrid.es) |
+| Censo de animales domésticos por distrito (2014-2024) | 21 distritos × 11 años | [datos.madrid.es](https://datos.madrid.es) |
 
 Los datos se descargan en CSV desde el portal y se parsean en cliente (ISO-8859-1, separador `;`). Cache 24h en localStorage para no machacar el servidor del Ayuntamiento.
 

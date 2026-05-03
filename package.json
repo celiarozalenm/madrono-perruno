@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "vite",
     "fetch-data": "node scripts/fetch-data.mjs",
+    "postfetch-data": "node scripts/geocode-vets.mjs",
+    "geocode-vets": "node scripts/geocode-vets.mjs",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
