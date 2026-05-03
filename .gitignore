@@ -25,3 +25,6 @@ dist-ssr
 
 # Vercel
 .vercel
+
+# Contest submission materials (private)
+concurso/
