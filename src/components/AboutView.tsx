@@ -1,4 +1,4 @@
-import { ExternalLink, Smartphone, Apple, Monitor, WifiOff } from 'lucide-react'
+import { ExternalLink, Smartphone, Apple, Monitor, WifiOff, Accessibility, Keyboard, Eye, Sparkles } from 'lucide-react'
 import type { Locale } from '../types'
 import { t } from '../i18n'
 import { DATASETS } from '../services/madridData'
@@ -91,6 +91,46 @@ export default function AboutView({ locale }: Props) {
         </div>
       </section>
 
+      <section>
+        <div className="flex items-baseline gap-2 mb-3">
+          <h2 className="font-semibold text-stone-900">
+            {t(locale, 'about.a11y.title')}
+          </h2>
+        </div>
+        <div className="bg-white rounded-xl border border-stone-200 p-4 space-y-4">
+          <div className="flex items-start gap-3">
+            <span className="bg-brand-50 text-brand-600 w-9 h-9 rounded-lg flex items-center justify-center shrink-0">
+              <Accessibility size={18} />
+            </span>
+            <p className="text-sm text-stone-700 leading-relaxed">
+              {t(locale, 'about.a11y.body')}
+            </p>
+          </div>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <A11yItem
+              icon={<Keyboard size={16} />}
+              title={t(locale, 'about.a11y.keyboard.title')}
+              body={t(locale, 'about.a11y.keyboard.body')}
+            />
+            <A11yItem
+              icon={<Eye size={16} />}
+              title={t(locale, 'about.a11y.contrast.title')}
+              body={t(locale, 'about.a11y.contrast.body')}
+            />
+            <A11yItem
+              icon={<Sparkles size={16} />}
+              title={t(locale, 'about.a11y.motion.title')}
+              body={t(locale, 'about.a11y.motion.body')}
+            />
+            <A11yItem
+              icon={<Accessibility size={16} />}
+              title={t(locale, 'about.a11y.aria.title')}
+              body={t(locale, 'about.a11y.aria.body')}
+            />
+          </ul>
+        </div>
+      </section>
+
       <section className="bg-white rounded-xl border border-stone-200 p-4 space-y-3">
         <div className="flex items-start gap-3">
           <div>
@@ -107,15 +147,20 @@ export default function AboutView({ locale }: Props) {
             </a>
           </div>
         </div>
-        <a
-          href="https://github.com/celiarozalenm/madrono-perruno"
-          target="_blank"
-          rel="noopener"
-          className="inline-flex items-center gap-2 text-sm font-medium text-stone-900 bg-stone-100 hover:bg-stone-200 rounded-lg px-3 py-2"
-        >
-          <GithubIcon size={16} />
-          {t(locale, 'about.code')}
-        </a>
+        <div className="space-y-2">
+          <a
+            href="https://github.com/celiarozalenm/madrono-perruno"
+            target="_blank"
+            rel="noopener"
+            className="inline-flex items-center gap-2 text-sm font-medium text-stone-900 bg-stone-100 hover:bg-stone-200 rounded-lg px-3 py-2"
+          >
+            <GithubIcon size={16} />
+            {t(locale, 'about.code')}
+          </a>
+          <p className="text-xs text-stone-500">
+            {t(locale, 'about.code.tagline')}
+          </p>
+        </div>
       </section>
 
       <p className="text-xs text-stone-500 leading-relaxed">{t(locale, 'about.license')}</p>
@@ -138,5 +183,25 @@ function PlatformCard({
       <div className="font-semibold text-sm text-stone-900 leading-tight">{title}</div>
       <div className="text-[12.5px] text-stone-600 leading-relaxed">{body}</div>
     </div>
+  )
+}
+
+function A11yItem({
+  icon,
+  title,
+  body,
+}: {
+  icon: React.ReactNode
+  title: string
+  body: string
+}) {
+  return (
+    <li className="bg-stone-50 border border-stone-200 rounded-lg p-3 flex items-start gap-2.5">
+      <span className="text-brand-600 shrink-0 mt-0.5">{icon}</span>
+      <div className="min-w-0">
+        <div className="font-semibold text-sm text-stone-900 leading-tight">{title}</div>
+        <div className="text-[12.5px] text-stone-600 leading-relaxed mt-0.5">{body}</div>
+      </div>
+    </li>
   )
 }
