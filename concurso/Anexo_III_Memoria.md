@@ -21,9 +21,9 @@
 
 ## Resumen ejecutivo
 
-**Madroño Perruno** es una aplicación web (PWA) que reutiliza **seis** conjuntos de datos abiertos del Ayuntamiento de Madrid sobre infraestructura canina y los enriquece con una capa colaborativa para resolver el problema que ninguna app oficial ha resuelto: **saber si una papelera tiene bolsas o no en este momento**.
+**Madroño Perruno** es una aplicación web (PWA) que reutiliza **ocho** conjuntos de datos abiertos del Ayuntamiento de Madrid sobre infraestructura canina y los enriquece con una capa colaborativa para resolver el problema que ninguna app oficial ha resuelto: **saber si una papelera tiene bolsas o no en este momento**.
 
-Reutiliza papeleras con dispensador de bolsas (≈6.000 registros), áreas caninas (≈150), parques y jardines (≈210), centros veterinarios inspeccionados (≈615), **calidad del aire en tiempo real** (24 estaciones con lecturas horarias de NO₂, PM2.5, PM10 y O₃) y **censo de animales domésticos** por distrito (datos anuales). Los combina en seis funcionalidades:
+Reutiliza papeleras con dispensador de bolsas (≈6.000 registros), áreas caninas (≈150), parques y jardines (≈210), centros veterinarios inspeccionados (≈615), **fuentes de agua para beber** (≈2.100), **calidad del aire en tiempo real** (24 estaciones con lecturas horarias de NO₂, PM2.5, PM10 y O₃), **censo de animales domésticos** por distrito (serie histórica anual 2014-2024) y **estadísticas del Centro de Protección Animal**. Los combina en seis funcionalidades:
 
 1. **Reportes colaborativos en tiempo real** *(característica estrella, sin precedentes)*: cualquier vecino puede reportar en un solo clic si una papelera concreta tiene bolsas, y dejar comentarios 👍/👎 con texto en parques y áreas caninas. La app muestra el último reporte y el balance de los últimos días. Sin registro y sin tracking. Resuelve la queja n.º 1 de los usuarios actuales: el dato municipal indica que la papelera existe, pero no si está dotada.
 2. **Mi barrio canino**: el ciudadano introduce una dirección y obtiene una puntuación 0-100 sobre la infraestructura canina disponible a 5, 10 y 15 minutos andando, complementada con la **calidad del aire de la estación más cercana** y un mensaje contextual ("aire limpio, buen momento para pasear" / "aire muy contaminado, mejor un paseo corto"). Incluye **botón de compartir**: genera al instante una tarjeta PNG 1200×630 con la puntuación y los conteos clave, lista para Twitter, LinkedIn, WhatsApp o Instagram. Cada vez que un vecino comparte, los datos del Ayuntamiento ganan visibilidad pública sin coste.
@@ -36,7 +36,7 @@ El proyecto se diferencia explícitamente de **BolsaCan** (app oficial del Ayunt
 
 **Impacto principal:** convertir el dataset estático de papeleras en un servicio público vivo, alimentado por la propia ciudadanía, mientras democratiza el acceso a datos municipales sobre infraestructura canina y los proyecta a redes sociales mediante tarjetas compartibles que devuelven visibilidad al Portal de Datos Abiertos.
 
-**Resultados clave:** **6 datasets** reutilizados, ≈7.500 puntos georreferenciados servidos en cliente, 6 funcionalidades novedosas no disponibles previamente, 21 distritos visualizados en coropleta, sistema colaborativo con verificación anti-spam por IP, **mecanismo viral de difusión** del valor del Portal de Datos Abiertos a través de las redes sociales de los propios ciudadanos.
+**Resultados clave:** **8 datasets** del Portal de Datos Abiertos reutilizados, ≈9.600 puntos georreferenciados servidos en cliente, 6 funcionalidades novedosas no disponibles previamente, **serie histórica de 11 años** del censo de animales domésticos, 21 distritos visualizados en coropleta, sistema colaborativo con verificación anti-spam por IP, **mecanismo viral de difusión** del valor del Portal de Datos Abiertos a través de las redes sociales de los propios ciudadanos.
 
 ---
 
@@ -53,7 +53,7 @@ Madrid publica desde hace años datos detallados sobre su infraestructura canina
 
 ### Objetivos
 
-1. **Convertir seis conjuntos de datos abiertos en un servicio consultable** sin formación técnica.
+1. **Convertir ocho conjuntos de datos abiertos en un servicio consultable** sin formación técnica.
 2. **Aportar utilidades nuevas** (no replicar BolsaCan): scoring de barrios y generación de rutas peatonales pasando por puntos de interés canino.
 3. **Promover la transparencia y la equidad territorial** mediante comparativas claras entre distritos.
 4. **Hacer el proyecto bilingüe** (español e inglés) para incluir al colectivo de personas con perro de habla no española que reside o visita Madrid.
@@ -183,27 +183,29 @@ Innovación frente al estado del arte:
 
 ### Variedad de conjuntos de datos utilizados del Portal de Datos Abiertos de Madrid
 
-**Seis** conjuntos del Portal, todos pre-procesados en build (Node) para evitar problemas de CORS al hacer fetch directo desde navegador:
+**Ocho** conjuntos del Portal, todos pre-procesados en build (Node) para evitar problemas de CORS al hacer fetch directo desde navegador:
 
 1. **Papeleras con dispensador de bolsas para excrementos caninos** (mobiliario urbano) — ≈6.000 puntos georreferenciados
 2. **Áreas caninas** (instalaciones de ocio) — ≈150 puntos con superficie y disponibilidad de juegos
 3. **Principales parques y jardines** (zonas verdes) — ≈210 puntos con descripción y horarios
 4. **Inspecciones a centros de animales de compañía** (control veterinario) — ≈615 registros geocodificados a posteriori vía Nominatim (528 con coordenadas)
-5. **Calidad del aire. Datos en tiempo real** (medio ambiente) — 24 estaciones con lecturas horarias de NO₂, PM2.5, PM10 y O₃, evaluadas según directrices WHO 2021
-6. **Censo de animales domésticos por distrito** (RIAC) — datos anuales de perros y gatos por los 21 distritos
+5. **Fuentes de agua para beber** (mobiliario urbano) — ≈2.100 puntos georreferenciados, útiles para hidratar al perro durante el paseo
+6. **Calidad del aire. Datos en tiempo real** (medio ambiente) — 24 estaciones con lecturas horarias de NO₂, PM2.5, PM10 y O₃, evaluadas según directrices WHO 2021
+7. **Censo de animales domésticos por distrito** (RIAC) — **serie histórica completa 2014-2024** (11 años) de perros y gatos por los 21 distritos
+8. **Estadísticas del Centro de Protección Animal** — datos de adopciones, abandonos y entradas anuales del centro municipal
 
 A esto se suman dos datasets geográficos del Geoportal del Ayuntamiento (`geoportal.madrid.es`) descargados como TopoJSON y convertidos a GeoJSON al build:
 
 - **Distritos municipales de Madrid** (21 polígonos) — base del mapa coropleta
 - **Barrios municipales de Madrid** (131 polígonos) — disponible para uso futuro a granularidad fina
 
-La combinación cubre la cadena ciudadana-municipio completa: dónde tirar la bolsa, dónde soltar al perro, dónde pasear, qué calidad del aire vas a respirar, dónde acudir si enferma, cómo se distribuye toda esa infraestructura en el territorio y cuántos perros hay realmente en tu distrito. Tres datasets se cruzan ya en la feature **Mi barrio canino** (papeleras + áreas + parques + aire), un cuarto enriquece la **comparativa por distrito** (perros), y los dos restantes (veterinarios + perros) habilitan análisis derivados como "papeleras por cada 1.000 perros" o "veterinarios por distrito".
+La combinación cubre la cadena ciudadana-municipio completa: dónde tirar la bolsa, dónde soltar al perro, dónde pasear, dónde hidratar al perro, qué calidad del aire vas a respirar, dónde acudir si enferma, cómo se distribuye toda esa infraestructura en el territorio, cuántos perros hay realmente en tu distrito (con serie histórica 2014-2024) y cómo evoluciona el trabajo del Centro de Protección Animal. Cuatro datasets se cruzan ya en la feature **Mi barrio canino** (papeleras + áreas + parques + aire), tres enriquecen la **comparativa por distrito** (perros con histórico, fuentes y veterinarios), y el resto habilitan análisis derivados como "papeleras por cada 1.000 perros", "evolución censo 2014-2024" o "ratio veterinarios por distrito".
 
 ### Calidad técnica
 
-- **TypeScript estricto** en todo el código, con tipos exhaustivos para los seis datasets.
+- **TypeScript estricto** en todo el código, con tipos exhaustivos para los ocho datasets.
 - **Modularidad**: separación clara de capas (servicios, hooks, componentes, edge functions) que facilita extender el atlas con nuevos datasets en una sola tarde.
-- **Pipeline de datos reproducible**: un único script Node (`scripts/fetch-data.mjs`) descarga los seis CSVs del Portal, los normaliza (encoding ISO-8859-1, separador `;`), valida coordenadas dentro de la bounding box de Madrid y produce JSON limpios listos para servir como assets estáticos. Cualquier mantenedor puede regenerar los datos con `npm run fetch-data`.
+- **Pipeline de datos reproducible**: un único script Node (`scripts/fetch-data.mjs`) descarga los ocho CSVs del Portal, los normaliza (encoding ISO-8859-1, separador `;`), valida coordenadas dentro de la bounding box de Madrid y produce JSON limpios listos para servir como assets estáticos. Cualquier mantenedor puede regenerar los datos con `npm run fetch-data`.
 - **Geocoding por lotes con respeto a la política de Nominatim**: el script `scripts/geocode-vets.mjs` resuelve las direcciones de los 615 centros veterinarios a coordenadas WGS84 con rate limit de 1 req/s, User-Agent identificativo y caché por dirección normalizada. Tasa de resolución: 528/615 (86 %).
 - **Tests manuales** completos en Chrome, Safari iOS y Firefox.
 - **PWA validada**: manifest, service worker (`workbox` con `skipWaiting` + `clientsClaim`) que cachea HTML, JS, CSS, JSON, tiles CARTO y fuentes Google. Instalable desde el navegador en Android, iOS y escritorio.
@@ -225,9 +227,11 @@ La combinación cubre la cadena ciudadana-municipio completa: dónde tirar la bo
 | Áreas caninas | https://datos.madrid.es/dataset/300094-0-areas-caninas |
 | Principales parques y jardines | https://datos.madrid.es/dataset/200761-0-parques-jardines |
 | Inspecciones a centros de animales de compañía (veterinarios) | https://datos.madrid.es/dataset/300281-0-inspecciones-veterinarios |
+| Fuentes de agua para beber | https://datos.madrid.es/dataset/300051-0-fuentes |
 | Calidad del aire — Datos en tiempo real | https://datos.madrid.es/dataset/212531-0-calidad-aire-tiempo-real |
 | Calidad del aire — Estaciones de control | https://datos.madrid.es/dataset/212629-0-estaciones-control-aire |
-| Censo de animales domésticos por distrito | https://datos.madrid.es/dataset/207118-0-censo-animales |
+| Censo de animales domésticos por distrito (2014-2024) | https://datos.madrid.es/dataset/207118-0-censo-animales |
+| Estadísticas del Centro de Protección Animal | https://datos.madrid.es/dataset/211899-0-estadisticas-animales |
 
 ### Conjuntos de datos geográficos del Geoportal del Ayuntamiento de Madrid (https://geoportal.madrid.es)
 
@@ -248,7 +252,7 @@ La combinación cubre la cadena ciudadana-municipio completa: dónde tirar la bo
 
 ## Conclusiones
 
-Madroño Perruno demuestra que con datos abiertos bien publicados —como los del Ayuntamiento de Madrid— es viable construir, en pocos días y sin financiación, un servicio público útil que vaya **más allá de replicar la app oficial**. La clave está en cruzar seis conjuntos de datos para responder preguntas nuevas, añadir una capa colaborativa que convierte los datasets estáticos en servicios vivos, pulir la accesibilidad para llegar a perfiles no técnicos, y liberar el código para que el esfuerzo no se pierda.
+Madroño Perruno demuestra que con datos abiertos bien publicados —como los del Ayuntamiento de Madrid— es viable construir, en pocos días y sin financiación, un servicio público útil que vaya **más allá de replicar la app oficial**. La clave está en cruzar ocho conjuntos de datos para responder preguntas nuevas, añadir una capa colaborativa que convierte los datasets estáticos en servicios vivos, pulir la accesibilidad para llegar a perfiles no técnicos, y liberar el código para que el esfuerzo no se pierda.
 
 ### Propuestas de mejora y ampliaciones futuras
 
@@ -263,7 +267,7 @@ Madroño Perruno demuestra que con datos abiertos bien publicados —como los de
 
 ### Reflexión final
 
-Los premios a la reutilización de datos abiertos cumplen una función importante: incentivan que los datos publicados se transformen en servicios. Este proyecto ha demostrado, en su propio ciclo de desarrollo, que con AI-assisted development es posible que una sola persona entregue en pocos días un producto funcional, accesible, bilingüe, bien documentado, con seis datasets cruzados, una capa colaborativa anti-spam y un mecanismo viral de difusión propia. Esa velocidad de entrega y esa generosidad de alcance es justo el tipo de capacidad que conviene celebrar en una convocatoria que premia la **agilidad ciudadana sobre el dato público**.
+Los premios a la reutilización de datos abiertos cumplen una función importante: incentivan que los datos publicados se transformen en servicios. Este proyecto ha demostrado, en su propio ciclo de desarrollo, que con AI-assisted development es posible que una sola persona entregue en pocos días un producto funcional, accesible, bilingüe, bien documentado, con ocho datasets cruzados, una capa colaborativa anti-spam y un mecanismo viral de difusión propia. Esa velocidad de entrega y esa generosidad de alcance es justo el tipo de capacidad que conviene celebrar en una convocatoria que premia la **agilidad ciudadana sobre el dato público**.
 
 ---
 

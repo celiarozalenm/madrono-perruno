@@ -24,7 +24,7 @@
 
 **Pantalla:** Landing page https://madrono-perruno.vercel.app
 **Voz:**
-> "Madroño Perruno es un atlas canino de Madrid construido con seis conjuntos de datos abiertos del Ayuntamiento. Cruza papeleras, áreas caninas, parques, veterinarios, calidad del aire y censo de animales para resolver preguntas que ninguna app oficial responde."
+> "Madroño Perruno es un atlas canino de Madrid construido con ocho conjuntos de datos abiertos del Ayuntamiento. Cruza papeleras, áreas caninas, parques, veterinarios, fuentes de agua, calidad del aire, censo de animales y estadísticas del centro de protección animal para resolver preguntas que ninguna app oficial responde."
 
 **Acción:** scroll suave por la landing mostrando hero y features.
 
@@ -34,7 +34,7 @@
 
 **Pantalla:** click en "Abrir atlas" → mapa principal
 **Voz:**
-> "Cinco capas combinables sobre el mapa: papeleras con bolsas, áreas caninas, parques, centros veterinarios y calidad del aire en tiempo real con código de color WHO."
+> "Capas combinables sobre el mapa: papeleras con bolsas, áreas caninas, parques, centros veterinarios, fuentes de agua para hidratar al perro y calidad del aire en tiempo real con código de color WHO."
 
 **Acción:** activar/desactivar las capas en el panel CAPAS para que se vea el cambio visual. Hacer zoom a un distrito.
 

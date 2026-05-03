@@ -159,8 +159,8 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
                 </div>
               </div>
               <div className="col-span-12 md:col-span-7 mp-fade-up mp-fade-up-2">
-                <div className="bg-stone-50 border border-stone-900/10 rounded-2xl p-3 sm:p-5 overflow-hidden">
-                  <HeroIllustration className="w-full h-[180px] sm:h-[320px] lg:h-[360px] block" />
+                <div className="bg-stone-50 border border-stone-900/10 rounded-2xl overflow-hidden">
+                  <HeroIllustration className="block" />
                 </div>
               </div>
             </div>
@@ -266,34 +266,44 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
 
         {/* === ROW 4 — Two feature cards === */}
         <div className="grid grid-cols-12 gap-3 sm:gap-5">
-          {/* Card A — Colabora (verde) */}
-          <article className="col-span-12 md:col-span-6 lg:col-span-4 bg-verde-50 rounded-2xl px-6 py-7 sm:px-7 sm:py-8 relative overflow-hidden">
-            <div className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-600">
-              {t(locale, 'landing.bento.colabora.eyebrow')}
-            </div>
-            <h3 className="text-[1.6rem] font-extrabold tracking-[-0.02em] leading-tight text-verde-700 mt-2">
-              {t(locale, 'landing.bento.colabora.title')}
-            </h3>
-            <p className="text-sm text-stone-700 mt-3 max-w-[20rem] leading-relaxed">
-              {t(locale, 'landing.bento.colabora.body')}
-            </p>
-            <div className="flex flex-wrap gap-2 mt-5">
-              <a
-                href="#/participar"
-                onClick={goReport}
-                className="inline-flex items-center gap-1.5 bg-verde-500 hover:bg-verde-600 text-white text-xs font-semibold px-3.5 py-2 rounded-full transition-colors"
-              >
-                <span>👍</span>
-                {locale === 'es' ? 'Está bien' : 'Looking good'}
-              </a>
-              <a
-                href="#/participar"
-                onClick={goReport}
-                className="inline-flex items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold px-3.5 py-2 rounded-full transition-colors"
-              >
-                <span>👎</span>
-                {locale === 'es' ? 'Mal estado' : 'Needs care'}
-              </a>
+          {/* Card A — Colabora (verde, photo overlay) */}
+          <article className="col-span-12 md:col-span-6 lg:col-span-4 bg-verde-50 rounded-2xl relative overflow-hidden min-h-[300px] lg:min-h-[340px]">
+            <img
+              src="/colabora-mockup.png"
+              alt=""
+              className="absolute right-0 bottom-0 h-[110%] w-auto object-contain object-bottom-right pointer-events-none"
+              loading="lazy"
+              decoding="async"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-verde-50 via-verde-50/85 to-transparent" />
+            <div className="relative h-full px-6 py-7 sm:px-7 sm:py-8 flex flex-col">
+              <div className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-600">
+                {t(locale, 'landing.bento.colabora.eyebrow')}
+              </div>
+              <h3 className="text-[1.6rem] font-extrabold tracking-[-0.02em] leading-tight text-verde-700 mt-2 whitespace-pre-line">
+                {t(locale, 'landing.bento.colabora.title')}
+              </h3>
+              <p className="text-sm text-stone-700 mt-3 leading-relaxed max-w-[14rem]">
+                {t(locale, 'landing.bento.colabora.body')}
+              </p>
+              <div className="flex flex-wrap gap-2 mt-5">
+                <a
+                  href="#/participar"
+                  onClick={goReport}
+                  className="inline-flex items-center gap-1.5 bg-verde-500 hover:bg-verde-600 text-white text-xs font-semibold px-3.5 py-2 rounded-full transition-colors"
+                >
+                  <span>👍</span>
+                  {locale === 'es' ? 'Está bien' : 'Looking good'}
+                </a>
+                <a
+                  href="#/participar"
+                  onClick={goReport}
+                  className="inline-flex items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold px-3.5 py-2 rounded-full transition-colors"
+                >
+                  <span>👎</span>
+                  {locale === 'es' ? 'Mal estado' : 'Needs care'}
+                </a>
+              </div>
             </div>
           </article>
 
@@ -305,7 +315,7 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
             <div className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-600">
               {t(locale, 'landing.bento.datos.eyebrow')}
             </div>
-            <h3 className="text-[1.6rem] font-extrabold tracking-[-0.02em] leading-tight text-madrono-700 mt-2">
+            <h3 className="text-[1.6rem] font-extrabold tracking-[-0.02em] leading-tight text-madrono-700 mt-2 whitespace-pre-line">
               {t(locale, 'landing.bento.datos.title')}
             </h3>
             <p className="text-sm text-stone-700 mt-3 max-w-[22rem] leading-relaxed">
