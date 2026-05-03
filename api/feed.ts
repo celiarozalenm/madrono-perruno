@@ -60,9 +60,17 @@ interface CommentFeedEntry {
 
 type FeedEntry = ReportFeedEntry | CommentFeedEntry
 
-function parseEntry(raw: string): FeedEntry | null {
+function parseEntry(raw: unknown): FeedEntry | null {
   try {
-    const obj = JSON.parse(raw) as Partial<FeedEntry>
+    // Upstash Redis JS client auto-deserialises JSON values, so a member
+    // stored as JSON.stringify(...) comes back already parsed as an object.
+    // For older entries or odd cases we still accept a raw JSON string.
+    let obj: Partial<FeedEntry> | null = null
+    if (typeof raw === 'string') {
+      obj = JSON.parse(raw) as Partial<FeedEntry>
+    } else if (raw && typeof raw === 'object') {
+      obj = raw as Partial<FeedEntry>
+    }
     if (!obj || typeof obj !== 'object') return null
     if (obj.kind === 'report' && obj.entityType === 'papelera') {
       return {
@@ -113,10 +121,10 @@ export default async function handler(req: Request) {
   const limitRaw = parseInt(url.searchParams.get('limit') ?? '', 10)
   const limit = Math.min(MAX_LIMIT, Math.max(1, isFinite(limitRaw) ? limitRaw : DEFAULT_LIMIT))
 
-  const raw = await redis.zrange<string[]>(FEED_KEY, 0, limit - 1, { rev: true })
+  const raw = (await redis.zrange(FEED_KEY, 0, limit - 1, { rev: true })) as unknown[]
   const entries: FeedEntry[] = []
   for (const r of raw) {
-    const e = parseEntry(String(r))
+    const e = parseEntry(r)
     if (e) entries.push(e)
   }
 
