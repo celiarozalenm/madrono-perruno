@@ -177,7 +177,7 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
               <div className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-600">
                 {t(locale, 'landing.bento.features.eyebrow')}
               </div>
-              <h2 className="text-[1.7rem] sm:text-[2rem] font-extrabold tracking-[-0.02em] leading-[1.05] text-madrono-700 mt-2 max-w-xs">
+              <h2 className="text-[1.7rem] sm:text-[2rem] font-extrabold tracking-[-0.02em] leading-[1.05] text-madrono-700 mt-2 max-w-xs whitespace-pre-line">
                 {t(locale, 'landing.bento.features.title')}
               </h2>
             </div>
