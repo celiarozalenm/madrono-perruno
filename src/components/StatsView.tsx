@@ -698,7 +698,8 @@ function NeedsPanel({
         ))}
       </div>
 
-      <div className="overflow-x-auto -mx-4 sm:mx-0">
+      {/* Desktop: table */}
+      <div className="hidden sm:block">
         <table className="w-full text-sm border-separate border-spacing-0">
           <thead>
             <tr className="text-left text-stone-500 text-xs uppercase tracking-wide">
@@ -746,9 +747,73 @@ function NeedsPanel({
         </table>
       </div>
 
+      {/* Mobile: stacked cards */}
+      <ul className="sm:hidden flex flex-col gap-2">
+        {rows.map((r) => {
+          const priority = ratioPriority(r.ratio, highCutoff, midCutoff)
+          const ratioLabel =
+            r.ratio === null
+              ? t(locale, 'stats.needs.unavailable')
+              : numFmt.format(Math.round(r.ratio))
+          return (
+            <li
+              key={r.distrito}
+              className="rounded-lg border border-stone-200 bg-white p-3 flex flex-col gap-2.5"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <span className="font-semibold text-stone-900 text-sm leading-tight">
+                  {r.distrito}
+                </span>
+                <PriorityBadge level={priority} locale={locale} />
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <MiniStat
+                  label={t(locale, 'stats.needs.col.perros')}
+                  value={numFmt.format(r.perros)}
+                />
+                <MiniStat
+                  label={t(locale, 'stats.needs.col.recurso')}
+                  value={r.recurso > 0 ? numFmt.format(r.recurso) : '—'}
+                />
+                <MiniStat
+                  label={t(locale, 'stats.needs.col.ratio')}
+                  value={ratioLabel}
+                  emphasis
+                />
+              </div>
+            </li>
+          )
+        })}
+      </ul>
+
       <p className="text-xs text-stone-500 leading-relaxed">
         {t(locale, 'stats.needs.note')}
       </p>
+    </div>
+  )
+}
+
+function MiniStat({
+  label,
+  value,
+  emphasis = false,
+}: {
+  label: string
+  value: string
+  emphasis?: boolean
+}) {
+  return (
+    <div className="bg-stone-50 rounded-md px-2 py-1.5">
+      <div className="text-[10px] uppercase tracking-wide text-stone-500 leading-tight">
+        {label}
+      </div>
+      <div
+        className={`tabular-nums leading-tight mt-0.5 ${
+          emphasis ? 'text-base font-bold text-stone-900' : 'text-sm text-stone-700'
+        }`}
+      >
+        {value}
+      </div>
     </div>
   )
 }

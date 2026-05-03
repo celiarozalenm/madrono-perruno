@@ -168,6 +168,12 @@ export function buildEntityPopupContent(args: Args): HTMLDivElement {
       args.entityId,
       chosenSentiment,
       textarea.value,
+      {
+        name: args.title,
+        lat: args.lat,
+        lng: args.lng,
+        distrito: args.district,
+      },
     )
     if ('error' in result) {
       flash.textContent = result.error === 'rate_limited' ? tr.rateLimit : tr.error

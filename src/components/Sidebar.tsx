@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Map as MapIcon, BarChart3, Compass, Footprints, MessageSquareHeart, Info, Globe, ArrowLeft, ChevronDown, X } from 'lucide-react'
+import { Map as MapIcon, BarChart3, Compass, Footprints, MessageSquareHeart, Info, Globe, ArrowLeft, ChevronDown, X, Activity } from 'lucide-react'
 import type { Locale } from '../types'
 import { t } from '../i18n'
 
-export type View = 'map' | 'barrio' | 'route' | 'stats' | 'participar' | 'about'
+export type View = 'map' | 'barrio' | 'route' | 'stats' | 'participar' | 'recientes' | 'about'
 export type StatsSection = 'overview' | 'ranking' | 'needs' | 'proteccion'
 
 interface Props {
@@ -46,6 +46,7 @@ export default function Sidebar({
     },
     { key: 'stats', label: t(locale, 'nav.stats'), icon: <BarChart3 size={18} /> },
     { key: 'participar', label: t(locale, 'nav.participar'), icon: <MessageSquareHeart size={18} /> },
+    { key: 'recientes', label: t(locale, 'nav.recientes'), icon: <Activity size={18} /> },
   ]
 
   const aboutTab = { key: 'about' as View, label: t(locale, 'nav.about'), icon: <Info size={18} /> }
@@ -99,12 +100,9 @@ export default function Sidebar({
               alt=""
               className="w-9 h-9 shrink-0 transition-transform duration-300 group-hover:rotate-[-6deg]"
             />
-            <div className="leading-tight min-w-0">
-              <div className="font-extrabold tracking-tight text-stone-900 truncate text-[15px]">
+            <div className="min-w-0">
+              <div className="font-extrabold tracking-tight text-stone-900 truncate text-[15px] leading-tight">
                 {t(locale, 'app.title')}
-              </div>
-              <div className="text-[10px] uppercase tracking-[0.18em] text-stone-500 truncate font-medium">
-                {t(locale, 'app.subtitle')}
               </div>
             </div>
           </a>

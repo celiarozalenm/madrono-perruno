@@ -1,6 +1,6 @@
 # Guion vídeo demo — Madroño Perruno
 
-**Duración objetivo: 2:30 min** (máximo permitido: 3 min)
+**Duración objetivo: 2:40 min** (máximo permitido: 3 min)
 **Plataforma: YouTube unlisted**
 **Herramienta sugerida: Loom o Cmd+Shift+5 → grabación de pantalla**
 
@@ -76,7 +76,17 @@
 
 ---
 
-### 1:55 - 2:15 — Comparativa por distrito (20s)
+### 1:55 - 2:10 — Hilo en vivo "Últimos reportes" (15s)
+
+**Pantalla:** menú lateral → click en "Últimos reportes"
+**Voz:**
+> "Y la novedad más reciente: un hilo en vivo con los últimos reportes y comentarios de toda la ciudad. Refresco automático. La ciudad mantenida por la propia ciudad, en tiempo real."
+
+**Acción:** mostrar la lista cronológica con los reportes/comentarios que hayas dejado durante la grabación.
+
+---
+
+### 2:10 - 2:25 — Comparativa por distrito (15s)
 
 **Pantalla:** sección "Estadísticas"
 **Voz:**
@@ -89,7 +99,7 @@
 
 ---
 
-### 2:15 - 2:30 — Cierre (15s)
+### 2:25 - 2:40 — Cierre (15s)
 
 **Pantalla:** volver a landing → scroll a sección de privacidad y open source
 **Voz:**

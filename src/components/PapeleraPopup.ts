@@ -100,7 +100,12 @@ export function buildPapeleraPopupContent(args: Args): HTMLDivElement {
     btnYes.disabled = true
     btnNo.disabled = true
     flash.textContent = ''
-    const result = await submitReport(args.binId, hasBags)
+    const result = await submitReport(args.binId, hasBags, {
+      name: args.address || args.title,
+      lat: args.lat,
+      lng: args.lng,
+      distrito: args.district,
+    })
     if ('error' in result) {
       flash.textContent = result.error === 'rate_limited' ? tr.rateLimit : tr.error
       flash.className = 'mp-popup-flash error'

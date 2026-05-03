@@ -59,11 +59,12 @@ export default function ChartActions({ title, subtitle, filename, locale, target
       type="button"
       onClick={handle}
       disabled={busy}
-      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium border border-stone-300 hover:bg-stone-100 text-stone-700 disabled:opacity-50 transition-colors"
+      className="inline-flex items-center justify-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-md text-xs font-medium border border-stone-300 hover:bg-stone-100 text-stone-700 disabled:opacity-50 transition-colors"
       aria-label={label}
+      title={label}
     >
-      <Icon size={13} className={busy ? 'animate-spin' : ''} />
-      <span>{label}</span>
+      <Icon size={14} className={busy ? 'animate-spin' : ''} />
+      <span className="hidden sm:inline">{label}</span>
     </button>
   )
 }
