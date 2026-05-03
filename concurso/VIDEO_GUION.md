@@ -101,11 +101,13 @@
 
 ### 2:25 - 2:40 — Cierre (15s)
 
-**Pantalla:** volver a landing → scroll a sección de privacidad y open source
+**Pantalla:** volver a landing → scroll a la stats bar inferior y click en el chip "Funciona sin conexión · Instalable como app"
 **Voz:**
-> "Web instalable como app, bilingüe español-inglés, sin tracking, sin cookies, código abierto en GitHub. Madroño Perruno demuestra que con datos abiertos y AI-assisted development una persona puede entregar un servicio público útil en pocos días. Gracias."
+> "Y porque sigue siendo una web, se instala como app desde cualquier navegador, funciona sin conexión, no necesita tienda de aplicaciones y no almacena nada del usuario. Bilingüe español-inglés, código abierto. Madroño Perruno demuestra que con datos abiertos y AI-assisted development una persona puede entregar un servicio público útil en pocos días. Gracias."
 
-**Acción:** mostrar URL `madrono-perruno.vercel.app` y `github.com/celiarozalenm/madrono-perruno` en pantalla.
+**Acción:**
+1. Click en el chip de la stats bar para abrir el modal de instalación con las tres plataformas (Android, iOS, Desktop)
+2. Cerrar el modal y dejar visibles las URLs `madrono-perruno.vercel.app` y `github.com/celiarozalenm/madrono-perruno` en pantalla.
 
 ---
 
