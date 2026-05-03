@@ -145,6 +145,7 @@ export default function Map({
       setLayerVis(map, 'areas-labels', visibleLayers.areas)
       setLayerVis(map, 'parques-points', visibleLayers.parques)
       setLayerVis(map, 'vets-points', visibleLayers.vets)
+      setLayerVis(map, 'fuentes-points', visibleLayers.fuentes)
       setLayerVis(map, 'air-points', visibleLayers.air)
       setLayerVis(map, 'distritos-perros-fill', visibleLayers.perros)
       setLayerVis(map, 'distritos-perros-line', visibleLayers.perros)
@@ -222,7 +223,7 @@ export default function Map({
         popupRef.current = new maplibregl.Popup({ offset: 6, maxWidth: '260px' })
           .setLngLat(e.lngLat)
           .setHTML(
-            `<div class="mp-popup"><div class="mp-popup-bar" style="background:#1f4d7a"></div><div class="mp-popup-body" style="padding:8px 10px"><div style="font-weight:600;font-size:0.9rem">${escapeText(
+            `<div class="mp-popup"><div class="mp-popup-bar" style="background:#5a3f2a"></div><div class="mp-popup-body" style="padding:8px 10px"><div style="font-weight:600;font-size:0.9rem">${escapeText(
               p.name,
             )}</div><div style="font-size:0.8rem;color:#6b7280;margin-top:2px">${escapeText(
               label,
@@ -408,6 +409,47 @@ export default function Map({
         )
         .addTo(map)
     }
+    const onFuenteClick = (e: maplibregl.MapLayerMouseEvent) => {
+      const f = e.features?.[0]
+      if (!f) return
+      const props = f.properties as Record<string, string>
+      if (popupRef.current) popupRef.current.remove()
+      const tipoLabel = (() => {
+        if (props.uso === 'mascotas')
+          return locale === 'es' ? 'Fuente para perros' : 'Pet drinking fountain'
+        if (props.uso === 'ambos')
+          return locale === 'es'
+            ? 'Fuente para personas y perros'
+            : 'Drinking fountain (people & pets)'
+        return locale === 'es' ? 'Fuente de beber' : 'Drinking fountain'
+      })()
+      const estadoLabel = (() => {
+        if (props.estado === 'operativa') return locale === 'es' ? 'Operativa' : 'Operational'
+        if (props.estado === 'cerrada')
+          return locale === 'es' ? 'Cerrada temporalmente' : 'Temporarily closed'
+        if (props.estado === 'fueraDeServicio')
+          return locale === 'es' ? 'Fuera de servicio' : 'Out of service'
+        return ''
+      })()
+      const address = [props.direccion, props.nombre]
+        .filter((s) => s && s.trim().length > 0)
+        .join(' · ')
+      const node = buildEntityPopupContent({
+        entityType: 'fuente',
+        entityId: props.id ?? `fuente-${e.lngLat.lng.toFixed(5)}-${e.lngLat.lat.toFixed(5)}`,
+        title: tipoLabel,
+        address,
+        district: props.distrito ?? '',
+        extra: estadoLabel,
+        lat: e.lngLat.lat,
+        lng: e.lngLat.lng,
+        locale,
+      })
+      popupRef.current = new maplibregl.Popup({ offset: 12, maxWidth: '320px' })
+        .setLngLat(e.lngLat)
+        .setDOMContent(node)
+        .addTo(map)
+    }
     const onParqueClick = (e: maplibregl.MapLayerMouseEvent) => {
       const f = e.features?.[0]
       if (!f) return
@@ -446,9 +488,10 @@ export default function Map({
     map.on('click', 'areas-points', onAreaClick)
     map.on('click', 'parques-points', onParqueClick)
     map.on('click', 'vets-points', onVetClick)
+    map.on('click', 'fuentes-points', onFuenteClick)
     map.on('click', 'air-points', onAirClick)
     map.on('click', 'papeleras-cluster', onClusterClick)
-    for (const layer of ['papeleras-points', 'areas-points', 'parques-points', 'vets-points', 'air-points', 'papeleras-cluster']) {
+    for (const layer of ['papeleras-points', 'areas-points', 'parques-points', 'vets-points', 'fuentes-points', 'air-points', 'papeleras-cluster']) {
       map.on('mouseenter', layer, setPointer(true))
       map.on('mouseleave', layer, setPointer(false))
     }
@@ -458,6 +501,7 @@ export default function Map({
       map.off('click', 'areas-points', onAreaClick)
       map.off('click', 'parques-points', onParqueClick)
       map.off('click', 'vets-points', onVetClick)
+      map.off('click', 'fuentes-points', onFuenteClick)
       map.off('click', 'air-points', onAirClick)
       map.off('click', 'papeleras-cluster', onClusterClick)
     }
@@ -547,6 +591,25 @@ function vetsGeoJson(data: Datasets) {
   }
 }
 
+function fuentesGeoJson(data: Datasets) {
+  return {
+    type: 'FeatureCollection' as const,
+    features: (data.fuentes ?? []).map((f) => ({
+      type: 'Feature' as const,
+      properties: {
+        id: f.id,
+        nombre: f.nombre,
+        direccion: f.direccion,
+        distrito: f.distrito,
+        barrio: f.barrio,
+        uso: f.uso,
+        estado: f.estado,
+      },
+      geometry: { type: 'Point' as const, coordinates: [f.lng, f.lat] },
+    })),
+  }
+}
+
 function airGeoJson(data: Datasets) {
   return {
     type: 'FeatureCollection' as const,
@@ -585,6 +648,7 @@ function addSources(map: MlMap, data: Datasets) {
   map.addSource('areas', { type: 'geojson', data: areasGeoJson(data) })
   map.addSource('parques', { type: 'geojson', data: parquesGeoJson(data) })
   map.addSource('vets', { type: 'geojson', data: vetsGeoJson(data) })
+  map.addSource('fuentes', { type: 'geojson', data: fuentesGeoJson(data) })
   map.addSource('air', { type: 'geojson', data: airGeoJson(data) })
 }
 
@@ -593,6 +657,7 @@ function updateSources(map: MlMap, data: Datasets) {
   ;(map.getSource('areas') as GeoJSONSource | undefined)?.setData(areasGeoJson(data))
   ;(map.getSource('parques') as GeoJSONSource | undefined)?.setData(parquesGeoJson(data))
   ;(map.getSource('vets') as GeoJSONSource | undefined)?.setData(vetsGeoJson(data))
+  ;(map.getSource('fuentes') as GeoJSONSource | undefined)?.setData(fuentesGeoJson(data))
   ;(map.getSource('air') as GeoJSONSource | undefined)?.setData(airGeoJson(data))
 }
 
@@ -640,7 +705,7 @@ function addLayers(map: MlMap) {
     type: 'circle',
     source: 'areas',
     paint: {
-      'circle-color': '#2f7d3a',
+      'circle-color': '#3d6e3a',
       'circle-radius': 8,
       'circle-stroke-width': 2,
       'circle-stroke-color': '#fff',
@@ -664,8 +729,40 @@ function addLayers(map: MlMap) {
     type: 'circle',
     source: 'vets',
     paint: {
-      'circle-color': '#0e7490',
+      'circle-color': '#3a5a6e',
       'circle-radius': 5,
+      'circle-stroke-width': 1.5,
+      'circle-stroke-color': '#fff',
+    },
+    layout: { visibility: 'none' },
+  })
+
+  // Fuentes de agua para beber. Pet-accessible fountains (uso = mascotas
+  // or ambos) get a brighter blue and slightly larger radius to stand out
+  // for the dog-atlas use case. Non-operational fountains fade to grey.
+  map.addLayer({
+    id: 'fuentes-points',
+    type: 'circle',
+    source: 'fuentes',
+    paint: {
+      'circle-color': [
+        'case',
+        ['==', ['get', 'estado'], 'operativa'],
+        [
+          'match',
+          ['get', 'uso'],
+          'mascotas', '#2f6e8c',
+          'ambos', '#2f6e8c',
+          '#7eb1c5',
+        ],
+        '#a8a29e',
+      ],
+      'circle-radius': [
+        'case',
+        ['any', ['==', ['get', 'uso'], 'mascotas'], ['==', ['get', 'uso'], 'ambos']],
+        7,
+        4.5,
+      ],
       'circle-stroke-width': 1.5,
       'circle-stroke-color': '#fff',
     },

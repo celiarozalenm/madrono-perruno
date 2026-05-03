@@ -6,8 +6,9 @@ import { formatRelativeTime } from './reportsTime'
 import type { Locale } from '../types'
 
 const COLOR: Record<EntityType, string> = {
-  area: '#2f7d3a',
+  area: '#3d6e3a',
   parque: '#5b3a1e',
+  fuente: '#2f6e8c',
 }
 
 interface Args {
@@ -146,7 +147,7 @@ export function buildEntityPopupContent(args: Args): HTMLDivElement {
       const summary = await fetchComments(args.entityType, args.entityId)
       renderList(summary.comments)
     } catch {
-      list.innerHTML = `<div class="mp-popup-empty">—</div>`
+      list.innerHTML = `<div class="mp-popup-empty">${tr.noComments}</div>`
     }
   }
 

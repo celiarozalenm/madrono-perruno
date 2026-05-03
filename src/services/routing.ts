@@ -1,12 +1,12 @@
-import type { Papelera, AreaCanina } from '../types'
+import type { Papelera, AreaCanina, Parque } from '../types'
 import { distanceMeters } from './scoring'
 
 export interface RouteWaypoint {
   lat: number
   lng: number
-  type: 'start' | 'papelera' | 'area'
+  type: 'start' | 'papelera' | 'area' | 'parque'
   label: string
-  ref?: Papelera | AreaCanina
+  ref?: Papelera | AreaCanina | Parque
 }
 
 export interface RouteResult {
@@ -16,6 +16,7 @@ export interface RouteResult {
   estimatedMinutes: number
   papelerasCount: number
   areasCount: number
+  parquesCount: number
   source: 'osrm' | 'straight'
 }
 
@@ -26,6 +27,7 @@ interface BuildOpts {
   durationMin: number
   papeleras: Papelera[]
   areas: AreaCanina[]
+  parques: Parque[]
 }
 
 export async function buildBagFriendlyRoute(opts: BuildOpts): Promise<RouteResult> {
@@ -57,6 +59,18 @@ export async function buildBagFriendlyRoute(opts: BuildOpts): Promise<RouteResul
       })
     }
   }
+  for (const pk of opts.parques) {
+    const d = distanceMeters(opts.start, pk)
+    if (d <= maxFromStart) {
+      candidates.push({
+        lat: pk.lat,
+        lng: pk.lng,
+        type: 'parque',
+        label: pk.nombre || pk.direccion || 'Parque',
+        ref: pk,
+      })
+    }
+  }
 
   const ordered = greedyLoopOrder(opts.start, candidates, targetMeters)
 
@@ -84,6 +98,7 @@ export async function buildBagFriendlyRoute(opts: BuildOpts): Promise<RouteResul
 
   const papelerasCount = ordered.filter((w) => w.type === 'papelera').length
   const areasCount = ordered.filter((w) => w.type === 'area').length
+  const parquesCount = ordered.filter((w) => w.type === 'parque').length
 
   return {
     waypoints,
@@ -92,6 +107,7 @@ export async function buildBagFriendlyRoute(opts: BuildOpts): Promise<RouteResul
     estimatedMinutes: Math.round(totalMeters / WALK_SPEED_M_PER_MIN),
     papelerasCount,
     areasCount,
+    parquesCount,
     source,
   }
 }

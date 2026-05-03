@@ -16,25 +16,45 @@ export default {
           800: '#933618',
           900: '#762e16',
         },
-        // Marrón tronco del madroño — color del logo, usado como sello
-        // "denominación de origen" en enlaces a datos.madrid.es, chips de
-        // datasets y footer. El rojo de los frutos queda reservado solo
-        // como decoración dentro del icono.
+        // Verde tierra — terciario, usado como acento en confirmaciones,
+        // áreas/parques y en cards "colabora". Tonos terrosos compatibles
+        // con la paleta naranja/marrón.
+        verde: {
+          50: '#eef2e9',
+          100: '#d8e1cf',
+          500: '#3d6e3a',
+          600: '#2f5b2c',
+          700: '#244520',
+        },
+        // Azul agua — teal-blue terroso, complementario del naranja
+        // brand y casado con el verde y el madroño en saturación/luminosidad.
+        // NO es el azul institucional del Ayuntamiento (#003df6); ese satura
+        // demasiado para esta paleta cálida y editorial.
+        agua: {
+          50: '#eef5f9',
+          100: '#d4e6ee',
+          200: '#adcedc',
+          300: '#7eb1c5',
+          400: '#5396ad',
+          500: '#2f6e8c',
+          600: '#255871',
+          700: '#1d4458',
+          800: '#163242',
+          900: '#0f222e',
+        },
+        // Marrón tronco del madroño — segundo color de marca. Gama tonal
+        // completa para acentos cálidos.
         madrono: {
           50: '#f5f0eb',
           100: '#e3d5c4',
+          200: '#cdb89e',
+          300: '#b89a76',
+          400: '#8c6a44',
           500: '#5a3f2a',
           600: '#48321f',
           700: '#382617',
-        },
-        // Verde madroño — color del logo (copa del árbol). Áreas caninas,
-        // estados positivos (con bolsas), tints suaves de fondos.
-        verde: {
-          50: '#e7f2ea',
-          100: '#cce5d2',
-          500: '#2a6f35',
-          600: '#225a2b',
-          700: '#1a4421',
+          800: '#2a1c10',
+          900: '#1c1208',
         },
       },
       fontFamily: {

@@ -5,7 +5,6 @@
 import type { BarrioScore } from '../types'
 
 interface Args {
-  address: string
   score: BarrioScore
   locale: 'es' | 'en'
 }
@@ -17,9 +16,9 @@ const COLOR = {
   bg: '#faf7f2',
   brand: '#ed731f',
   brandDark: '#b84314',
-  green: '#2f7d3a',
+  green: '#3d6e3a',
   brown: '#5b3a1e',
-  cyan: '#0e7490',
+  cyan: '#3a5a6e',
   text: '#1a1a1a',
   textDim: '#4b5563',
   textFaint: '#6b7280',
@@ -27,8 +26,8 @@ const COLOR = {
 } as const
 
 const SCORE_COLOR: Record<BarrioScore['scoreLabel'], string> = {
-  excelente: '#2f7d3a',
-  bueno: '#65a30d',
+  excelente: '#3d6e3a',
+  bueno: '#7a8a2a',
   mejorable: '#d97706',
   pobre: '#b8431b',
 }
@@ -68,15 +67,20 @@ export async function generateShareCard(args: Args): Promise<Blob> {
   ctx.fillStyle = COLOR.brand
   ctx.fillRect(0, 0, W, 8)
 
-  // Logo (simplified, on left)
-  drawLogo(ctx, 60, 60, 80)
+  // Logo — load the brand SVG so the share card matches the live icon exactly.
+  try {
+    const img = await loadIcon()
+    ctx.drawImage(img, 60, 60, 80, 80)
+  } catch {
+    drawLogo(ctx, 60, 60, 80)
+  }
   ctx.fillStyle = COLOR.text
   ctx.font = 'bold 38px "DM Sans", system-ui, sans-serif'
   ctx.textBaseline = 'middle'
   ctx.fillText('Madroño Perruno', 160, 90)
   ctx.fillStyle = COLOR.textDim
   ctx.font = '500 18px "DM Sans", system-ui, sans-serif'
-  ctx.fillText(args.locale === 'es' ? 'Atlas Canino de Madrid' : 'Madrid Dog Atlas', 160, 122)
+  ctx.fillText(args.locale === 'es' ? 'Portal perruno de Madrid' : 'Madrid Dog Portal', 160, 122)
 
   // Big score block (left side)
   const scoreColor = SCORE_COLOR[args.score.scoreLabel]
@@ -122,23 +126,23 @@ export async function generateShareCard(args: Args): Promise<Blob> {
     y,
     COLOR.cyan,
     args.score.veterinariosDistrito,
-    args.locale === 'es' ? 'veterinarios en el distrito' : 'vets in the district',
+    args.locale === 'es' ? 'veterinarios registrados en el distrito' : 'registered vets in the district',
   )
 
-  // Address line (clamped)
+  // Distrito line (only neighborhood / distrito name)
   ctx.fillStyle = COLOR.textDim
-  ctx.font = '500 18px "DM Sans", system-ui, sans-serif'
-  const addr = clampLine(ctx, args.address, W - 120)
-  ctx.fillText(addr, 60, 588)
+  ctx.font = '600 20px "DM Sans", system-ui, sans-serif'
+  ctx.textBaseline = 'alphabetic'
+  ctx.fillText(args.score.distrito || (args.locale === 'es' ? 'Madrid' : 'Madrid'), 60, 588)
 
-  // Madrid blue badge bottom-right
+  // Brand badge bottom-right
   ctx.fillStyle = COLOR.madrono
-  roundRect(ctx, W - 360, 558, 300, 44, 22)
+  roundRect(ctx, W - 320, 558, 260, 44, 22)
   ctx.fill()
   ctx.fillStyle = '#ffffff'
-  ctx.font = '600 14px "DM Sans", system-ui, sans-serif'
+  ctx.font = '700 16px "DM Sans", system-ui, sans-serif'
   ctx.textBaseline = 'middle'
-  ctx.fillText('madrono-perruno.vercel.app', W - 340, 580)
+  ctx.fillText('Madroño Perruno', W - 300, 580)
 
   return await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
@@ -149,8 +153,17 @@ export async function generateShareCard(args: Args): Promise<Blob> {
   })
 }
 
+function loadIcon(): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = () => reject(new Error('icon load failed'))
+    img.src = '/icon.svg'
+  })
+}
+
 function drawLogo(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
-  // Simplified mini logo: orange disc with the green madroño + dog silhouette
   const cx = x + size / 2
   const cy = y + size / 2
   ctx.save()
@@ -163,14 +176,14 @@ function drawLogo(ctx: CanvasRenderingContext2D, x: number, y: number, size: num
   ctx.fillStyle = COLOR.brown
   ctx.fillRect(cx + 6, cy - 4, 6, 22)
   // Canopy
-  ctx.fillStyle = COLOR.green
+  ctx.fillStyle = '#8c6a44'
   ctx.beginPath()
   ctx.arc(cx + 9, cy - 12, 16, 0, Math.PI * 2)
   ctx.arc(cx + 18, cy - 6, 11, 0, Math.PI * 2)
   ctx.arc(cx + 1, cy - 6, 11, 0, Math.PI * 2)
   ctx.fill()
   // Fruits
-  ctx.fillStyle = '#c8252b'
+  ctx.fillStyle = COLOR.brand
   for (const [px, py] of [
     [cx + 4, cy - 14],
     [cx + 14, cy - 8],
@@ -220,16 +233,3 @@ function drawStatRow(
   ctx.restore()
 }
 
-function clampLine(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
-  if (ctx.measureText(text).width <= maxWidth) return text
-  const ellipsis = '…'
-  let lo = 0
-  let hi = text.length
-  while (lo < hi) {
-    const mid = ((lo + hi) >> 1) + 1
-    const t = text.slice(0, mid) + ellipsis
-    if (ctx.measureText(t).width <= maxWidth) lo = mid
-    else hi = mid - 1
-  }
-  return text.slice(0, lo) + ellipsis
-}

@@ -6,6 +6,22 @@ import { scoreBarrio } from '../services/scoring'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { assessStation, nearestStation, AIR_LEVEL_COLORS, AIR_LEVEL_LABELS } from '../services/air'
 import { generateShareCard } from '../services/shareCard'
+import { PapeleraIcon, AreaCaninaIcon, ParqueIcon, VetIcon } from './icons/CustomIcons'
+
+const EXAMPLES = [
+  'Plaza Mayor, Centro',
+  'Calle de Alcalá 100, Salamanca',
+  'Parque del Retiro',
+  'Calle Doctor Esquerdo, Moratalaz',
+  'Avenida de la Albufera 50, Vallecas',
+]
+
+const INGREDIENTS: { key: 'papeleras' | 'areas' | 'parques' | 'vets'; weight: number }[] = [
+  { key: 'papeleras', weight: 40 },
+  { key: 'areas', weight: 30 },
+  { key: 'parques', weight: 20 },
+  { key: 'vets', weight: 10 },
+]
 
 interface Props {
   data: Datasets
@@ -20,8 +36,8 @@ interface Geocoded {
 }
 
 const SCORE_COLOR: Record<string, string> = {
-  excelente: '#2f7d3a',
-  bueno: '#65a30d',
+  excelente: '#3d6e3a',
+  bueno: '#7a8a2a',
   mejorable: '#d97706',
   pobre: '#b8431b',
 }
@@ -45,13 +61,14 @@ export default function BarrioScore({ data, locale, onLocate }: Props) {
   const [point, setPoint] = useState<Geocoded | null>(null)
   const geo = useGeolocation()
 
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
-    if (!address.trim()) return
+  async function runSearch(query?: string) {
+    const q = (query ?? address).trim()
+    if (!q) return
+    if (query !== undefined) setAddress(query)
     setPending(true)
     setError(null)
     try {
-      const result = await geocode(address.trim())
+      const result = await geocode(q)
       if (!result) {
         setError(locale === 'es' ? 'No se ha encontrado esa dirección' : 'Address not found')
         return
@@ -63,6 +80,11 @@ export default function BarrioScore({ data, locale, onLocate }: Props) {
     } finally {
       setPending(false)
     }
+  }
+
+  async function handleSearch(e: React.FormEvent) {
+    e.preventDefault()
+    runSearch()
   }
 
   function useMyLocation() {
@@ -137,12 +159,78 @@ export default function BarrioScore({ data, locale, onLocate }: Props) {
         </div>
       )}
 
+      {!point && !pending && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <article className="rounded-2xl bg-stone-50 border border-stone-900/10 p-5">
+            <div className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-600">
+              {t(locale, 'barrio.empty.ingredients.eyebrow')}
+            </div>
+            <h2 className="text-lg font-extrabold text-madrono-700 mt-1.5 tracking-tight">
+              {t(locale, 'barrio.empty.ingredients.title')}
+            </h2>
+            <ul className="mt-4 space-y-3">
+              {INGREDIENTS.map(({ key, weight }) => {
+                const icon =
+                  key === 'papeleras' ? <PapeleraIcon size={16} /> :
+                  key === 'areas' ? <AreaCaninaIcon size={16} /> :
+                  key === 'parques' ? <ParqueIcon size={16} /> :
+                  <VetIcon size={16} />
+                const tone =
+                  key === 'papeleras' ? 'bg-brand-100 text-brand-700' :
+                  key === 'areas' ? 'bg-verde-100 text-verde-700' :
+                  key === 'parques' ? 'bg-madrono-100 text-madrono-700' :
+                  'bg-brand-100 text-brand-700'
+                return (
+                  <li key={key} className="flex items-center gap-3">
+                    <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${tone}`} aria-hidden>
+                      {icon}
+                    </span>
+                    <span className="flex-1 text-sm text-stone-800">
+                      {t(locale, `barrio.empty.ingredients.${key}` as 'barrio.empty.ingredients.papeleras')}
+                    </span>
+                    <span className="text-sm font-bold tabular-nums text-madrono-700">
+                      {weight} pts
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
+            <p className="text-xs text-stone-500 mt-4 leading-relaxed">
+              {t(locale, 'barrio.empty.ingredients.note')}
+            </p>
+          </article>
+
+          <article className="rounded-2xl bg-brand-50 border border-brand-100 p-5">
+            <div className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-700">
+              {t(locale, 'barrio.empty.examples.eyebrow')}
+            </div>
+            <h2 className="text-lg font-extrabold text-madrono-700 mt-1.5 tracking-tight">
+              {t(locale, 'barrio.empty.examples.title')}
+            </h2>
+            <p className="text-xs text-stone-600 mt-2 leading-relaxed">
+              {t(locale, 'barrio.empty.examples.lede')}
+            </p>
+            <div className="flex flex-wrap gap-2 mt-4">
+              {EXAMPLES.map((ex) => (
+                <button
+                  key={ex}
+                  type="button"
+                  onClick={() => runSearch(ex)}
+                  className="text-xs font-medium px-3 py-1.5 rounded-full bg-white border border-brand-100 text-stone-800 hover:bg-brand-500 hover:text-white hover:border-brand-500 transition-colors"
+                >
+                  {ex}
+                </button>
+              ))}
+            </div>
+          </article>
+        </div>
+      )}
+
       {point && main && score5 && score15 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="text-sm text-stone-600 truncate flex-1 min-w-0">{point.label}</div>
             <ShareButton
-              address={point.label}
               score={main}
               locale={locale}
             />
@@ -175,7 +263,7 @@ export default function BarrioScore({ data, locale, onLocate }: Props) {
                   {row.label}
                 </div>
                 <Row n={row.s.papeleras} label={t(locale, 'barrio.papeleras')} dot="#ed731f" />
-                <Row n={row.s.areasCaninas} label={t(locale, 'barrio.areas')} dot="#2f7d3a" />
+                <Row n={row.s.areasCaninas} label={t(locale, 'barrio.areas')} dot="#3d6e3a" />
                 <Row n={row.s.parques} label={t(locale, 'barrio.parques')} dot="#5b3a1e" />
               </div>
             ))}
@@ -257,84 +345,103 @@ function Row({ n, label, dot }: { n: number; label: string; dot: string }) {
 }
 
 function ShareButton({
-  address,
   score,
   locale,
 }: {
-  address: string
   score: import('../types').BarrioScore
   locale: Locale
 }) {
-  const [busy, setBusy] = useState(false)
+  const [busy, setBusy] = useState<'share' | 'download' | null>(null)
   const [done, setDone] = useState<'shared' | 'downloaded' | null>(null)
 
-  async function handleShare() {
-    setBusy(true)
+  const canShare =
+    typeof navigator !== 'undefined' &&
+    typeof (navigator as Navigator & { share?: unknown }).share === 'function'
+
+  async function shareNative() {
+    setBusy('share')
     setDone(null)
     try {
-      const blob = await generateShareCard({ address, score, locale })
+      const blob = await generateShareCard({ score, locale })
       const file = new File([blob], 'mi-barrio-canino.png', { type: 'image/png' })
+      const distrito = score.distrito || 'Madrid'
       const text =
         locale === 'es'
-          ? `Mi barrio canino en Madrid: ${score.scoreOver100}/100 — ${score.papeleras} papeleras, ${score.areasCaninas} áreas caninas, ${score.parques} parques cerca. https://madrono-perruno.vercel.app`
-          : `My Madrid dog neighborhood: ${score.scoreOver100}/100 — ${score.papeleras} bins, ${score.areasCaninas} dog areas, ${score.parques} parks nearby. https://madrono-perruno.vercel.app`
+          ? `Mi barrio canino (${distrito}): ${score.scoreOver100}/100 — ${score.papeleras} papeleras, ${score.areasCaninas} áreas caninas, ${score.parques} parques cerca. https://madrono-perruno.vercel.app`
+          : `My Madrid dog neighbourhood (${distrito}): ${score.scoreOver100}/100 — ${score.papeleras} bins, ${score.areasCaninas} dog areas, ${score.parques} parks nearby. https://madrono-perruno.vercel.app`
       const nav = navigator as Navigator & {
         canShare?: (data: ShareData) => boolean
         share?: (data: ShareData) => Promise<void>
       }
       if (nav.canShare?.({ files: [file] }) && nav.share) {
-        await nav.share({
-          files: [file],
-          title: 'Madroño Perruno',
-          text,
-        })
-        setDone('shared')
-      } else {
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = 'mi-barrio-canino.png'
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        URL.revokeObjectURL(url)
-        setDone('downloaded')
+        await nav.share({ files: [file], title: 'Madroño Perruno', text })
+      } else if (nav.share) {
+        await nav.share({ title: 'Madroño Perruno', text })
       }
+      setDone('shared')
     } catch (err) {
       console.error(err)
     } finally {
-      setBusy(false)
+      setBusy(null)
       setTimeout(() => setDone(null), 3000)
     }
   }
 
+  async function downloadPng() {
+    setBusy('download')
+    setDone(null)
+    try {
+      const blob = await generateShareCard({ score, locale })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'mi-barrio-canino.png'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+      setDone('downloaded')
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setBusy(null)
+      setTimeout(() => setDone(null), 3000)
+    }
+  }
+
+  const baseCls =
+    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border disabled:opacity-50'
+
   return (
-    <button
-      type="button"
-      onClick={handleShare}
-      disabled={busy}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border border-stone-300 hover:bg-stone-100 text-stone-700 disabled:opacity-50"
-    >
-      {busy ? (
-        <Loader2 size={14} className="animate-spin" />
-      ) : done === 'downloaded' ? (
-        <Download size={14} />
-      ) : (
-        <Share2 size={14} />
+    <div className="flex gap-2">
+      {canShare && (
+        <button
+          type="button"
+          onClick={shareNative}
+          disabled={busy !== null}
+          className={`${baseCls} border-brand-500 bg-brand-500 hover:bg-brand-600 text-white`}
+        >
+          {busy === 'share' ? <Loader2 size={14} className="animate-spin" /> : <Share2 size={14} />}
+          <span>
+            {done === 'shared'
+              ? locale === 'es' ? '¡Compartido!' : 'Shared!'
+              : locale === 'es' ? 'Compartir' : 'Share'}
+          </span>
+        </button>
       )}
-      <span>
-        {done === 'shared'
-          ? locale === 'es'
-            ? '¡Compartido!'
-            : 'Shared!'
-          : done === 'downloaded'
-          ? locale === 'es'
-            ? 'Descargado'
-            : 'Downloaded'
-          : locale === 'es'
-          ? 'Compartir'
-          : 'Share'}
-      </span>
-    </button>
+      <button
+        type="button"
+        onClick={downloadPng}
+        disabled={busy !== null}
+        className={`${baseCls} border-stone-300 hover:bg-stone-100 text-stone-700`}
+      >
+        {busy === 'download' ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+        <span>
+          {done === 'downloaded'
+            ? locale === 'es' ? 'Descargado' : 'Downloaded'
+            : locale === 'es' ? 'Descargar' : 'Download'}
+        </span>
+      </button>
+    </div>
   )
 }

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400;1,9..40,500;1,9..40,700;1,9..40,900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -22,13 +22,137 @@ body {
   color: #1a1a1a;
 }
 
+/* Editorial layout helpers — used by LandingPage. Kept here so they stay
+   isolated from utility classes and from the design system tokens. */
+@keyframes mp-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes mp-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes mp-pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(237,115,31,0.55); }
+  80%  { box-shadow: 0 0 0 14px rgba(237,115,31,0); }
+  100% { box-shadow: 0 0 0 0 rgba(237,115,31,0); }
+}
+@keyframes mp-tilt {
+  0%, 100% { transform: rotate(-2.5deg); }
+  50%      { transform: rotate(2.5deg); }
+}
+
+.mp-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: mp-marquee 38s linear infinite;
+}
+.mp-marquee:hover .mp-marquee-track { animation-play-state: paused; }
+
+.mp-fade-up { animation: mp-fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.mp-fade-up-1 { animation-delay: 0.05s; }
+.mp-fade-up-2 { animation-delay: 0.15s; }
+.mp-fade-up-3 { animation-delay: 0.25s; }
+.mp-fade-up-4 { animation-delay: 0.35s; }
+
+/* Hard-edge offset shadow — gives the editorial / civic feel without
+   leaving the existing palette. Used on accent cards and the hero plate. */
+.mp-shadow-hard {
+  box-shadow: 6px 6px 0 0 #1c1917;
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+.mp-shadow-hard:hover {
+  box-shadow: 10px 10px 0 0 #1c1917;
+  transform: translate(-2px, -2px);
+}
+.mp-shadow-hard-brand {
+  box-shadow: 6px 6px 0 0 #ed731f;
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+.mp-shadow-hard-brand:hover {
+  box-shadow: 10px 10px 0 0 #ed731f;
+  transform: translate(-2px, -2px);
+}
+
+/* Soft layered shadow for hovering feature cards. */
+.mp-card {
+  transition: transform 250ms cubic-bezier(0.2, 0.7, 0.2, 1),
+              box-shadow 250ms cubic-bezier(0.2, 0.7, 0.2, 1),
+              border-color 200ms ease;
+}
+.mp-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 60px -28px rgba(28,25,23,0.35),
+              0 8px 18px -10px rgba(28,25,23,0.2);
+}
+
+/* Pulsing dot — a tiny live indicator on the ticker. */
+.mp-pulse {
+  position: relative;
+  border-radius: 9999px;
+  animation: mp-pulse-ring 1.8s ease-out infinite;
+}
+
+/* Editorial hover underline — a left-to-right reveal. */
+.mp-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.mp-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 1.5px;
+  width: 0;
+  background: currentColor;
+  transition: width 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.mp-link:hover::after { width: 100%; }
+
+/* Small wobble for decorative badges — only when hovered, no idle motion. */
+.mp-badge-tilt { transition: transform 250ms ease; }
+.mp-badge-tilt:hover { animation: mp-tilt 1.2s ease-in-out infinite; }
+
+/* Ticker row separators */
+.mp-ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 1.4rem;
+  white-space: nowrap;
+}
+.mp-ticker-item + .mp-ticker-item::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 9999px;
+  margin-right: 1.4rem;
+  opacity: 0.55;
+}
+
+/* Reduced motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .mp-marquee-track,
+  .mp-fade-up,
+  .mp-pulse,
+  .mp-badge-tilt:hover {
+    animation: none !important;
+  }
+  .mp-card:hover { transform: none; }
+  .mp-shadow-hard:hover,
+  .mp-shadow-hard-brand:hover { transform: none; }
+}
+
 /* MapLibre overrides */
 .maplibregl-popup-content {
   padding: 0 !important;
   border-radius: 12px !important;
   box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
   overflow: hidden;
-  max-width: 280px;
 }
 
 .maplibregl-popup-close-button {
@@ -41,9 +165,45 @@ body {
   font-size: 10px;
 }
 
+/* Mobile: open popups as a fullscreen sheet so the comment form and
+   action buttons are fully reachable without horizontal scrolling. */
+@media (max-width: 640px) {
+  .maplibregl-popup {
+    position: fixed !important;
+    inset: 0 !important;
+    transform: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1000;
+  }
+  .maplibregl-popup-tip { display: none !important; }
+  .maplibregl-popup-content {
+    max-width: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+  }
+  .maplibregl-popup-close-button {
+    font-size: 1.75rem;
+    padding: 8px 14px;
+  }
+  .mp-popup,
+  .mp-popup-entity,
+  .mp-popup-pap {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+  .mp-popup-comments-list { max-height: none; }
+}
+
 .mp-popup {
   font-family: 'DM Sans', system-ui, sans-serif;
   width: 250px;
+  box-sizing: border-box;
 }
 .mp-popup-bar { height: 4px; }
 .mp-popup-body { padding: 12px 14px 14px; }
@@ -51,6 +211,7 @@ body {
   font-weight: 600;
   font-size: 0.95rem;
   margin-bottom: 4px;
+  padding-right: 24px;
   color: #1a1a1a;
 }
 .mp-popup-row {
@@ -111,7 +272,7 @@ body {
   background: #fff;
 }
 
-.mp-popup-pap { width: 280px; }
+.mp-popup-pap { width: 280px; box-sizing: border-box; }
 
 .mp-popup-reports {
   margin-top: 14px;
@@ -145,12 +306,12 @@ body {
   margin-bottom: 6px;
 }
 .mp-popup-latest.mp-r-yes {
-  background: #ecfdf5;
-  color: #065f46;
+  background: #e7efe5;
+  color: #2a4f28;
 }
 .mp-popup-latest.mp-r-no {
-  background: #fef2f2;
-  color: #991b1b;
+  background: #fbe7dd;
+  color: #7a2d12;
 }
 .mp-popup-rel {
   font-size: 0.75rem;
@@ -166,8 +327,8 @@ body {
   gap: 10px;
   font-size: 0.78rem;
 }
-.mp-popup-tally .mp-r-yes { color: #059669; font-weight: 600; }
-.mp-popup-tally .mp-r-no { color: #dc2626; font-weight: 600; }
+.mp-popup-tally .mp-r-yes { color: #3d6e3a; font-weight: 600; }
+.mp-popup-tally .mp-r-no { color: #b8431b; font-weight: 600; }
 
 .mp-popup-vote {
   display: grid;
@@ -185,20 +346,22 @@ body {
   background: #fff;
   cursor: pointer;
   transition: all 0.15s;
+  box-sizing: border-box;
+  min-width: 0;
 }
 .mp-popup-vote .mp-vote-yes {
-  border-color: #059669;
-  color: #065f46;
+  border-color: #3d6e3a;
+  color: #2a4f28;
 }
 .mp-popup-vote .mp-vote-yes:hover:not(:disabled) {
-  background: #ecfdf5;
+  background: #e7efe5;
 }
 .mp-popup-vote .mp-vote-no {
-  border-color: #dc2626;
-  color: #991b1b;
+  border-color: #b8431b;
+  color: #7a2d12;
 }
 .mp-popup-vote .mp-vote-no:hover:not(:disabled) {
-  background: #fef2f2;
+  background: #fbe7dd;
 }
 .mp-popup-vote button:disabled {
   opacity: 0.5;
@@ -211,10 +374,10 @@ body {
   text-align: center;
   min-height: 1em;
 }
-.mp-popup-flash.ok { color: #059669; }
-.mp-popup-flash.error { color: #dc2626; }
+.mp-popup-flash.ok { color: #3d6e3a; }
+.mp-popup-flash.error { color: #b8431b; }
 
-.mp-popup-entity { width: 290px; }
+.mp-popup-entity { width: 290px; box-sizing: border-box; }
 
 .mp-popup-comments-list {
   max-height: 180px;
@@ -230,8 +393,8 @@ body {
   background: #f9fafb;
   border-left: 3px solid #d1d5db;
 }
-.mp-popup-comment.mp-r-yes { border-left-color: #059669; background: #ecfdf5; }
-.mp-popup-comment.mp-r-no { border-left-color: #dc2626; background: #fef2f2; }
+.mp-popup-comment.mp-r-yes { border-left-color: #3d6e3a; background: #e7efe5; }
+.mp-popup-comment.mp-r-no { border-left-color: #b8431b; background: #fbe7dd; }
 .mp-popup-comment-head {
   display: flex;
   align-items: center;
@@ -280,6 +443,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
+  box-sizing: border-box;
 }
 .mp-popup-submit:hover:not(:disabled) { background: #de5915; }
 .mp-popup-submit:disabled { opacity: 0.5; cursor: not-allowed; }

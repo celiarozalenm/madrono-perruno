@@ -22,7 +22,7 @@ const COMMENTS_RETURNED = 8
 const COMMENT_TTL_SECONDS = 60 * 60 * 24 * 60 // 60 days
 const RATE_LIMIT_PER_HOUR = 12
 const MAX_TEXT_LENGTH = 140
-const ALLOWED_TYPES = new Set(['area', 'parque'])
+const ALLOWED_TYPES = new Set(['area', 'parque', 'fuente'])
 const ALLOWED_ORIGINS = [
   'https://madrono-perruno.vercel.app',
   'http://localhost:5173',

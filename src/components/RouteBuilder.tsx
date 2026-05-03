@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, MapPin, Loader2, AlertCircle, Footprints, RotateCcw, Trash2, Dog, Lock } from 'lucide-react'
+import { Search, MapPin, Loader2, AlertCircle, Footprints, RotateCcw, Trash2, Dog, Trees, Lock, ExternalLink } from 'lucide-react'
 import type { Datasets, Locale } from '../types'
 import { t } from '../i18n'
 import { buildBagFriendlyRoute, type RouteResult } from '../services/routing'
@@ -69,11 +69,20 @@ export default function RouteBuilder({ data, locale, onRoute, onLocate }: Props)
       }
     }
     if (!starting) {
-      setError(
-        locale === 'es'
-          ? 'Introduce una dirección o usa tu ubicación'
-          : 'Enter an address or use your location',
-      )
+      if (!geo.coords && !geo.error) {
+        geo.request()
+        setError(
+          locale === 'es'
+            ? 'Pidiendo permiso de ubicación. Pulsa "Generar ruta" otra vez cuando aceptes, o introduce una dirección.'
+            : 'Asking for location permission. Tap "Build route" again once allowed, or enter an address.',
+        )
+      } else {
+        setError(
+          locale === 'es'
+            ? 'Introduce una dirección o pulsa "Mi ubicación"'
+            : 'Enter an address or tap "My location"',
+        )
+      }
       return
     }
 
@@ -84,6 +93,7 @@ export default function RouteBuilder({ data, locale, onRoute, onLocate }: Props)
         durationMin: duration,
         papeleras: data.papeleras,
         areas: data.areas,
+        parques: data.parques,
       })
       setRoute(r)
       onRoute(r)
@@ -118,8 +128,8 @@ export default function RouteBuilder({ data, locale, onRoute, onLocate }: Props)
         </h1>
         <p className="text-sm text-stone-600 mt-1">
           {locale === 'es'
-            ? 'Genera un paseo en bucle que pasa por papeleras y áreas caninas cercanas. Ideal para sacar al perro sin acabar a oscuras lejos de casa.'
-            : 'Generate a loop walk passing through nearby bins and dog areas. Perfect for an evening walk without ending far from home.'}
+            ? 'Genera un paseo en bucle que pasa por papeleras, parques y áreas caninas cercanas. Ideal para sacar al perro sin acabar a oscuras lejos de casa.'
+            : 'Generate a loop walk passing through nearby bins, parks and dog areas. Perfect for an evening walk without ending far from home.'}
         </p>
         <div className="text-xs text-stone-500 mt-2 flex items-start gap-1.5">
           <Lock size={12} className="mt-0.5 shrink-0" />
@@ -203,6 +213,72 @@ export default function RouteBuilder({ data, locale, onRoute, onLocate }: Props)
         </div>
       )}
 
+      {!route && !pending && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <article className="rounded-2xl bg-stone-50 border border-stone-900/10 p-5">
+            <div className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-600">
+              {t(locale, 'route.empty.steps.eyebrow')}
+            </div>
+            <h2 className="text-lg font-extrabold text-madrono-700 mt-1.5 tracking-tight">
+              {t(locale, 'route.empty.steps.title')}
+            </h2>
+            <ol className="mt-4 space-y-3">
+              {[1, 2, 3].map((n) => {
+                const icon =
+                  n === 1 ? <MapPin size={16} /> :
+                  n === 2 ? <span className="text-sm font-bold tabular-nums">⏱</span> :
+                  <Footprints size={16} />
+                return (
+                  <li key={n} className="flex items-start gap-3">
+                    <span className="shrink-0 w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm tabular-nums" aria-hidden>
+                      {n}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-stone-900 flex items-center gap-1.5">
+                        <span className="text-brand-600">{icon}</span>
+                        {t(locale, `route.empty.steps.${n}.title` as 'route.empty.steps.1.title')}
+                      </div>
+                      <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
+                        {t(locale, `route.empty.steps.${n}.body` as 'route.empty.steps.1.body')}
+                      </p>
+                    </div>
+                  </li>
+                )
+              })}
+            </ol>
+          </article>
+
+          <article className="rounded-2xl bg-brand-50 border border-brand-100 p-5">
+            <div className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-700">
+              {t(locale, 'route.empty.tips.eyebrow')}
+            </div>
+            <h2 className="text-lg font-extrabold text-madrono-700 mt-1.5 tracking-tight">
+              {t(locale, 'route.empty.tips.title')}
+            </h2>
+            <ul className="mt-4 space-y-2.5">
+              {([
+                { sizeKey: 'big', durKey: 'bigDuration', emoji: '🐕‍🦺' },
+                { sizeKey: 'medium', durKey: 'mediumDuration', emoji: '🐩' },
+                { sizeKey: 'small', durKey: 'smallDuration', emoji: '🐶' },
+              ] as const).map(({ sizeKey, durKey, emoji }) => (
+                <li
+                  key={sizeKey}
+                  className="flex items-center gap-3 bg-white border border-brand-100 rounded-xl px-3 py-2.5"
+                >
+                  <span className="text-xl shrink-0" aria-hidden>{emoji}</span>
+                  <span className="flex-1 text-sm text-stone-800">
+                    {t(locale, `route.empty.tips.${sizeKey}` as 'route.empty.tips.big')}
+                  </span>
+                  <span className="text-xs font-bold text-brand-700 tabular-nums shrink-0">
+                    {t(locale, `route.empty.tips.${durKey}` as 'route.empty.tips.bigDuration')}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </div>
+      )}
+
       {route && (
         <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
           <div className="bg-brand-500 text-white p-4">
@@ -225,7 +301,20 @@ export default function RouteBuilder({ data, locale, onRoute, onLocate }: Props)
             </div>
           </div>
           <div className="p-4">
-            <div className="flex gap-4 text-sm mb-3">
+            <a
+              href={`https://www.google.com/maps/dir/${route.waypoints
+                .map((w) => `${w.lat},${w.lng}`)
+                .concat([`${route.waypoints[0].lat},${route.waypoints[0].lng}`])
+                .join('/')}/data=!4m2!4m1!3e2`}
+              target="_blank"
+              rel="noopener"
+              className="mb-3 w-full inline-flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+            >
+              <MapPin size={16} />
+              {locale === 'es' ? 'Seguir ruta en Google Maps' : 'Open route in Google Maps'}
+              <ExternalLink size={14} className="opacity-70" />
+            </a>
+            <div className="flex flex-wrap gap-4 text-sm mb-3">
               <div className="flex items-center gap-1.5">
                 <Trash2 size={14} className="text-brand-600" />
                 <span className="font-bold tabular-nums">{route.papelerasCount}</span>
@@ -234,10 +323,17 @@ export default function RouteBuilder({ data, locale, onRoute, onLocate }: Props)
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Dog size={14} className="text-green-700" />
+                <Dog size={14} className="text-madrono-700" />
                 <span className="font-bold tabular-nums">{route.areasCount}</span>
                 <span className="text-stone-600">
                   {locale === 'es' ? 'áreas caninas' : 'dog areas'}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Trees size={14} className="text-madrono-600" />
+                <span className="font-bold tabular-nums">{route.parquesCount}</span>
+                <span className="text-stone-600">
+                  {locale === 'es' ? 'parques' : 'parks'}
                 </span>
               </div>
             </div>
@@ -257,6 +353,10 @@ export default function RouteBuilder({ data, locale, onRoute, onLocate }: Props)
                         ? locale === 'es'
                           ? 'Área canina'
                           : 'Dog area'
+                        : wp.type === 'parque'
+                        ? locale === 'es'
+                          ? 'Parque'
+                          : 'Park'
                         : locale === 'es'
                         ? 'Papelera'
                         : 'Bin'}

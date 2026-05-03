@@ -2,6 +2,7 @@ import type {
   AirStation,
   AreaCanina,
   Datasets,
+  Fuente,
   Papelera,
   Parque,
   PerrosCensus,
@@ -34,6 +35,10 @@ export const DATASETS = {
     portalUrl:
       'https://datos.madrid.es/portal/site/egob/menuitem.c05c1f754a33a9fbe4b2e4b284f1a5a0/?vgnextoid=46b55cc016f49510VgnVCM1000008a4a900aRCRD',
   },
+  fuentes: {
+    label: 'Fuentes de agua para beber',
+    portalUrl: 'https://datos.madrid.es/dataset/300051-0-fuentes',
+  },
   perros: {
     label: 'Censo de animales domésticos por distrito',
     portalUrl: 'https://datos.madrid.es/dataset/207118-0-censo-animales',
@@ -60,16 +65,17 @@ export async function loadAllDatasets(): Promise<Datasets> {
   const manifestRes = await fetch('/data/manifest.json', { cache: 'no-cache' })
   const manifest = manifestRes.ok ? await manifestRes.json() : {}
   const version = encodeURIComponent(manifest.generatedAt ?? Date.now().toString())
-  const [papeleras, areas, parques, vets, air, perros, proteccionAnimal] = await Promise.all([
+  const [papeleras, areas, parques, vets, fuentes, air, perros, proteccionAnimal] = await Promise.all([
     loadJson<Papelera[]>('papeleras', version),
     loadJson<AreaCanina[]>('areas', version),
     loadJson<Parque[]>('parques', version),
     loadJson<Veterinario[]>('vets', version),
+    loadJson<Fuente[]>('fuentes', version).catch(() => [] as Fuente[]),
     loadJson<AirStation[]>('air', version).catch(() => [] as AirStation[]),
     loadJson<PerrosCensus>('perros', version).catch(() => EMPTY_PERROS),
     loadJson<ProteccionAnimalEntry[]>('proteccionAnimal', version).catch(
       () => [] as ProteccionAnimalEntry[],
     ),
   ])
-  return { papeleras, areas, parques, vets, air, perros, proteccionAnimal }
+  return { papeleras, areas, parques, vets, fuentes, air, perros, proteccionAnimal }
 }
