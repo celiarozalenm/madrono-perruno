@@ -28,8 +28,23 @@ export default defineConfig({
         clientsClaim: true,
         skipWaiting: true,
         cleanupOutdatedCaches: true,
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,json}'],
+        // Precache app shell assets, but NOT /data/*.json — those refresh
+        // weekly via fetch-data.mjs and need to come from the network so
+        // users see fresh counts (vets coords, perros census, etc.) without
+        // being stuck on a stale precached snapshot.
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        globIgnores: ['**/data/**'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         runtimeCaching: [
+          {
+            urlPattern: /\/data\/[^/]+\.json/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'madrono-data',
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            },
+          },
           {
             urlPattern: /^https:\/\/[a-d]\.basemaps\.cartocdn\.com\//,
             handler: 'CacheFirst',
