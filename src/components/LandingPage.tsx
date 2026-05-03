@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ArrowRight, Globe, Code, Heart, Download, MapPin, Footprints, BarChart3, Wind, Dog } from 'lucide-react'
+import { ArrowRight, Globe, Code, Heart, Download, MapPin, Footprints, BarChart3, Wind, Dog, Smartphone } from 'lucide-react'
 import type { Locale } from '../types'
 import { t } from '../i18n'
 import HeroIllustration from './HeroIllustration'
+import InstallModal from './InstallModal'
 import {
   PapeleraIcon,
   AreaCaninaIcon,
@@ -36,6 +37,7 @@ const STATS: {
 export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
   const [installEvt, setInstallEvt] = useState<InstallPromptEvent | null>(null)
   const [installed, setInstalled] = useState(false)
+  const [installModalOpen, setInstallModalOpen] = useState(false)
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -379,7 +381,21 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
               />
             ))}
           </div>
-          <div className="mt-6 pt-5 border-t border-stone-200 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 text-xs text-stone-600">
+          <div className="mt-5 pt-5 border-t border-stone-200">
+            <button
+              type="button"
+              onClick={() => setInstallModalOpen(true)}
+              className="inline-flex items-center gap-2 text-xs font-medium text-stone-600 hover:text-brand-600 transition-colors"
+            >
+              <Smartphone size={13} className="text-brand-500" />
+              <span>{t(locale, 'landing.install.chip')}</span>
+              <span className="text-stone-400">·</span>
+              <span className="font-semibold text-brand-600">
+                {t(locale, 'landing.install.chipCta')} →
+              </span>
+            </button>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 text-xs text-stone-600">
             <span className="flex items-center gap-2">
               <img src="/icon.svg" alt="" className="w-5 h-5" />
               <span className="leading-tight">
@@ -406,6 +422,15 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
           </div>
         </section>
       </div>
+
+      {installModalOpen && (
+        <InstallModal
+          locale={locale}
+          onClose={() => setInstallModalOpen(false)}
+          onTriggerInstall={triggerInstall}
+          canInstallNatively={!!installEvt && !installed}
+        />
+      )}
     </div>
   )
 }
