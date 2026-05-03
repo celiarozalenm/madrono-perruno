@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { View, StatsSection } from '../components/Sidebar'
 
-const VIEWS: readonly View[] = ['map', 'barrio', 'route', 'stats', 'participar', 'about'] as const
+const VIEWS: readonly View[] = ['map', 'barrio', 'route', 'stats', 'participar', 'recientes', 'about'] as const
 const STATS_SECTIONS: readonly StatsSection[] = ['overview', 'ranking', 'needs', 'proteccion'] as const
 
 export interface RouteState {

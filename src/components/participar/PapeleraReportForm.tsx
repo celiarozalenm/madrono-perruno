@@ -7,11 +7,12 @@ import type { Locale } from '../../types'
 interface Props {
   binId: string
   locale: Locale
+  meta?: { name?: string; lat?: number; lng?: number; distrito?: string }
 }
 
 type Flash = { kind: 'ok' | 'error'; text: string } | null
 
-export default function PapeleraReportForm({ binId, locale }: Props) {
+export default function PapeleraReportForm({ binId, locale, meta }: Props) {
   const [summary, setSummary] = useState<BinReportsSummary | null>(null)
   const [busy, setBusy] = useState(false)
   const [flash, setFlash] = useState<Flash>(null)
@@ -35,7 +36,7 @@ export default function PapeleraReportForm({ binId, locale }: Props) {
   async function vote(hasBags: boolean) {
     setFlash(null)
     setBusy(true)
-    const result = await submitReport(binId, hasBags)
+    const result = await submitReport(binId, hasBags, meta)
     if ('error' in result) {
       setFlash({
         kind: 'error',

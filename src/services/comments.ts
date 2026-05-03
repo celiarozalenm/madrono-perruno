@@ -29,16 +29,24 @@ export async function fetchComments(
   return (await res.json()) as CommentsSummary
 }
 
+export interface CommentMeta {
+  name?: string
+  lat?: number
+  lng?: number
+  distrito?: string
+}
+
 export async function submitComment(
   type: EntityType,
   id: string,
   sentiment: Sentiment,
   text: string,
+  meta?: CommentMeta,
 ): Promise<{ ok: true; ts: number } | { error: string }> {
   const res = await fetch('/api/comment', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type, id, sentiment, text }),
+    body: JSON.stringify({ type, id, sentiment, text, meta }),
   })
   if (res.status === 429) return { error: 'rate_limited' }
   if (!res.ok) return { error: `HTTP ${res.status}` }

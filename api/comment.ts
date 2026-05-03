@@ -23,6 +23,9 @@ const COMMENT_TTL_SECONDS = 60 * 60 * 24 * 60 // 60 days
 const RATE_LIMIT_PER_HOUR = 12
 const MAX_TEXT_LENGTH = 140
 const ALLOWED_TYPES = new Set(['area', 'parque', 'fuente'])
+const FEED_KEY = 'feed:global'
+const FEED_MAX_ENTRIES = 200
+const FEED_TTL_SECONDS = 60 * 60 * 24 * 60 // 60 days
 const ALLOWED_ORIGINS = [
   'https://madrono-perruno.vercel.app',
   'http://localhost:5173',
@@ -113,7 +116,13 @@ export default async function handler(req: Request) {
   }
 
   if (req.method === 'POST') {
-    let body: { type?: string; id?: string; sentiment?: string; text?: string }
+    let body: {
+      type?: string
+      id?: string
+      sentiment?: string
+      text?: string
+      meta?: { name?: string; lat?: number; lng?: number; distrito?: string }
+    }
     try {
       body = (await req.json()) as typeof body
     } catch {
@@ -127,6 +136,16 @@ export default async function handler(req: Request) {
     const entityId = String(body.id ?? '').slice(0, 60)
     const sentiment = body.sentiment === 'good' || body.sentiment === 'bad' ? body.sentiment : null
     const text = sanitiseText(typeof body.text === 'string' ? body.text : '')
+    const meta = body.meta && typeof body.meta === 'object' ? body.meta : undefined
+    const safeMeta =
+      meta
+        ? {
+            name: typeof meta.name === 'string' ? meta.name.slice(0, 80) : undefined,
+            lat: typeof meta.lat === 'number' && isFinite(meta.lat) ? meta.lat : undefined,
+            lng: typeof meta.lng === 'number' && isFinite(meta.lng) ? meta.lng : undefined,
+            distrito: typeof meta.distrito === 'string' ? meta.distrito.slice(0, 60) : undefined,
+          }
+        : undefined
 
     if (!ALLOWED_TYPES.has(entityType) || !entityId || !/^[a-zA-Z0-9_\-]+$/.test(entityId) || !sentiment) {
       return new Response(JSON.stringify({ error: 'invalid params' }), {
@@ -161,6 +180,29 @@ export default async function handler(req: Request) {
       await redis.zremrangebyrank(key, 0, total - MAX_COMMENTS_PER_ENTITY - 1)
     }
     await redis.expire(key, COMMENT_TTL_SECONDS)
+
+    // Also push to global feed for "Últimos reportes" view.
+    try {
+      const feedEntry = JSON.stringify({
+        kind: 'comment',
+        entityType,
+        id: entityId,
+        sentiment,
+        text,
+        meta: safeMeta,
+        ipHash,
+        ts,
+        rand,
+      })
+      await redis.zadd(FEED_KEY, { score: ts, member: feedEntry })
+      const feedTotal = await redis.zcard(FEED_KEY)
+      if (feedTotal > FEED_MAX_ENTRIES) {
+        await redis.zremrangebyrank(FEED_KEY, 0, feedTotal - FEED_MAX_ENTRIES - 1)
+      }
+      await redis.expire(FEED_KEY, FEED_TTL_SECONDS)
+    } catch {
+      // Feed write failures are non-fatal.
+    }
 
     return new Response(
       JSON.stringify({ ok: true, ts, sentiment, text }),

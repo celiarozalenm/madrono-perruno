@@ -21,6 +21,9 @@ const MAX_REPORTS_PER_BIN = 50
 const REPORTS_RETURNED = 10
 const REPORT_TTL_SECONDS = 60 * 60 * 24 * 30 // 30 days
 const RATE_LIMIT_PER_HOUR = 20
+const FEED_KEY = 'feed:global'
+const FEED_MAX_ENTRIES = 200
+const FEED_TTL_SECONDS = 60 * 60 * 24 * 60 // 60 days
 const ALLOWED_ORIGINS = [
   'https://madrono-perruno.vercel.app',
   'http://localhost:5173',
@@ -104,9 +107,13 @@ export default async function handler(req: Request) {
   }
 
   if (req.method === 'POST') {
-    let body: { binId?: string; hasBags?: boolean }
+    let body: {
+      binId?: string
+      hasBags?: boolean
+      meta?: { name?: string; lat?: number; lng?: number; distrito?: string }
+    }
     try {
-      body = (await req.json()) as { binId?: string; hasBags?: boolean }
+      body = (await req.json()) as typeof body
     } catch {
       return new Response(JSON.stringify({ error: 'invalid json' }), {
         status: 400,
@@ -122,6 +129,17 @@ export default async function handler(req: Request) {
         headers: { ...cors, 'Content-Type': 'application/json' },
       })
     }
+
+    const meta = body.meta && typeof body.meta === 'object' ? body.meta : undefined
+    const safeMeta =
+      meta
+        ? {
+            name: typeof meta.name === 'string' ? meta.name.slice(0, 80) : undefined,
+            lat: typeof meta.lat === 'number' && isFinite(meta.lat) ? meta.lat : undefined,
+            lng: typeof meta.lng === 'number' && isFinite(meta.lng) ? meta.lng : undefined,
+            distrito: typeof meta.distrito === 'string' ? meta.distrito.slice(0, 60) : undefined,
+          }
+        : undefined
 
     const ip =
       req.headers.get('x-real-ip') ||
@@ -153,6 +171,28 @@ export default async function handler(req: Request) {
       await redis.zremrangebyrank(setKey, 0, total - MAX_REPORTS_PER_BIN - 1)
     }
     await redis.expire(setKey, REPORT_TTL_SECONDS)
+
+    // Also push to global feed for "Últimos reportes" view.
+    try {
+      const feedEntry = JSON.stringify({
+        kind: 'report',
+        entityType: 'papelera',
+        id: binId,
+        hasBags,
+        meta: safeMeta,
+        ipHash,
+        ts,
+        rand,
+      })
+      await redis.zadd(FEED_KEY, { score: ts, member: feedEntry })
+      const feedTotal = await redis.zcard(FEED_KEY)
+      if (feedTotal > FEED_MAX_ENTRIES) {
+        await redis.zremrangebyrank(FEED_KEY, 0, feedTotal - FEED_MAX_ENTRIES - 1)
+      }
+      await redis.expire(FEED_KEY, FEED_TTL_SECONDS)
+    } catch {
+      // Feed write failures are non-fatal — the per-bin record is the source of truth.
+    }
 
     return new Response(
       JSON.stringify({ ok: true, ts, hasBags }),

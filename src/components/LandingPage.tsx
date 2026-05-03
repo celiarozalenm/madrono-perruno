@@ -9,7 +9,6 @@ import {
   ParqueIcon,
   VetIcon,
   FuenteIcon,
-  MadronoMarkIcon,
 } from './icons/CustomIcons'
 
 interface Props {
@@ -271,7 +270,7 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
             <img
               src="/colabora-mockup.png"
               alt=""
-              className="absolute right-0 bottom-0 h-[110%] w-auto object-contain object-bottom-right pointer-events-none"
+              className="absolute -right-4 bottom-0 h-[78%] w-auto object-contain object-bottom-right pointer-events-none"
               loading="lazy"
               decoding="async"
             />
@@ -307,33 +306,39 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
             </div>
           </article>
 
-          {/* Card B — Datos abiertos (cream/brand) */}
+          {/* Card B — Datos abiertos (cream/brand, with illustration) */}
           <article
             id="datos"
-            className="col-span-12 md:col-span-6 lg:col-span-4 bg-brand-50 rounded-2xl px-6 py-7 sm:px-7 sm:py-8 relative overflow-hidden"
+            className="col-span-12 md:col-span-6 lg:col-span-4 bg-brand-50 rounded-2xl relative overflow-hidden min-h-[300px] lg:min-h-[340px]"
           >
-            <div className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-600">
-              {t(locale, 'landing.bento.datos.eyebrow')}
-            </div>
-            <h3 className="text-[1.6rem] font-extrabold tracking-[-0.02em] leading-tight text-madrono-700 mt-2 whitespace-pre-line">
-              {t(locale, 'landing.bento.datos.title')}
-            </h3>
-            <p className="text-sm text-stone-700 mt-3 max-w-[22rem] leading-relaxed">
-              {t(locale, 'landing.bento.datos.body')}
-            </p>
-            <a
-              href="https://github.com/celiarozalenm/madrono-perruno"
-              target="_blank"
-              rel="noopener"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-stone-800 hover:text-brand-600 transition-colors mt-5"
-            >
-              <Code size={15} />
-              {t(locale, 'landing.bento.datos.cta')}
-            </a>
-            <MadronoMarkIcon
-              size={120}
-              className="absolute -right-4 -bottom-4 text-brand-500/20"
+            <img
+              src="/datos-illustration.png"
+              alt=""
+              className="absolute -right-2 bottom-0 h-[78%] w-auto object-contain object-bottom-right pointer-events-none"
+              loading="lazy"
+              decoding="async"
             />
+            <div className="absolute inset-0 bg-gradient-to-r from-brand-50 via-brand-50/85 to-transparent" />
+            <div className="relative h-full px-6 py-7 sm:px-7 sm:py-8 flex flex-col">
+              <div className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-600">
+                {t(locale, 'landing.bento.datos.eyebrow')}
+              </div>
+              <h3 className="text-[1.6rem] font-extrabold tracking-[-0.02em] leading-tight text-madrono-700 mt-2 whitespace-pre-line">
+                {t(locale, 'landing.bento.datos.title')}
+              </h3>
+              <p className="text-sm text-stone-700 mt-3 max-w-[16rem] leading-relaxed">
+                {t(locale, 'landing.bento.datos.body')}
+              </p>
+              <a
+                href="https://github.com/celiarozalenm/madrono-perruno"
+                target="_blank"
+                rel="noopener"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-stone-800 hover:text-brand-600 transition-colors mt-5"
+              >
+                <Code size={15} />
+                {t(locale, 'landing.bento.datos.cta')}
+              </a>
+            </div>
           </article>
 
           {/* Card C — Ciudad para todos (photo background + overlay) */}

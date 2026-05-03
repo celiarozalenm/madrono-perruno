@@ -204,12 +204,30 @@ export default function ParticiparView({ data, locale }: Props) {
                         </div>
                       )}
                       {tab === 'papeleras' ? (
-                        <PapeleraReportForm binId={id} locale={locale} />
+                        <PapeleraReportForm
+                          binId={id}
+                          locale={locale}
+                          meta={{
+                            name: (item as Papelera).direccion,
+                            lat: item.lat,
+                            lng: item.lng,
+                            distrito: item.distrito,
+                          }}
+                        />
                       ) : (
                         <EntityCommentForm
                           entityType={tab === 'parques' ? 'parque' : 'area'}
                           entityId={id}
                           locale={locale}
+                          meta={{
+                            name:
+                              tab === 'parques'
+                                ? (item as Parque).nombre || (item as Parque).direccion
+                                : (item as AreaCanina).direccion,
+                            lat: item.lat,
+                            lng: item.lng,
+                            distrito: item.distrito,
+                          }}
                         />
                       )}
                     </div>

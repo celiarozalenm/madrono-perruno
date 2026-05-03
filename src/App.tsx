@@ -8,6 +8,7 @@ import StatsView from './components/StatsView'
 import RouteBuilder from './components/RouteBuilder'
 import AboutView from './components/AboutView'
 import ParticiparView from './components/ParticiparView'
+import RecientesView from './components/RecientesView'
 import Onboarding from './components/Onboarding'
 import LandingPage from './components/LandingPage'
 import { useDatasets } from './hooks/useDataset'
@@ -207,6 +208,11 @@ function App() {
             {view === 'participar' && (
               <div className="absolute inset-0 overflow-y-auto bg-white">
                 <ParticiparView data={data} locale={locale} />
+              </div>
+            )}
+            {view === 'recientes' && (
+              <div className="absolute inset-0 overflow-y-auto bg-white">
+                <RecientesView locale={locale} />
               </div>
             )}
             {view === 'about' && (

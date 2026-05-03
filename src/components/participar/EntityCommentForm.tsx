@@ -13,12 +13,13 @@ interface Props {
   entityType: EntityType
   entityId: string
   locale: Locale
+  meta?: { name?: string; lat?: number; lng?: number; distrito?: string }
 }
 
 type Sentiment = 'good' | 'bad' | null
 type Flash = { kind: 'ok' | 'error'; text: string } | null
 
-export default function EntityCommentForm({ entityType, entityId, locale }: Props) {
+export default function EntityCommentForm({ entityType, entityId, locale, meta }: Props) {
   const [comments, setComments] = useState<Comment[] | null>(null)
   const [chosen, setChosen] = useState<Sentiment>(null)
   const [text, setText] = useState('')
@@ -50,7 +51,7 @@ export default function EntityCommentForm({ entityType, entityId, locale }: Prop
       return
     }
     setBusy(true)
-    const result = await submitComment(entityType, entityId, chosen, text)
+    const result = await submitComment(entityType, entityId, chosen, text, meta)
     if ('error' in result) {
       setFlash({
         kind: 'error',
