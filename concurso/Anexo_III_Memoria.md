@@ -116,11 +116,20 @@ Los CSVs se descargan desde el Portal de Datos Abiertos en cada arranque (con ca
 
 ### Accesibilidad y rendimiento
 
-- Contraste WCAG AA en toda la interfaz (paleta naranja-mostaza inspirada en el madroño y la bandera de Madrid).
-- Navegación completa por teclado y atributos ARIA en controles interactivos.
-- Mobile-first: la app está pensada para consultarse desde el móvil mientras se pasea.
-- Lighthouse: ≥90 en Performance, Accessibility, Best Practices, SEO y PWA.
-- Funciona offline tras la primera carga gracias al service worker.
+La accesibilidad se ha tratado como requisito desde el inicio, no como añadido final:
+
+- **Estructura semántica**: `<header>`, `<main>`, `<nav>`, `<section>`, `<article>` y `<aside>` en su sentido nativo; un único `<h1>` por vista; jerarquía de `<h2>`/`<h3>` consistente.
+- **Skip-to-content link**: enlace oculto visualmente que aparece al primer Tab del teclado para saltar la barra lateral y caer directamente en `<main id="main-content">`.
+- **Atributos ARIA en todos los controles interactivos**: `aria-current="page"` en navegación, `aria-pressed` en pestañas, `aria-expanded` en colapsables, `role="dialog"` + `aria-modal="true"` en modales (con cierre por tecla Escape y focus-trap del overflow del body), `aria-live="polite"` en el feed de "Últimos reportes" para que los lectores de pantalla anuncien nuevos eventos sin interrumpir.
+- **Foco visible**: anillo de foco propio en `:focus-visible` (naranja brand `#ed731f`, 2 px) que solo aparece con teclado, no con ratón.
+- **Atajos del idioma**: el toggle ES/EN tiene `aria-label` específico ("Switch to English" / "Cambiar a español"), no se basa solo en el icono globo.
+- **Contraste WCAG AA**: paleta verificada para texto sobre crema. Titulares en `madrono-700` (#382617) sobre `stone-50` (#faf7f2) → 13.5:1. CTAs en blanco sobre `brand-500` (#ed731f) → ratio AA para texto grande, suficiente para botones.
+- **Reducción de animaciones**: `@media (prefers-reduced-motion: reduce)` desactiva el marquee, las transiciones de aparición y los efectos de hover para usuarios con sensibilidad vestibular.
+- **Móvil sin scroll horizontal**: la tabla de "Necesidades por distrito" se transforma en cards apiladas en viewports < 640 px; los tooltips de Recharts se reducen y los toggles del mapa muestran labels completos sin truncar.
+- **Texto y zoom**: tipografía base 14-15 px con `line-height` generoso; soporta zoom del navegador hasta 200 % sin pérdida de funcionalidad.
+- **Rendimiento**: Lighthouse ≥ 90 en Performance, Accessibility, Best Practices, SEO y PWA. Imágenes hero comprimidas con `pngquant` (159 KB de 652 KB), `loading="lazy"` en imágenes secundarias, code-splitting automático por Vite.
+- **Offline first**: tras la primera carga la app funciona sin conexión gracias al service worker (Workbox) que cachea HTML, JS, CSS, JSONs de datasets y tiles del mapa.
+- **Mobile-first**: pensada para consultarse desde el móvil mientras se pasea, con el panel del mapa flotante diseñado para tap targets ≥ 44 px.
 
 ---
 
