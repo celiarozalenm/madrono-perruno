@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Smartphone, Apple, Monitor, WifiOff } from 'lucide-react'
 import type { Locale } from '../types'
 import { t } from '../i18n'
 import { DATASETS } from '../services/madridData'
@@ -56,6 +56,41 @@ export default function AboutView({ locale }: Props) {
         </ul>
       </section>
 
+      <section>
+        <div className="flex items-baseline gap-2 mb-3">
+          <h2 className="font-semibold text-stone-900">
+            {t(locale, 'about.install.title')}
+          </h2>
+        </div>
+        <div className="bg-white rounded-xl border border-stone-200 p-4 space-y-4">
+          <div className="flex items-start gap-3">
+            <span className="bg-brand-50 text-brand-600 w-9 h-9 rounded-lg flex items-center justify-center shrink-0">
+              <WifiOff size={18} />
+            </span>
+            <p className="text-sm text-stone-700 leading-relaxed">
+              {t(locale, 'about.install.body')}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <PlatformCard
+              icon={<Smartphone size={18} />}
+              title={t(locale, 'landing.install.android')}
+              body={t(locale, 'landing.install.android.body')}
+            />
+            <PlatformCard
+              icon={<Apple size={18} />}
+              title={t(locale, 'landing.install.ios')}
+              body={t(locale, 'landing.install.ios.body')}
+            />
+            <PlatformCard
+              icon={<Monitor size={18} />}
+              title={t(locale, 'landing.install.desktop')}
+              body={t(locale, 'landing.install.desktop.body')}
+            />
+          </div>
+        </div>
+      </section>
+
       <section className="bg-white rounded-xl border border-stone-200 p-4 space-y-3">
         <div className="flex items-start gap-3">
           <div>
@@ -84,6 +119,24 @@ export default function AboutView({ locale }: Props) {
       </section>
 
       <p className="text-xs text-stone-500 leading-relaxed">{t(locale, 'about.license')}</p>
+    </div>
+  )
+}
+
+function PlatformCard({
+  icon,
+  title,
+  body,
+}: {
+  icon: React.ReactNode
+  title: string
+  body: string
+}) {
+  return (
+    <div className="bg-stone-50 border border-stone-200 rounded-lg p-3 flex flex-col gap-2">
+      <span className="text-stone-700">{icon}</span>
+      <div className="font-semibold text-sm text-stone-900 leading-tight">{title}</div>
+      <div className="text-[12.5px] text-stone-600 leading-relaxed">{body}</div>
     </div>
   )
 }
