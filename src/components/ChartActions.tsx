@@ -30,8 +30,16 @@ export default function ChartActions({ title, subtitle, filename, locale, target
       })
       setDone(result)
     } catch (err) {
-      console.error('chart share failed', err)
-      setDone('error')
+      // User cancelling the native share sheet throws AbortError. That's not
+      // a failure — just reset the button silently without the red "Error".
+      const isAbort =
+        err instanceof DOMException && err.name === 'AbortError'
+      if (isAbort) {
+        setDone(null)
+      } else {
+        console.error('chart share failed', err)
+        setDone('error')
+      }
     } finally {
       setBusy(false)
       if (timerRef.current) window.clearTimeout(timerRef.current)
