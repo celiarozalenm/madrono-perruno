@@ -27,8 +27,10 @@ Proyecto presentado a los **II Premios a la Reutilización de Datos Abiertos del
 | Áreas caninas | ~150 | [datos.madrid.es](https://datos.madrid.es) |
 | Principales parques y jardines | ~210 | [datos.madrid.es](https://datos.madrid.es) |
 | Inspecciones a centros de animales de compañía (veterinarios) | ~615 | [datos.madrid.es](https://datos.madrid.es) |
+| Fuentes de agua para beber | ~2.100 | [datos.madrid.es](https://datos.madrid.es) |
 | Calidad del aire — datos en tiempo real | 24 estaciones | [datos.madrid.es](https://datos.madrid.es) |
 | Censo de animales domésticos por distrito (2014-2024) | 21 distritos × 11 años | [datos.madrid.es](https://datos.madrid.es) |
+| Estadísticas del Centro de Protección Animal | anual | [datos.madrid.es](https://datos.madrid.es) |
 
 Los datos se descargan en CSV desde el portal y se parsean en cliente (ISO-8859-1, separador `;`). Cache 24h en localStorage para no machacar el servidor del Ayuntamiento.
 

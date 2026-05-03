@@ -7,7 +7,7 @@ export default function HeroIllustration({ className = '' }: Props) {
     <img
       src="/hero.svg"
       alt=""
-      className={`object-contain object-center select-none pointer-events-none ${className}`}
+      className={`w-full h-auto select-none pointer-events-none ${className}`}
       aria-hidden
       draggable={false}
     />
