@@ -159,7 +159,9 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
                 </div>
               </div>
               <div className="col-span-12 md:col-span-7 mp-fade-up mp-fade-up-2">
-                <HeroIllustration className="w-full h-[200px] sm:h-[340px] lg:h-[380px] block" />
+                <div className="bg-stone-50 border border-stone-900/10 rounded-2xl p-3 sm:p-5 overflow-hidden">
+                  <HeroIllustration className="w-full h-[180px] sm:h-[320px] lg:h-[360px] block" />
+                </div>
               </div>
             </div>
           </section>
