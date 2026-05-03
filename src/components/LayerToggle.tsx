@@ -45,7 +45,7 @@ export default function LayerToggle({
     ? locale === 'es' ? 'Mostrar' : 'Show'
     : locale === 'es' ? 'Ocultar' : 'Hide'
   return (
-    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur rounded-xl shadow-lg border border-stone-200 p-2 z-10 max-w-[calc(100vw-1.5rem)] sm:max-w-[260px]">
+    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur rounded-xl shadow-lg border border-stone-200 p-2 z-10 max-w-[calc(100vw-1.5rem)] sm:max-w-none sm:w-[280px]">
       <button
         type="button"
         onClick={() => setCollapsed((c) => !c)}
@@ -71,7 +71,7 @@ export default function LayerToggle({
               <div
                 role="presentation"
                 onClick={() => toggle(item.key)}
-                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm cursor-pointer transition-colors ${
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[13px] sm:text-sm cursor-pointer transition-colors ${
                   checked ? 'text-stone-900' : 'text-stone-600 hover:bg-stone-50'
                 }`}
               >
@@ -81,8 +81,8 @@ export default function LayerToggle({
                   aria-hidden
                 />
                 <span className="shrink-0 text-stone-500">{item.icon}</span>
-                <span className="flex-1 text-left truncate">{t(locale, labelKey)}</span>
-                <span className="text-[11px] text-stone-500 tabular-nums mr-1">{item.count}</span>
+                <span className="flex-1 text-left leading-tight">{t(locale, labelKey)}</span>
+                <span className="text-[11px] text-stone-500 tabular-nums mr-1 shrink-0">{item.count}</span>
                 <ToggleSwitch
                   checked={checked}
                   onChange={() => toggle(item.key)}
