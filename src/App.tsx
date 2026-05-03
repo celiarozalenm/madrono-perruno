@@ -95,6 +95,9 @@ function App() {
 
   return (
     <div className="h-full flex bg-stone-50">
+      <a href="#main-content" className="mp-skip-link">
+        {locale === 'es' ? 'Saltar al contenido' : 'Skip to content'}
+      </a>
       <Sidebar
         view={view}
         setView={setView}
@@ -133,7 +136,7 @@ function App() {
           </div>
         </div>
 
-        <main className="flex-1 relative overflow-hidden">
+        <main id="main-content" tabIndex={-1} className="flex-1 relative overflow-hidden">
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white z-20">
             <div className="flex items-center gap-3 text-stone-700">

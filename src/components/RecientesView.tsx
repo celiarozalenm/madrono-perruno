@@ -66,7 +66,7 @@ export default function RecientesView({ locale }: Props) {
       </header>
 
       {error && (
-        <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 mb-4 flex items-center gap-2 text-sm text-rose-700">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 mb-4 flex items-center gap-2 text-sm text-red-700">
           <AlertCircle size={16} />
           {error}
         </div>
@@ -83,7 +83,12 @@ export default function RecientesView({ locale }: Props) {
           <p className="text-stone-600 text-sm">{t(locale, 'recientes.empty')}</p>
         </div>
       ) : (
-        <ul className="flex flex-col gap-2.5">
+        <ul
+          className="flex flex-col gap-2.5"
+          aria-live="polite"
+          aria-relevant="additions"
+          aria-busy={refreshing}
+        >
           {entries.map((e, idx) => (
             <FeedRow key={`${e.kind}-${e.id}-${e.ts}-${idx}`} entry={e} locale={locale} />
           ))}
@@ -104,7 +109,7 @@ function FeedRow({ entry, locale }: { entry: FeedEntry; locale: Locale }) {
       <li className="rounded-xl border border-stone-200 bg-white px-4 py-3 flex gap-3 items-start">
         <div
           className={`shrink-0 mt-0.5 w-9 h-9 rounded-full flex items-center justify-center ${
-            positive ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+            positive ? 'bg-verde-100 text-verde-700' : 'bg-red-100 text-red-700'
           }`}
         >
           {positive ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
@@ -116,7 +121,7 @@ function FeedRow({ entry, locale }: { entry: FeedEntry; locale: Locale }) {
             </span>
             <span
               className={`text-xs font-semibold ${
-                positive ? 'text-emerald-700' : 'text-rose-700'
+                positive ? 'text-verde-700' : 'text-red-700'
               }`}
             >
               {positive
@@ -155,7 +160,7 @@ function FeedRow({ entry, locale }: { entry: FeedEntry; locale: Locale }) {
     <li className="rounded-xl border border-stone-200 bg-white px-4 py-3 flex gap-3 items-start">
       <div
         className={`shrink-0 mt-0.5 w-9 h-9 rounded-full flex items-center justify-center ${
-          good ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+          good ? 'bg-verde-100 text-verde-700' : 'bg-red-100 text-red-700'
         }`}
       >
         {good ? <ThumbsUp size={18} /> : <ThumbsDown size={18} />}
@@ -183,8 +188,8 @@ function FeedRow({ entry, locale }: { entry: FeedEntry; locale: Locale }) {
           <div
             className={`mt-2 text-sm rounded-md px-3 py-2 border-l-2 ${
               good
-                ? 'bg-emerald-50 border-emerald-500 text-stone-800'
-                : 'bg-rose-50 border-rose-500 text-stone-800'
+                ? 'bg-verde-50 border-verde-500 text-stone-800'
+                : 'bg-red-50 border-red-500 text-stone-800'
             }`}
           >
             “{entry.text}”

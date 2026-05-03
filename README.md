@@ -1,10 +1,13 @@
 # Madroño Perruno — Atlas Canino de Madrid
 
-[![Datos abiertos](https://img.shields.io/badge/datos-Madrid-ed731f)](https://datos.madrid.es)
-[![PWA](https://img.shields.io/badge/PWA-instalable-2f7d3a)](#)
-[![License](https://img.shields.io/badge/license-MIT-blue)](#licencia)
+[![Demo](https://img.shields.io/badge/demo-madrono--perruno.vercel.app-ed731f?style=flat-square)](https://madrono-perruno.vercel.app)
+[![Datos abiertos](https://img.shields.io/badge/datos-Madrid-ed731f?style=flat-square)](https://datos.madrid.es)
+[![PWA](https://img.shields.io/badge/PWA-instalable-2a6f35?style=flat-square)](https://madrono-perruno.vercel.app)
+[![License](https://img.shields.io/badge/license-MIT-5a3f2a?style=flat-square)](LICENSE)
 
-Observatorio ciudadano construido con **datos abiertos del Ayuntamiento de Madrid**: cruza papeleras con dispensador de bolsas, áreas caninas, parques y veterinarios para responder preguntas que ninguna app oficial resuelve.
+> **🌐 [madrono-perruno.vercel.app](https://madrono-perruno.vercel.app)** · web instalable como app, sin tienda, sin tracking
+
+Observatorio ciudadano construido con **datos abiertos del Ayuntamiento de Madrid**: cruza papeleras con dispensador de bolsas, áreas caninas, parques, veterinarios, fuentes de agua, calidad del aire y censo canino para responder preguntas que ninguna app oficial resuelve. La diferencial: **¿la papelera más cercana tiene bolsas ahora mismo?** — solo lo saben los vecinos que pasan por ahí, así que la app les permite reportarlo en un toque, sin registro.
 
 Proyecto presentado a los **II Premios a la Reutilización de Datos Abiertos del Ayuntamiento de Madrid 2026**, categoría *Servicios web, aplicaciones y visualizaciones*.
 
