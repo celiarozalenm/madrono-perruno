@@ -45,7 +45,7 @@ export default function LayerToggle({
     ? locale === 'es' ? 'Mostrar' : 'Show'
     : locale === 'es' ? 'Ocultar' : 'Hide'
   return (
-    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur rounded-xl shadow-lg border border-stone-200 p-2 z-10 max-w-[calc(100vw-1.5rem)] sm:max-w-none sm:w-[280px]">
+    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur rounded-xl shadow-lg border border-stone-200 p-2 z-10 max-w-[calc(100vw-1.5rem)] sm:max-w-none sm:w-[320px]">
       <button
         type="button"
         onClick={() => setCollapsed((c) => !c)}
@@ -81,7 +81,7 @@ export default function LayerToggle({
                   aria-hidden
                 />
                 <span className="shrink-0 text-stone-500">{item.icon}</span>
-                <span className="flex-1 text-left leading-tight">{t(locale, labelKey)}</span>
+                <span className="flex-1 text-left leading-tight whitespace-nowrap">{t(locale, labelKey)}</span>
                 <span className="text-[11px] text-stone-500 tabular-nums mr-1 shrink-0">{item.count}</span>
                 <ToggleSwitch
                   checked={checked}
