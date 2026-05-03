@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Trash2, Dog, Trees, Stethoscope, Wind, Droplet, ChevronDown, ChevronUp } from 'lucide-react'
+import { Trash2, Dog, Trees, Stethoscope, Wind, Droplet, ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react'
 import type { Datasets, LayerKey, Locale } from '../types'
 import { t } from '../i18n'
 
@@ -53,7 +53,8 @@ export default function LayerToggle({
         aria-label={`${toggleLabel} ${titleLabel}`}
         className="w-full flex items-center justify-between gap-2 px-2 pt-1 pb-1 hover:bg-stone-100 rounded transition-colors"
       >
-        <span className="text-[11px] font-semibold uppercase tracking-wide text-stone-500">
+        <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-stone-500">
+          <SlidersHorizontal size={13} aria-hidden />
           {titleLabel}
         </span>
         <span className="text-stone-500">

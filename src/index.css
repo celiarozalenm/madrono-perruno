@@ -168,21 +168,25 @@ body {
 /* Mobile: open popups as a fullscreen sheet so the comment form and
    action buttons are fully reachable without horizontal scrolling. */
 @media (max-width: 640px) {
+  /* Dim the map behind the sheet so it reads as a modal, not a fullscreen
+     takeover. The popup itself becomes a centred sheet with margins,
+     rounded corners and a soft shadow. */
   .maplibregl-popup {
     position: fixed !important;
-    inset: 0 !important;
+    inset: 16px !important;
     transform: none !important;
-    max-width: 100% !important;
-    width: 100% !important;
-    height: 100% !important;
+    max-width: none !important;
+    width: auto !important;
+    height: auto !important;
     z-index: 1000;
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.25));
   }
   .maplibregl-popup-tip { display: none !important; }
   .maplibregl-popup-content {
     max-width: none !important;
     width: 100% !important;
     height: 100% !important;
-    border-radius: 0 !important;
+    border-radius: 16px !important;
     overflow-y: auto !important;
     overscroll-behavior: contain;
   }
