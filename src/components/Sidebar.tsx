@@ -55,7 +55,9 @@ export default function Sidebar({
 
   function handleNavClick(key: View) {
     setView(key)
-    if (key === 'stats') setStatsSection('overview')
+    if (key === 'stats') {
+      setStatsSection('overview')
+    }
     maybeCloseMobile()
   }
 
