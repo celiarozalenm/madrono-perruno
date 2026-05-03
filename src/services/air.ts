@@ -18,10 +18,10 @@ export interface AirAssessment {
 }
 
 export const AIR_LEVEL_COLORS: Record<AirLevel, string> = {
-  good: '#22c55e', // green
-  fair: '#eab308', // yellow
-  poor: '#f97316', // orange
-  bad: '#dc2626', // red
+  good: '#3d6e3a',
+  fair: '#a3851a',
+  poor: '#ed731f',
+  bad: '#b8431b',
 }
 
 export const AIR_LEVEL_LABELS: Record<AirLevel, { es: string; en: string }> = {

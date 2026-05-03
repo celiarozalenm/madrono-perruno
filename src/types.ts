@@ -1,6 +1,29 @@
 export type Locale = 'es' | 'en'
 
-export type LayerKey = 'papeleras' | 'areas' | 'parques' | 'vets' | 'air' | 'perros'
+export type LayerKey =
+  | 'papeleras'
+  | 'areas'
+  | 'parques'
+  | 'vets'
+  | 'fuentes'
+  | 'air'
+  | 'perros'
+
+export type FuenteUso = 'personas' | 'mascotas' | 'ambos' | 'zonaVerde' | 'desconocido'
+export type FuenteEstado = 'operativa' | 'cerrada' | 'fueraDeServicio' | 'desconocido'
+
+export interface Fuente {
+  id: string
+  lat: number
+  lng: number
+  direccion: string
+  nombre: string
+  distrito: string
+  barrio: string
+  uso: FuenteUso
+  estado: FuenteEstado
+  modelo: string
+}
 
 export interface Papelera {
   id: string
@@ -97,6 +120,7 @@ export interface Datasets {
   areas: AreaCanina[]
   parques: Parque[]
   vets: Veterinario[]
+  fuentes: Fuente[]
   air: AirStation[]
   perros: PerrosCensus
   proteccionAnimal: ProteccionAnimalEntry[]
@@ -109,6 +133,7 @@ export interface BarrioScore {
   veterinariosDistrito: number
   scoreOver100: number
   scoreLabel: 'excelente' | 'bueno' | 'mejorable' | 'pobre'
+  distrito: string
 }
 
 export interface DistrictAggregate {

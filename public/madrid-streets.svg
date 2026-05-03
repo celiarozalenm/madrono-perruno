@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640">
+  <!--
+    Patrón "callejero de Madrid" — abstracción del trazado radial-concéntrico
+    del centro: tres anillos viarios (Sol → M-30 → M-40), seis radiales que
+    salen del kilómetro cero, una retícula al sur (Lavapiés/Embajadores) y
+    el río Manzanares al oeste. Pensado como tile decorativo a baja
+    opacidad sobre fondos cream o stone-50. Solo usa los tokens existentes:
+    madroño 700, brand 500/700, verde 500.
+  -->
+
+  <defs>
+    <pattern id="dots" x="0" y="0" width="14" height="14" patternUnits="userSpaceOnUse">
+      <circle cx="0.6" cy="0.6" r="0.6" fill="#5a3f2a" fill-opacity="0.12"/>
+    </pattern>
+  </defs>
+
+  <rect width="640" height="640" fill="url(#dots)"/>
+
+  <!-- Río Manzanares -->
+  <path d="M 60 0 C 110 140, 70 320, 130 480 S 190 620 220 640"
+        fill="none" stroke="#225a2b" stroke-opacity="0.35"
+        stroke-width="6" stroke-linecap="round"/>
+
+  <!-- M-40 (anillo exterior) -->
+  <circle cx="340" cy="320" r="270" fill="none" stroke="#5a3f2a"
+          stroke-opacity="0.35" stroke-width="2.4" stroke-dasharray="3 6"/>
+
+  <!-- M-30 (segundo anillo) -->
+  <circle cx="340" cy="320" r="180" fill="none" stroke="#382617"
+          stroke-opacity="0.45" stroke-width="2.6"/>
+
+  <!-- Ronda interior -->
+  <circle cx="340" cy="320" r="90" fill="none" stroke="#48321f"
+          stroke-opacity="0.55" stroke-width="2"/>
+
+  <!-- Radiales: 6 ejes A-1, A-2, A-3, A-4, A-5, A-6 -->
+  <g stroke="#5a3f2a" stroke-opacity="0.45" stroke-width="1.8" stroke-linecap="round">
+    <line x1="340" y1="320" x2="340" y2="40"/>
+    <line x1="340" y1="320" x2="600" y2="170"/>
+    <line x1="340" y1="320" x2="610" y2="450"/>
+    <line x1="340" y1="320" x2="380" y2="610"/>
+    <line x1="340" y1="320" x2="80" y2="500"/>
+    <line x1="340" y1="320" x2="100" y2="190"/>
+  </g>
+
+  <!-- Kilómetro 0 (Puerta del Sol) -->
+  <circle cx="340" cy="320" r="6" fill="#ed731f"/>
+  <circle cx="340" cy="320" r="11" fill="none" stroke="#ed731f"
+          stroke-opacity="0.7" stroke-width="1.2"/>
+
+  <!-- Retícula del centro-sur (Lavapiés/Embajadores) -->
+  <g stroke="#5a3f2a" stroke-opacity="0.22" stroke-width="0.8">
+    <path d="M260 360 H440 M260 380 H440 M260 400 H440 M260 420 H440 M260 440 H440 M260 460 H440"/>
+    <path d="M280 350 V480 M310 350 V480 M340 350 V480 M370 350 V480 M400 350 V480 M430 350 V480"/>
+  </g>
+
+  <!-- Manchas verdes: parques (Casa de Campo, Retiro, Madrid Río) -->
+  <g fill="#2a6f35" fill-opacity="0.18">
+    <ellipse cx="160" cy="280" rx="58" ry="78"/>
+    <ellipse cx="430" cy="280" rx="44" ry="56"/>
+    <ellipse cx="220" cy="540" rx="36" ry="20"/>
+  </g>
+  <g fill="#2a6f35" fill-opacity="0.32">
+    <circle cx="430" cy="280" r="3"/>
+    <circle cx="430" cy="290" r="2.4"/>
+    <circle cx="160" cy="280" r="3"/>
+    <circle cx="155" cy="295" r="2.4"/>
+  </g>
+
+  <!-- Algunas plazas representativas (puntos brand) -->
+  <g fill="#ed731f" fill-opacity="0.85">
+    <circle cx="318" cy="298" r="2.2"/> <!-- Sol -->
+    <circle cx="372" cy="296" r="2.2"/> <!-- Cibeles -->
+    <circle cx="412" cy="312" r="2.2"/> <!-- Alcalá -->
+    <circle cx="295" cy="270" r="2.2"/> <!-- Plaza Mayor -->
+  </g>
+
+  <!-- Esquinas: marca de retícula tipo plano oficial -->
+  <g stroke="#1c1917" stroke-opacity="0.4" stroke-width="1" fill="none">
+    <path d="M14 14 H30 M14 14 V30"/>
+    <path d="M626 14 H610 M626 14 V30"/>
+    <path d="M14 626 H30 M14 626 V610"/>
+    <path d="M626 626 H610 M626 626 V610"/>
+  </g>
+</svg>

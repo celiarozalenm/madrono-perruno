@@ -64,6 +64,7 @@ export function scoreBarrio(
     veterinariosDistrito: vetsDist,
     scoreOver100: score,
     scoreLabel: label,
+    distrito: titleCase(distritoVecino),
   }
 }
 

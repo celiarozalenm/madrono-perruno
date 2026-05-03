@@ -15,7 +15,7 @@ interface PopupData {
 
 const COLOR: Record<Kind, string> = {
   papelera: '#ed731f',
-  area: '#2f7d3a',
+  area: '#3d6e3a',
   parque: '#5b3a1e',
 }
 

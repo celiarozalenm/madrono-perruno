@@ -63,7 +63,7 @@ export default function Header({ view, setView, locale, toggleLocale }: Props) {
           aria-label={locale === 'es' ? 'Cambiar a inglés' : 'Switch to Spanish'}
         >
           <Languages size={16} />
-          <span className="font-mono text-xs uppercase">{locale === 'es' ? 'EN' : 'ES'}</span>
+          <span className="text-xs uppercase">{locale === 'es' ? 'EN' : 'ES'}</span>
         </button>
       </div>
     </header>

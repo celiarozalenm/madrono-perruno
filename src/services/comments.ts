@@ -1,6 +1,6 @@
 // Client for the /api/comment Edge Function. Used for áreas caninas and parques.
 
-export type EntityType = 'area' | 'parque'
+export type EntityType = 'area' | 'parque' | 'fuente'
 export type Sentiment = 'good' | 'bad'
 
 export interface Comment {

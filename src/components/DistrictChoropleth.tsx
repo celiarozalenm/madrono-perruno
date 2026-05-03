@@ -85,10 +85,9 @@ export default function DistrictChoropleth({ metric, aggregates, locale, metricL
       attributionControl: { compact: true },
     })
     mapRef.current = map
-    // Container can settle to its final size after MapLibre measures it
-    // (sidebar/page transitions, fonts loading, etc.). A ResizeObserver
-    // keeps the canvas in sync; otherwise the map stays at 0×0 and nothing
-    // is painted.
+    // Force a resize after first paint in case the container was hidden
+    // when MapLibre initialised (visibility:hidden, display:none, etc.).
+    map.on('load', () => requestAnimationFrame(() => map.resize()))
     const ro = new ResizeObserver(() => map.resize())
     ro.observe(container)
     return () => {
@@ -185,7 +184,10 @@ export default function DistrictChoropleth({ metric, aggregates, locale, metricL
 
   return (
     <div className="relative w-full h-[460px] rounded-lg overflow-hidden">
-      <div ref={containerRef} className="absolute inset-0" />
+      {/* MapLibre injects .maplibregl-map { position: relative } onto this
+          node, which would override `absolute inset-0` and collapse the
+          map to 0×0. Use w-full h-full so the container fills the parent. */}
+      <div ref={containerRef} className="w-full h-full" />
       {/* Legend */}
       <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur rounded-lg shadow border border-stone-200 p-2 text-xs">
         <div className="font-semibold uppercase text-[10px] text-stone-500 mb-1">

@@ -4,6 +4,7 @@ import type { AreaCanina, Datasets, Locale, Papelera, Parque } from '../types'
 import { t } from '../i18n'
 import EntityCommentForm from './participar/EntityCommentForm'
 import PapeleraReportForm from './participar/PapeleraReportForm'
+import InlineLocationMap from './InlineLocationMap'
 
 type Tab = 'parques' | 'areas' | 'papeleras'
 
@@ -12,19 +13,25 @@ const PAGE_SIZE = 50
 interface Props {
   data: Datasets
   locale: Locale
-  onLocateOnMap: (lat: number, lng: number) => void
 }
 
-export default function ParticiparView({ data, locale, onLocateOnMap }: Props) {
+export default function ParticiparView({ data, locale }: Props) {
   const [tab, setTab] = useState<Tab>('parques')
   const [search, setSearch] = useState('')
   const [district, setDistrict] = useState<string>('all')
   const [openId, setOpenId] = useState<string | null>(null)
+  const [mapOpen, setMapOpen] = useState(false)
   const [pageSize, setPageSize] = useState<number>(PAGE_SIZE)
+
+  function toggleOpen(id: string) {
+    setOpenId((curr) => (curr === id ? null : id))
+    setMapOpen(false)
+  }
 
   function changeTab(next: Tab) {
     setTab(next)
     setOpenId(null)
+    setMapOpen(false)
     setPageSize(PAGE_SIZE)
   }
 
@@ -165,7 +172,7 @@ export default function ParticiparView({ data, locale, onLocateOnMap }: Props) {
                 <li key={id} className="rounded-md border border-stone-200 bg-white overflow-hidden">
                   <button
                     type="button"
-                    onClick={() => setOpenId(isOpen ? null : id)}
+                    onClick={() => toggleOpen(id)}
                     aria-expanded={isOpen}
                     className="w-full flex items-start gap-2 px-3 py-2.5 text-left hover:bg-stone-50 transition-colors"
                   >
@@ -181,13 +188,21 @@ export default function ParticiparView({ data, locale, onLocateOnMap }: Props) {
                       <div className="flex justify-end mb-2">
                         <button
                           type="button"
-                          onClick={() => onLocateOnMap(item.lat, item.lng)}
+                          onClick={() => setMapOpen((v) => !v)}
+                          aria-expanded={mapOpen}
                           className="inline-flex items-center gap-1.5 text-xs text-brand-700 hover:text-brand-600 hover:underline"
                         >
                           <MapPin size={12} />
-                          {t(locale, 'participar.locateOnMap')}
+                          {mapOpen
+                            ? t(locale, 'participar.hideMap')
+                            : t(locale, 'participar.locateOnMap')}
                         </button>
                       </div>
+                      {mapOpen && (
+                        <div className="mb-3">
+                          <InlineLocationMap lat={item.lat} lng={item.lng} />
+                        </div>
+                      )}
                       {tab === 'papeleras' ? (
                         <PapeleraReportForm binId={id} locale={locale} />
                       ) : (

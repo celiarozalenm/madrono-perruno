@@ -1,23 +1,16 @@
 import { useEffect, useState } from 'react'
-import {
-  ArrowRight,
-  Compass,
-  Footprints,
-  BarChart3,
-  Map as MapIcon,
-  Smartphone,
-  Apple,
-  Monitor,
-  Download,
-  ExternalLink,
-  Users,
-  Globe,
-  MapPin,
-  MessageSquare,
-} from 'lucide-react'
+import { ArrowRight, Globe, Code, Heart, Download, MapPin, Footprints, BarChart3, Wind, Dog } from 'lucide-react'
 import type { Locale } from '../types'
 import { t } from '../i18n'
-import { DATASETS } from '../services/madridData'
+import HeroIllustration from './HeroIllustration'
+import {
+  PapeleraIcon,
+  AreaCaninaIcon,
+  ParqueIcon,
+  VetIcon,
+  FuenteIcon,
+  MadronoMarkIcon,
+} from './icons/CustomIcons'
 
 interface Props {
   locale: Locale
@@ -29,6 +22,17 @@ interface InstallPromptEvent extends Event {
   prompt: () => Promise<void>
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
+
+const STATS: {
+  value: string
+  key: 'papeleras' | 'areas' | 'parques' | 'vets' | 'fuentes'
+}[] = [
+  { value: '~6.000', key: 'papeleras' },
+  { value: '150', key: 'areas' },
+  { value: '200+', key: 'parques' },
+  { value: '2.100+', key: 'fuentes' },
+  { value: '600+', key: 'vets' },
+]
 
 export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
   const [installEvt, setInstallEvt] = useState<InstallPromptEvent | null>(null)
@@ -57,364 +61,438 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
     setInstallEvt(null)
   }
 
+  function goReport(e: React.MouseEvent) {
+    e.preventDefault()
+    window.location.hash = '#/participar'
+  }
+
   return (
-    <div className="min-h-full bg-gradient-to-b from-orange-50 via-stone-50 to-white">
-      {/* Top bar */}
-      <header className="px-4 sm:px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <img src="/icon.svg" alt="" className="w-9 h-9" />
-          <div className="leading-tight">
-            <div className="font-bold text-stone-900">{t(locale, 'app.title')}</div>
-            <div className="text-[11px] text-stone-500">{t(locale, 'app.subtitle')}</div>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={toggleLocale}
-          className="text-sm text-stone-700 hover:bg-white px-3 py-1.5 rounded-lg border border-stone-200 flex items-center gap-1.5"
-          aria-label={locale === 'es' ? 'Switch to English' : 'Cambiar a español'}
-        >
-          <Globe size={16} />
-          <span className="font-mono uppercase">{locale === 'es' ? 'EN' : 'ES'}</span>
-        </button>
-      </header>
-
-      {/* Hero */}
-      <section className="px-4 sm:px-6 pt-6 pb-12 max-w-4xl mx-auto text-center">
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-stone-900 leading-tight tracking-tight">
-          {t(locale, 'app.title')}
-          <span className="block text-brand-500 mt-1">{t(locale, 'app.subtitle')}</span>
-        </h1>
-        <p className="text-base sm:text-lg text-stone-700 mt-5 max-w-2xl mx-auto leading-relaxed">
-          {t(locale, 'landing.hero.lede')}
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
-          <button
-            type="button"
-            onClick={onEnter}
-            className="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-xl text-base font-semibold flex items-center gap-2 shadow-lg shadow-brand-500/30"
-          >
-            {t(locale, 'landing.hero.cta')}
-            <ArrowRight size={18} />
-          </button>
-          <a
-            href="https://github.com/celiarozalenm/madrono-perruno"
-            target="_blank"
-            rel="noopener"
-            className="border border-stone-300 hover:bg-white text-stone-800 px-6 py-3 rounded-xl text-base font-medium flex items-center gap-2"
-          >
-            {t(locale, 'landing.hero.cta2')}
-            <ExternalLink size={16} />
-          </a>
-        </div>
-      </section>
-
-      {/* Photo banner */}
-      <section className="px-4 sm:px-6 pb-2 max-w-5xl mx-auto">
-        <figure className="relative rounded-3xl overflow-hidden shadow-xl">
-          <img
-            src="/hero.jpg"
-            alt={
-              locale === 'es'
-                ? 'Persona con perro recogiendo una bolsa de una papelera con dispensador en una calle de Madrid'
-                : 'Person with dog taking a bag from a dispenser bin on a Madrid street'
-            }
-            className="w-full h-[260px] sm:h-[380px] object-cover"
-            loading="lazy"
-          />
-          <figcaption className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent text-white px-5 sm:px-8 py-5 sm:py-6">
-            <p className="text-sm sm:text-base font-medium leading-snug max-w-2xl">
-              {t(locale, 'landing.photo.caption')}
-            </p>
-          </figcaption>
-        </figure>
-      </section>
-
-      {/* Features */}
-      <section className="px-4 sm:px-6 py-12 max-w-5xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold text-stone-900 text-center mb-10">
-          {t(locale, 'landing.what.title')}
-        </h2>
-
-        {/* Hero feature: collaborative reports */}
-        <div className="bg-gradient-to-br from-brand-500 to-brand-700 rounded-2xl p-6 sm:p-8 text-white mb-4 shadow-xl shadow-brand-500/20">
-          <div className="flex items-start gap-4">
-            <div className="bg-white/20 backdrop-blur p-3 rounded-xl shrink-0">
-              <Users size={28} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="inline-block bg-white/20 backdrop-blur text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-2">
-                {t(locale, 'landing.what.f5.badge')}
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold leading-tight">
-                {t(locale, 'landing.what.f5.title')}
-              </h3>
-              <p className="text-sm sm:text-base text-white/90 mt-2 leading-relaxed">
-                {t(locale, 'landing.what.f5.body')}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FeatureCard
-            icon={<MapIcon size={24} />}
-            color="#d9641a"
-            title={t(locale, 'landing.what.f1.title')}
-            body={t(locale, 'landing.what.f1.body')}
-          />
-          <FeatureCard
-            icon={<Compass size={24} />}
-            color="#2a6f35"
-            title={t(locale, 'landing.what.f2.title')}
-            body={t(locale, 'landing.what.f2.body')}
-          />
-          <FeatureCard
-            icon={<Footprints size={24} />}
-            color="#5a3f2a"
-            title={t(locale, 'landing.what.f3.title')}
-            body={t(locale, 'landing.what.f3.body')}
-          />
-          <FeatureCard
-            icon={<BarChart3 size={24} />}
-            color="#44403c"
-            title={t(locale, 'landing.what.f4.title')}
-            body={t(locale, 'landing.what.f4.body')}
-          />
-        </div>
-      </section>
-
-      {/* Help your neighborhood — civic loop */}
-      <section className="px-4 sm:px-6 py-12 max-w-4xl mx-auto">
-        <div className="bg-verde-50 border border-verde-100 rounded-2xl p-6 sm:p-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-stone-900 text-center">
-            {t(locale, 'landing.help.title')}
-          </h2>
-          <p className="text-stone-700 text-center mt-3 max-w-2xl mx-auto leading-relaxed">
-            {t(locale, 'landing.help.lede')}
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
-            <div className="bg-white rounded-xl border border-verde-100 p-5">
-              <div className="w-10 h-10 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center mb-3">
-                <MapPin size={20} />
-              </div>
-              <h3 className="font-semibold text-stone-900">
-                {t(locale, 'landing.help.bags.title')}
-              </h3>
-              <p className="text-sm text-stone-600 mt-1 leading-relaxed">
-                {t(locale, 'landing.help.bags.body')}
-              </p>
-            </div>
-            <div className="bg-white rounded-xl border border-verde-100 p-5">
-              <div className="w-10 h-10 rounded-lg bg-verde-100 text-verde-700 flex items-center justify-center mb-3">
-                <MessageSquare size={20} />
-              </div>
-              <h3 className="font-semibold text-stone-900">
-                {t(locale, 'landing.help.parks.title')}
-              </h3>
-              <p className="text-sm text-stone-600 mt-1 leading-relaxed">
-                {t(locale, 'landing.help.parks.body')}
-              </p>
-            </div>
-          </div>
-          <p className="text-xs sm:text-sm text-madrono-600 text-center mt-6 max-w-2xl mx-auto leading-relaxed font-medium">
-            {t(locale, 'landing.help.loop')}
-          </p>
-          <div className="flex justify-center mt-7">
-            <button
-              type="button"
-              onClick={onEnter}
-              className="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-xl text-base font-semibold flex items-center gap-2 shadow-lg shadow-brand-500/30"
-            >
-              {t(locale, 'landing.help.cta')}
-              <ArrowRight size={18} />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Datasets */}
-      <section className="px-4 sm:px-6 py-12 max-w-4xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold text-stone-900 text-center">
-          {t(locale, 'landing.data.title')}
-        </h2>
-        <p className="text-stone-600 text-center mt-2 max-w-2xl mx-auto">
-          {t(locale, 'landing.data.lede')}
-        </p>
-        <ul className="mt-8 space-y-2">
-          {Object.entries(DATASETS).map(([key, ds]) => (
-            <li
-              key={key}
-              className="bg-white border border-stone-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-stone-900 truncate">{ds.label}</div>
-                <a
-                  href={ds.portalUrl}
-                  target="_blank"
-                  rel="noopener"
-                  className="text-xs text-madrono-500 hover:text-madrono-600 hover:underline inline-flex items-center gap-1.5 mt-0.5"
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-madrono-500 shrink-0" aria-hidden />
-                  datos.madrid.es
-                  <ExternalLink size={11} />
+    <div className="min-h-full bg-stone-50 text-stone-900">
+      <div className="max-w-[1360px] mx-auto px-3 sm:px-5 lg:px-6 py-3 sm:py-5 space-y-3 sm:space-y-5">
+        {/* === ROW 1 — Hero (full width) === */}
+        <div className="grid grid-cols-12 gap-3 sm:gap-5">
+          {/* HERO */}
+          <section className="col-span-12 relative">
+            {/* Top nav */}
+            <header className="pt-2 flex items-center justify-between gap-4">
+              <a href="/" className="flex items-center gap-2.5">
+                <img src="/icon.svg" alt="" className="w-9 h-9" />
+                <span className="font-extrabold tracking-tight text-madrono-700 leading-tight text-[15px]">
+                  Madroño
+                  <br />
+                  Perruno
+                </span>
+              </a>
+              <nav className="hidden md:flex items-center gap-6 text-[13px] font-medium text-stone-700">
+                <a href="#/map" className="hover:text-brand-600 transition-colors">
+                  {t(locale, 'landing.bento.nav.mapa')}
                 </a>
+                <a href="#features" className="hover:text-brand-600 transition-colors">
+                  {t(locale, 'landing.bento.nav.recursos')}
+                </a>
+                <a href="#/participar" className="hover:text-brand-600 transition-colors">
+                  {t(locale, 'landing.bento.nav.colabora')}
+                </a>
+                <a href="#datos" className="hover:text-brand-600 transition-colors">
+                  {t(locale, 'landing.bento.nav.datos')}
+                </a>
+                <a href="#/about" className="hover:text-brand-600 transition-colors">
+                  {t(locale, 'landing.bento.nav.about')}
+                </a>
+              </nav>
+              <div className="flex items-center gap-3">
+                {installEvt && !installed && (
+                  <button
+                    type="button"
+                    onClick={triggerInstall}
+                    className="hidden sm:inline-flex items-center gap-1.5 text-[12px] font-semibold text-stone-700 hover:text-brand-600 transition-colors"
+                  >
+                    <Download size={13} />
+                    {locale === 'es' ? 'Instalar' : 'Install'}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={toggleLocale}
+                  className="text-[12px] font-semibold tracking-wider text-stone-600 hover:text-brand-600 transition-colors flex items-center gap-1"
+                  aria-label={locale === 'es' ? 'Switch to English' : 'Cambiar a español'}
+                >
+                  <Globe size={13} />
+                  <span className={locale === 'es' ? 'text-brand-600' : ''}>ES</span>
+                  <span className="text-stone-300">/</span>
+                  <span className={locale === 'en' ? 'text-brand-600' : ''}>EN</span>
+                </button>
               </div>
-            </li>
-          ))}
-        </ul>
-        <div className="mt-5 flex items-center justify-center gap-2 text-xs text-madrono-500 font-medium">
-          <span className="w-2 h-2 rounded-full bg-madrono-500" aria-hidden />
-          <span>
-            {locale === 'es'
-              ? 'Datos: Ayuntamiento de Madrid · Licencia abierta'
-              : 'Data: Madrid City Council · Open licence'}
-          </span>
-        </div>
-      </section>
+            </header>
 
-      {/* Privacy */}
-      <section className="px-4 sm:px-6 py-10 max-w-3xl mx-auto">
-        <div className="bg-stone-100 border border-stone-200 rounded-2xl p-6 sm:p-7 text-center">
-          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-brand-700 bg-brand-100 px-3 py-1 rounded-full mb-3">
-            🔒 {locale === 'es' ? 'Privacidad' : 'Privacy'}
-          </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-stone-900">
-            {t(locale, 'landing.privacy.title')}
-          </h2>
-          <p className="text-sm text-stone-700 mt-3 leading-relaxed">
-            {t(locale, 'landing.privacy.body')}
-          </p>
-        </div>
-      </section>
-
-      {/* Install instructions */}
-      <section className="px-4 sm:px-6 py-12 bg-stone-900 text-stone-100">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center">
-            {t(locale, 'landing.install.title')}
-          </h2>
-          <p className="text-stone-400 text-center mt-2 max-w-2xl mx-auto">
-            {t(locale, 'landing.install.lede')}
-          </p>
-          {installEvt && !installed && (
-            <div className="text-center mt-6">
-              <button
-                type="button"
-                onClick={triggerInstall}
-                className="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-lg font-medium flex items-center gap-2 mx-auto"
-              >
-                <Download size={18} />
-                {locale === 'es' ? 'Instalar ahora' : 'Install now'}
-              </button>
+            <div className="grid grid-cols-12 gap-4 pt-8 sm:pt-12 pb-2 items-center">
+              <div className="col-span-12 md:col-span-5 mp-fade-up">
+                <span className="inline-flex items-center gap-1.5 bg-brand-50 border border-brand-100 text-brand-700 text-[11px] uppercase tracking-[0.2em] font-bold px-3 py-1.5 rounded-full mb-5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-500" aria-hidden />
+                  Madroño Perruno
+                </span>
+                <h1 className="text-4xl sm:text-5xl lg:text-[3.4rem] font-extrabold tracking-[-0.025em] leading-[1.02] text-madrono-700 whitespace-pre-line">
+                  {t(locale, 'landing.bento.hero.headline')}
+                </h1>
+                <p className="text-[15px] sm:text-base text-stone-600 mt-5 max-w-md leading-relaxed">
+                  {t(locale, 'landing.bento.hero.lede')}
+                </p>
+                <div className="flex flex-wrap items-center gap-3 mt-7">
+                  <button
+                    type="button"
+                    onClick={onEnter}
+                    className="group bg-brand-500 hover:bg-brand-600 text-white px-5 py-3 text-sm font-semibold rounded-full inline-flex items-center gap-2 transition-colors"
+                  >
+                    {t(locale, 'landing.bento.hero.cta1')}
+                    <ArrowRight
+                      size={16}
+                      className="transition-transform duration-300 group-hover:translate-x-0.5"
+                    />
+                  </button>
+                  <a
+                    href="#/participar"
+                    onClick={goReport}
+                    className="bg-stone-50 hover:bg-stone-100 border border-stone-300 text-stone-800 px-5 py-3 text-sm font-semibold rounded-full inline-flex items-center transition-colors"
+                  >
+                    {t(locale, 'landing.bento.hero.cta2')}
+                  </a>
+                </div>
+              </div>
+              <div className="col-span-12 md:col-span-7 mp-fade-up mp-fade-up-2">
+                <HeroIllustration className="w-full h-[200px] sm:h-[340px] lg:h-[380px] block" />
+              </div>
             </div>
-          )}
-          {installed && (
-            <div className="text-center mt-6 text-green-400 text-sm">
-              {locale === 'es' ? '✓ App instalada' : '✓ App installed'}
-            </div>
-          )}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-10">
-            <InstallCard
-              icon={<Smartphone />}
-              title={t(locale, 'landing.install.android')}
-              body={t(locale, 'landing.install.android.body')}
-            />
-            <InstallCard
-              icon={<Apple />}
-              title={t(locale, 'landing.install.ios')}
-              body={t(locale, 'landing.install.ios.body')}
-            />
-            <InstallCard
-              icon={<Monitor />}
-              title={t(locale, 'landing.install.desktop')}
-              body={t(locale, 'landing.install.desktop.body')}
-            />
-          </div>
-        </div>
-      </section>
+          </section>
 
-      {/* Final CTA + Footer */}
-      <section className="px-4 sm:px-6 py-12 text-center">
-        <button
-          type="button"
-          onClick={onEnter}
-          className="bg-brand-500 hover:bg-brand-600 text-white px-8 py-4 rounded-2xl text-lg font-semibold flex items-center gap-2 shadow-lg shadow-brand-500/30 mx-auto"
+        </div>
+
+        {/* === ROW 2 — Features (full width, horizontal) === */}
+        <section
+          id="features"
+          className="bg-stone-50 border border-stone-900/10 rounded-2xl px-6 sm:px-9 py-7 sm:py-9 relative overflow-hidden"
         >
-          {t(locale, 'landing.hero.cta')}
-          <ArrowRight size={20} />
-        </button>
-      </section>
+          <div className="grid grid-cols-12 gap-6 lg:gap-8 items-start">
+            <div className="col-span-12 lg:col-span-4">
+              <div className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-600">
+                {t(locale, 'landing.bento.features.eyebrow')}
+              </div>
+              <h2 className="text-[1.7rem] sm:text-[2rem] font-extrabold tracking-[-0.02em] leading-[1.05] text-madrono-700 mt-2 max-w-xs">
+                {t(locale, 'landing.bento.features.title')}
+              </h2>
+            </div>
+            <ul className="col-span-12 lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+              <FeatureRow
+                color="brand"
+                icon={<PapeleraIcon size={18} />}
+                label={t(locale, 'landing.bento.features.papeleras.label')}
+                body={t(locale, 'landing.bento.features.papeleras.body')}
+              />
+              <FeatureRow
+                color="madrono"
+                icon={<AreaCaninaIcon size={18} />}
+                label={t(locale, 'landing.bento.features.areas.label')}
+                body={t(locale, 'landing.bento.features.areas.body')}
+              />
+              <FeatureRow
+                color="verde"
+                icon={<ParqueIcon size={18} />}
+                label={t(locale, 'landing.bento.features.parques.label')}
+                body={t(locale, 'landing.bento.features.parques.body')}
+              />
+              <FeatureRow
+                color="brand"
+                icon={<VetIcon size={18} />}
+                label={t(locale, 'landing.bento.features.vets.label')}
+                body={t(locale, 'landing.bento.features.vets.body')}
+              />
+              <FeatureRow
+                color="agua"
+                icon={<FuenteIcon size={18} />}
+                label={t(locale, 'landing.bento.features.fuentes.label')}
+                body={t(locale, 'landing.bento.features.fuentes.body')}
+              />
+              <FeatureRow
+                color="madrono"
+                icon={<Wind size={18} />}
+                label={t(locale, 'landing.bento.features.air.label')}
+                body={t(locale, 'landing.bento.features.air.body')}
+              />
+              <FeatureRow
+                color="verde"
+                icon={<Dog size={18} />}
+                label={t(locale, 'landing.bento.features.censo.label')}
+                body={t(locale, 'landing.bento.features.censo.body')}
+              />
+            </ul>
+          </div>
+        </section>
 
-      <footer className="px-4 sm:px-6 py-8 border-t border-stone-200 text-center space-y-2">
-        <div className="inline-flex items-center gap-2 text-xs text-madrono-500 font-medium">
-          <span className="w-2 h-2 rounded-full bg-madrono-500" aria-hidden />
-          {t(locale, 'landing.foot.tag')}
-        </div>
-        <div className="text-xs text-stone-500">
-          {t(locale, 'landing.foot.author')}{' '}
-          <a
-            href="https://celiarozalenm.com"
-            target="_blank"
-            rel="noopener"
-            className="text-brand-600 hover:underline"
+        {/* === ROW 3 — Three ways to use it (no enclosing card) === */}
+        <section className="pt-2 sm:pt-4">
+          <div className="mb-6">
+            <div className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-600">
+              {t(locale, 'landing.bento.uses.eyebrow')}
+            </div>
+            <h2 className="text-[1.7rem] sm:text-[2rem] font-extrabold tracking-[-0.02em] leading-[1.05] text-madrono-700 mt-2">
+              {t(locale, 'landing.bento.uses.title')}
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-5">
+            <UseCard
+              href="#/barrio"
+              icon={<MapPin size={20} />}
+              label={t(locale, 'landing.bento.uses.barrio.label')}
+              body={t(locale, 'landing.bento.uses.barrio.body')}
+              cta={t(locale, 'landing.bento.uses.cta')}
+            />
+            <UseCard
+              href="#/route"
+              icon={<Footprints size={20} />}
+              label={t(locale, 'landing.bento.uses.ruta.label')}
+              body={t(locale, 'landing.bento.uses.ruta.body')}
+              cta={t(locale, 'landing.bento.uses.cta')}
+            />
+            <UseCard
+              href="#/stats"
+              icon={<BarChart3 size={20} />}
+              label={t(locale, 'landing.bento.uses.stats.label')}
+              body={t(locale, 'landing.bento.uses.stats.body')}
+              cta={t(locale, 'landing.bento.uses.cta')}
+            />
+          </div>
+        </section>
+
+        {/* === ROW 4 — Two feature cards === */}
+        <div className="grid grid-cols-12 gap-3 sm:gap-5">
+          {/* Card A — Colabora (verde) */}
+          <article className="col-span-12 md:col-span-6 lg:col-span-4 bg-verde-50 rounded-2xl px-6 py-7 sm:px-7 sm:py-8 relative overflow-hidden">
+            <div className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-600">
+              {t(locale, 'landing.bento.colabora.eyebrow')}
+            </div>
+            <h3 className="text-[1.6rem] font-extrabold tracking-[-0.02em] leading-tight text-verde-700 mt-2">
+              {t(locale, 'landing.bento.colabora.title')}
+            </h3>
+            <p className="text-sm text-stone-700 mt-3 max-w-[20rem] leading-relaxed">
+              {t(locale, 'landing.bento.colabora.body')}
+            </p>
+            <div className="flex flex-wrap gap-2 mt-5">
+              <a
+                href="#/participar"
+                onClick={goReport}
+                className="inline-flex items-center gap-1.5 bg-verde-500 hover:bg-verde-600 text-white text-xs font-semibold px-3.5 py-2 rounded-full transition-colors"
+              >
+                <span>👍</span>
+                {locale === 'es' ? 'Está bien' : 'Looking good'}
+              </a>
+              <a
+                href="#/participar"
+                onClick={goReport}
+                className="inline-flex items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold px-3.5 py-2 rounded-full transition-colors"
+              >
+                <span>👎</span>
+                {locale === 'es' ? 'Mal estado' : 'Needs care'}
+              </a>
+            </div>
+          </article>
+
+          {/* Card B — Datos abiertos (cream/brand) */}
+          <article
+            id="datos"
+            className="col-span-12 md:col-span-6 lg:col-span-4 bg-brand-50 rounded-2xl px-6 py-7 sm:px-7 sm:py-8 relative overflow-hidden"
           >
-            celiarozalenm
-          </a>
-          {' · '}
-          <a
-            href="https://github.com/celiarozalenm/madrono-perruno"
-            target="_blank"
-            rel="noopener"
-            className="text-brand-600 hover:underline"
-          >
-            GitHub
-          </a>
+            <div className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-600">
+              {t(locale, 'landing.bento.datos.eyebrow')}
+            </div>
+            <h3 className="text-[1.6rem] font-extrabold tracking-[-0.02em] leading-tight text-madrono-700 mt-2">
+              {t(locale, 'landing.bento.datos.title')}
+            </h3>
+            <p className="text-sm text-stone-700 mt-3 max-w-[22rem] leading-relaxed">
+              {t(locale, 'landing.bento.datos.body')}
+            </p>
+            <a
+              href="https://github.com/celiarozalenm/madrono-perruno"
+              target="_blank"
+              rel="noopener"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-stone-800 hover:text-brand-600 transition-colors mt-5"
+            >
+              <Code size={15} />
+              {t(locale, 'landing.bento.datos.cta')}
+            </a>
+            <MadronoMarkIcon
+              size={120}
+              className="absolute -right-4 -bottom-4 text-brand-500/20"
+            />
+          </article>
+
+          {/* Card C — Ciudad para todos (photo background + overlay) */}
+          <article className="col-span-12 md:col-span-6 lg:col-span-4 rounded-2xl overflow-hidden relative min-h-[300px] lg:min-h-[340px]">
+            <img
+              src="/hero-dog.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/55 to-transparent" />
+            <div className="relative h-full px-6 py-7 sm:px-7 sm:py-8 flex flex-col justify-between">
+              <div className="bg-white shadow-md w-14 h-14 rounded-2xl flex items-center justify-center">
+                <img src="/icon.svg" alt="" className="w-9 h-9" />
+              </div>
+              <div>
+                <h3 className="text-[1.7rem] font-extrabold tracking-[-0.025em] leading-[1.05] text-madrono-700 max-w-[8ch]">
+                  {t(locale, 'landing.bento.ciudad.title')}
+                </h3>
+                <p className="text-sm text-stone-700 mt-3 leading-relaxed max-w-[14rem]">
+                  {t(locale, 'landing.bento.ciudad.sub')}
+                </p>
+              </div>
+            </div>
+          </article>
         </div>
-      </footer>
+
+        {/* === ROW 3 — Stats bar === */}
+        <section className="bg-stone-50 border border-stone-900/10 rounded-2xl px-5 sm:px-7 py-5 sm:py-6">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-x-6 gap-y-5">
+            {STATS.map((s) => (
+              <StatItem
+                key={s.key}
+                value={s.value}
+                label={t(locale, `landing.bento.stats.${s.key}` as const)}
+                iconKey={s.key}
+              />
+            ))}
+          </div>
+          <div className="mt-6 pt-5 border-t border-stone-200 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 text-xs text-stone-600">
+            <span className="flex items-center gap-2">
+              <img src="/icon.svg" alt="" className="w-5 h-5" />
+              <span className="leading-tight">
+                {t(locale, 'landing.bento.foot.proyecto')}
+              </span>
+            </span>
+            <span className="leading-tight">
+              {t(locale, 'landing.bento.foot.hecho.before')}{' '}
+              <Heart
+                size={12}
+                className="inline-block align-[-1px] text-brand-500 fill-current mx-0.5"
+                aria-hidden
+              />{' '}
+              {t(locale, 'landing.bento.foot.hecho.after')}{' '}
+              <a
+                href="https://celiarozalenm.com"
+                target="_blank"
+                rel="noopener"
+                className="font-semibold text-brand-600 hover:text-brand-700 transition-colors"
+              >
+                celiarozalenm
+              </a>
+            </span>
+          </div>
+        </section>
+      </div>
     </div>
   )
 }
 
-function FeatureCard({
+function UseCard({
+  href,
   icon,
-  color,
-  title,
+  label,
   body,
+  cta,
 }: {
+  href: string
   icon: React.ReactNode
-  color: string
-  title: string
+  label: string
   body: string
+  cta: string
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-stone-200 p-5 hover:border-brand-300 transition-colors">
-      <div
-        className="w-11 h-11 rounded-xl flex items-center justify-center text-white mb-3"
-        style={{ background: color }}
+    <a
+      href={href}
+      className="group bg-white border border-stone-200 hover:border-brand-500 rounded-xl p-5 sm:p-6 flex flex-col transition-colors"
+    >
+      <span
+        className="shrink-0 w-11 h-11 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center mb-4 group-hover:bg-brand-500 group-hover:text-white transition-colors"
+        aria-hidden
       >
         {icon}
-      </div>
-      <h3 className="font-semibold text-lg text-stone-900 mb-1">{title}</h3>
-      <p className="text-sm text-stone-600 leading-relaxed">{body}</p>
-    </div>
+      </span>
+      <h3 className="font-bold text-[1.05rem] tracking-tight text-madrono-700">
+        {label}
+      </h3>
+      <p className="text-[13.5px] text-stone-600 leading-relaxed mt-1.5 flex-1">
+        {body}
+      </p>
+      <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand-600 group-hover:gap-2.5 transition-all mt-4">
+        {cta}
+        <ArrowRight size={14} />
+      </span>
+    </a>
   )
 }
 
-function InstallCard({
+function FeatureRow({
+  color,
   icon,
-  title,
+  label,
   body,
 }: {
+  color: 'verde' | 'brand' | 'madrono' | 'agua'
   icon: React.ReactNode
-  title: string
+  label: string
   body: string
 }) {
+  const tone = {
+    verde: 'bg-verde-500 text-white',
+    brand: 'bg-brand-500 text-white',
+    madrono: 'bg-madrono-600 text-white',
+    agua: 'bg-agua-500 text-white',
+  }[color]
   return (
-    <div className="bg-stone-800 rounded-xl p-4">
-      <div className="text-brand-400 mb-2">{icon}</div>
-      <div className="font-semibold text-stone-100">{title}</div>
-      <div className="text-sm text-stone-400 mt-1">{body}</div>
+    <li className="flex items-start gap-3.5">
+      <span
+        className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${tone}`}
+        aria-hidden
+      >
+        {icon}
+      </span>
+      <span className="min-w-0 pt-0.5">
+        <span className="block text-[11px] uppercase tracking-[0.18em] font-bold text-brand-600">
+          {label}
+        </span>
+        <span className="block text-[13.5px] text-stone-700 leading-snug mt-0.5">
+          {body}
+        </span>
+      </span>
+    </li>
+  )
+}
+
+function StatItem({
+  value,
+  label,
+  iconKey,
+}: {
+  value: string
+  label: string
+  iconKey: 'papeleras' | 'areas' | 'parques' | 'vets' | 'fuentes'
+}) {
+  const icon = {
+    papeleras: <PapeleraIcon size={18} className="text-brand-600" />,
+    areas: <AreaCaninaIcon size={18} className="text-madrono-600" />,
+    parques: <ParqueIcon size={18} className="text-madrono-600" />,
+    vets: <VetIcon size={18} className="text-brand-600" />,
+    fuentes: <FuenteIcon size={18} className="text-agua-500" />,
+  }[iconKey]
+  return (
+    <div className="flex items-center gap-2.5">
+      <span className="shrink-0">{icon}</span>
+      <span className="leading-tight">
+        <span className="block text-xl font-extrabold tabular-nums tracking-tight text-stone-900">
+          {value}
+        </span>
+        <span className="block text-[11px] text-stone-500">{label}</span>
+      </span>
     </div>
   )
 }

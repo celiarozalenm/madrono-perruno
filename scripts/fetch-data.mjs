@@ -17,6 +17,11 @@ const SOURCES = {
   areas: 'https://datos.madrid.es/egob/catalogo/300094-0-areas-caninas.csv',
   parques: 'https://datos.madrid.es/egob/catalogo/200761-0-parques-jardines.csv',
   vets: 'https://datos.madrid.es/egob/catalogo/300281-0-inspecciones-veterinarios.csv',
+  // Fuentes de agua para beber (UTF-8 with BOM, ; separated). Includes
+  // ESTADO (OPERATIVO/CERRADA_TEMPORALMENT/NO_OPERATIVO) and USO
+  // (PERSONAS/MASCOTAS/PERSONAS_Y_MASCOTAS/ZV).
+  fuentes:
+    'https://datos.madrid.es/dataset/300051-0-fuentes/resource/300051-8-fuentes-csv/download/300051-8-fuentes-csv',
   // Annual pet census per district (RIAC, Colegio de Veterinarios). UTF-8 with BOM.
   perros:
     'https://datos.madrid.es/dataset/207118-0-censo-animales/resource/207118-0-censo-animales-csv/download/207118-0-censo-animales-csv.csv',
@@ -140,6 +145,47 @@ function parseParques(csv) {
   }
   return out
 }
+// Drinking-water fountains. Latin1 sometimes; portal serves UTF-8 with BOM.
+// USO maps to a small canonical set so downstream filters stay simple.
+const FUENTE_USO = {
+  PERSONAS: 'personas',
+  MASCOTAS: 'mascotas',
+  PERSONAS_Y_MASCOTAS: 'ambos',
+  ZV: 'zonaVerde',
+}
+const FUENTE_ESTADO = {
+  OPERATIVO: 'operativa',
+  CERRADA_TEMPORALMENT: 'cerrada',
+  CERRADA_TEMPORALMENTE: 'cerrada',
+  NO_OPERATIVO: 'fueraDeServicio',
+}
+function parseFuentes(csv) {
+  const rows = parseCsv(csv)
+  const out = []
+  for (const r of rows) {
+    const lat = num(r['LATITUD'])
+    const lng = num(r['LONGITUD'])
+    if (!inMadridBounds(lat, lng)) continue
+    const usoRaw = clean(r['USO']).toUpperCase()
+    const estadoRaw = clean(r['ESTADO']).toUpperCase()
+    out.push({
+      id: clean(r['ID']) || clean(r['CODIGO_INTERNO']) || `f-${out.length}`,
+      lat,
+      lng,
+      direccion: [clean(r['TIPO_VIA']), clean(r['NOM_VIA']), clean(r['NUM_VIA'])]
+        .filter(Boolean)
+        .join(' '),
+      nombre: clean(r['DIRECCION_AUX']),
+      distrito: clean(r['DISTRITO']),
+      barrio: clean(r['BARRIO']),
+      uso: FUENTE_USO[usoRaw] ?? 'desconocido',
+      estado: FUENTE_ESTADO[estadoRaw] ?? 'desconocido',
+      modelo: clean(r['MODELO']),
+    })
+  }
+  return out
+}
+
 function parseVets(csv) {
   const rows = parseCsv(csv)
   const out = []
@@ -356,6 +402,12 @@ const PARSERS = {
   vets: parseVets,
 }
 
+// Fuentes use UTF-8 with BOM unlike the Latin1 quartet above.
+async function fetchAndParseFuentes() {
+  const csv = await fetchCsvUtf8(SOURCES.fuentes)
+  return parseFuentes(csv)
+}
+
 async function main() {
   await mkdir(OUT_DIR, { recursive: true })
   const summary = {}
@@ -375,6 +427,19 @@ async function main() {
       console.log(` FAILED: ${err.message}`)
       summary[key] = `ERROR: ${err.message}`
     }
+  }
+
+  // Drinking fountains (UTF-8 with BOM). Includes USO + ESTADO so consumers
+  // can filter for pet-accessible / operational fountains.
+  process.stdout.write('Fetching fuentes…')
+  try {
+    const rows = await fetchAndParseFuentes()
+    await writeFile(resolve(OUT_DIR, 'fuentes.json'), JSON.stringify(rows))
+    summary.fuentes = rows.length
+    console.log(` ${rows.length} records → public/data/fuentes.json`)
+  } catch (err) {
+    console.log(` FAILED: ${err.message}`)
+    summary.fuentes = `ERROR: ${err.message}`
   }
 
   // Annual pet census per district (UTF-8 with BOM, semicolon-separated).

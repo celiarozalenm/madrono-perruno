@@ -12,6 +12,7 @@ import Onboarding from './components/Onboarding'
 import LandingPage from './components/LandingPage'
 import { useDatasets } from './hooks/useDataset'
 import { useLocale } from './hooks/useLocale'
+import { useRoute } from './hooks/useRoute'
 import { t } from './i18n'
 import type { LayerKey } from './types'
 import type { RouteResult } from './services/routing'
@@ -21,16 +22,25 @@ const ONBOARDING_KEY = 'mp-onboarded-v1'
 function App() {
   const { locale, toggle: toggleLocale } = useLocale()
   const { data, loading, error, reload } = useDatasets()
-  // Always start on the landing on every page load — the project framing is part
-  // of the value proposition; users decide to enter the atlas explicitly.
-  const [showLanding, setShowLanding] = useState<boolean>(true)
-  const [view, setView] = useState<View>('map')
-  const [statsSection, setStatsSection] = useState<StatsSection>('overview')
+  // The hash route is the source of truth for the current view. A bare URL ("/")
+  // shows the landing; any "/#/<section>" URL routes straight into the atlas so
+  // that sections and subsections are shareable.
+  const { view: routeView, statsSection, navigate } = useRoute()
+  const showLanding = routeView === null
+  const view: View = routeView ?? 'map'
+
+  function setView(v: View) {
+    navigate(v, v === 'stats' ? 'overview' : statsSection)
+  }
+  function setStatsSection(s: StatsSection) {
+    navigate('stats', s)
+  }
   const [visibleLayers, setVisibleLayers] = useState<Record<LayerKey, boolean>>({
     papeleras: true,
     areas: true,
     parques: true,
     vets: false,
+    fuentes: false,
     air: false,
     perros: false,
   })
@@ -58,7 +68,7 @@ function App() {
   }
 
   function enterApp() {
-    setShowLanding(false)
+    navigate('map')
   }
 
   function toggleLayer(k: LayerKey) {
@@ -67,7 +77,6 @@ function App() {
 
   function handleLocate(coords: { lat: number; lng: number }) {
     setHighlight(coords)
-    setView('map')
   }
 
   function handleRoute(r: RouteResult | null) {
@@ -94,22 +103,32 @@ function App() {
         toggleLocale={toggleLocale}
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        onGoHome={() => navigate(null)}
       />
 
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile top bar with hamburger */}
-        <div className="md:hidden bg-white border-b border-stone-200 px-3 py-2 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-md hover:bg-stone-100"
-            aria-label={locale === 'es' ? 'Abrir menú' : 'Open menu'}
-          >
-            <Menu size={20} />
-          </button>
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <img src="/icon.svg" alt="" className="w-7 h-7 shrink-0" />
-            <div className="font-bold text-stone-900 truncate">{t(locale, 'app.title')}</div>
+        <div className="md:hidden bg-stone-50 border-b border-stone-900/15 flex flex-col">
+          <div className="px-3 py-2.5 flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="p-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 transition-colors"
+              aria-label={locale === 'es' ? 'Abrir menú' : 'Open menu'}
+            >
+              <Menu size={18} />
+            </button>
+            <a href="/" className="flex items-center gap-2 flex-1 min-w-0" aria-label={t(locale, 'app.title')}>
+              <img src="/icon.svg" alt="" className="w-8 h-8 shrink-0" />
+              <div className="leading-tight min-w-0">
+                <div className="font-extrabold text-stone-900 truncate text-[15px]">
+                  {t(locale, 'app.title')}
+                </div>
+                <div className="text-[10px] uppercase tracking-[0.16em] text-stone-500 truncate font-medium">
+                  {t(locale, 'app.subtitle')}
+                </div>
+              </div>
+            </a>
           </div>
         </div>
 
@@ -187,11 +206,7 @@ function App() {
             )}
             {view === 'participar' && (
               <div className="absolute inset-0 overflow-y-auto bg-white">
-                <ParticiparView
-                  data={data}
-                  locale={locale}
-                  onLocateOnMap={(lat, lng) => handleLocate({ lat, lng })}
-                />
+                <ParticiparView data={data} locale={locale} />
               </div>
             )}
             {view === 'about' && (
