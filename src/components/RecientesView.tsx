@@ -1,5 +1,16 @@
-import { useEffect, useState } from 'react'
-import { Activity, Loader2, MapPin, RefreshCw, ThumbsUp, ThumbsDown, AlertCircle, CheckCircle } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import {
+  Activity,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  MapPin,
+  RefreshCw,
+  ThumbsUp,
+  ThumbsDown,
+  AlertCircle,
+  CheckCircle,
+} from 'lucide-react'
 import type { Locale } from '../types'
 import { t } from '../i18n'
 import { fetchFeed, type FeedEntry } from '../services/feed'
@@ -10,17 +21,22 @@ interface Props {
 }
 
 const POLL_INTERVAL_MS = 30_000
+const PAGE_SIZE = 20
 
 export default function RecientesView({ locale }: Props) {
   const [entries, setEntries] = useState<FeedEntry[] | null>(null)
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
+  const headerRef = useRef<HTMLDivElement>(null)
 
-  async function load() {
+  async function load(targetPage = page) {
     setRefreshing(true)
     try {
-      const res = await fetchFeed(50)
+      const res = await fetchFeed(PAGE_SIZE, targetPage * PAGE_SIZE)
       setEntries(res.entries)
+      setTotal(res.total)
       setError(null)
     } catch {
       setError(t(locale, 'recientes.error'))
@@ -29,16 +45,38 @@ export default function RecientesView({ locale }: Props) {
     }
   }
 
+  // Initial load + reload when page changes
   useEffect(() => {
-    load()
-    const id = setInterval(load, POLL_INTERVAL_MS)
+    load(page)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page])
+
+  // Auto-refresh only on the first page so older pages don't shift under the user
+  useEffect(() => {
+    if (page !== 0) return
+    const id = setInterval(() => load(0), POLL_INTERVAL_MS)
     return () => clearInterval(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [page])
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  const canPrev = page > 0
+  const canNext = page < totalPages - 1
+
+  function goTo(next: number) {
+    const clamped = Math.max(0, Math.min(totalPages - 1, next))
+    if (clamped === page) return
+    setPage(clamped)
+    headerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  const pageInfo = t(locale, 'recientes.pageInfo')
+    .replace('{page}', String(page + 1))
+    .replace('{total}', String(totalPages))
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-      <header className="mb-5 sm:mb-7">
+      <header ref={headerRef} className="mb-5 sm:mb-7 scroll-mt-4">
         <div className="flex items-center gap-2 text-brand-700 mb-2">
           <Activity size={18} />
           <span className="uppercase tracking-[0.18em] text-[11px] font-bold">
@@ -51,17 +89,21 @@ export default function RecientesView({ locale }: Props) {
         <p className="text-sm sm:text-base text-stone-600 mt-2 max-w-xl">
           {t(locale, 'recientes.lede')}
         </p>
-        <div className="mt-3 flex items-center gap-3 text-xs text-stone-500">
+        <div className="mt-3 flex items-center gap-3 text-xs text-stone-500 flex-wrap">
           <button
             type="button"
-            onClick={load}
+            onClick={() => load(page)}
             disabled={refreshing}
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-stone-200 bg-white hover:bg-stone-50 disabled:opacity-50 transition-colors"
           >
             <RefreshCw size={12} className={refreshing ? 'animate-spin' : ''} />
             {t(locale, 'recientes.refresh')}
           </button>
-          <span>{t(locale, 'recientes.autorefresh')}</span>
+          <span>
+            {page === 0
+              ? t(locale, 'recientes.autorefresh')
+              : t(locale, 'recientes.autorefreshPaused')}
+          </span>
         </div>
       </header>
 
@@ -83,16 +125,47 @@ export default function RecientesView({ locale }: Props) {
           <p className="text-stone-600 text-sm">{t(locale, 'recientes.empty')}</p>
         </div>
       ) : (
-        <ul
-          className="flex flex-col gap-2.5"
-          aria-live="polite"
-          aria-relevant="additions"
-          aria-busy={refreshing}
-        >
-          {entries.map((e, idx) => (
-            <FeedRow key={`${e.kind}-${e.id}-${e.ts}-${idx}`} entry={e} locale={locale} />
-          ))}
-        </ul>
+        <>
+          <ul
+            className="flex flex-col gap-2.5"
+            aria-live="polite"
+            aria-relevant="additions"
+            aria-busy={refreshing}
+          >
+            {entries.map((e, idx) => (
+              <FeedRow key={`${e.kind}-${e.id}-${e.ts}-${idx}`} entry={e} locale={locale} />
+            ))}
+          </ul>
+
+          {totalPages > 1 && (
+            <nav
+              className="mt-6 flex items-center justify-between gap-3"
+              aria-label="Pagination"
+            >
+              <button
+                type="button"
+                onClick={() => goTo(page - 1)}
+                disabled={!canPrev || refreshing}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-stone-200 bg-white text-sm text-stone-700 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft size={14} />
+                {t(locale, 'recientes.prev')}
+              </button>
+              <span className="text-xs text-stone-500" aria-live="polite">
+                {pageInfo}
+              </span>
+              <button
+                type="button"
+                onClick={() => goTo(page + 1)}
+                disabled={!canNext || refreshing}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-stone-200 bg-white text-sm text-stone-700 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                {t(locale, 'recientes.next')}
+                <ChevronRight size={14} />
+              </button>
+            </nav>
+          )}
+        </>
       )}
     </div>
   )

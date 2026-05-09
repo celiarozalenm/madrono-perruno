@@ -120,8 +120,13 @@ export default async function handler(req: Request) {
   const url = new URL(req.url)
   const limitRaw = parseInt(url.searchParams.get('limit') ?? '', 10)
   const limit = Math.min(MAX_LIMIT, Math.max(1, isFinite(limitRaw) ? limitRaw : DEFAULT_LIMIT))
+  const offsetRaw = parseInt(url.searchParams.get('offset') ?? '', 10)
+  const offset = Math.max(0, isFinite(offsetRaw) ? offsetRaw : 0)
 
-  const raw = (await redis.zrange(FEED_KEY, 0, limit - 1, { rev: true })) as unknown[]
+  const [raw, total] = await Promise.all([
+    redis.zrange(FEED_KEY, offset, offset + limit - 1, { rev: true }) as Promise<unknown[]>,
+    redis.zcard(FEED_KEY) as Promise<number>,
+  ])
   const entries: FeedEntry[] = []
   for (const r of raw) {
     const e = parseEntry(r)
@@ -132,6 +137,9 @@ export default async function handler(req: Request) {
     JSON.stringify({
       entries,
       count: entries.length,
+      total,
+      offset,
+      limit,
     }),
     {
       status: 200,

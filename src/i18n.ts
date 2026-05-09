@@ -303,6 +303,10 @@ const dict = {
     'recientes.report.hasBags': 'tiene bolsas',
     'recientes.report.noBags': 'sin bolsas',
     'recientes.unknownPlace': 'Ubicación sin nombre',
+    'recientes.prev': 'Anteriores',
+    'recientes.next': 'Siguientes',
+    'recientes.pageInfo': 'Página {page} de {total}',
+    'recientes.autorefreshPaused': 'Refresco pausado en páginas anteriores',
   },
   en: {
     'app.title': 'Madroño Perruno',
@@ -606,6 +610,10 @@ const dict = {
     'recientes.report.hasBags': 'has bags',
     'recientes.report.noBags': 'out of bags',
     'recientes.unknownPlace': 'Unnamed location',
+    'recientes.prev': 'Previous',
+    'recientes.next': 'Next',
+    'recientes.pageInfo': 'Page {page} of {total}',
+    'recientes.autorefreshPaused': 'Auto-refresh paused on previous pages',
   },
 } as const
 
