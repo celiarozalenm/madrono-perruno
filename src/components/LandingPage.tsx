@@ -85,9 +85,6 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
                 </span>
               </a>
               <nav className="hidden md:flex items-center gap-6 text-[13px] font-medium text-stone-700">
-                <a href="#/map" className="hover:text-brand-600 transition-colors">
-                  {t(locale, 'landing.bento.nav.mapa')}
-                </a>
                 <a href="#features" className="hover:text-brand-600 transition-colors">
                   {t(locale, 'landing.bento.nav.recursos')}
                 </a>
@@ -123,6 +120,17 @@ export default function LandingPage({ locale, toggleLocale, onEnter }: Props) {
                   <span className="text-stone-300">/</span>
                   <span className={locale === 'en' ? 'text-brand-600' : ''}>EN</span>
                 </button>
+                <a
+                  href="#/map"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    onEnter()
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-500 hover:bg-brand-600 text-white text-[12px] font-semibold transition-colors shadow-sm"
+                >
+                  <MapPin size={13} />
+                  {t(locale, 'landing.bento.nav.mapa')}
+                </a>
               </div>
             </header>
 
