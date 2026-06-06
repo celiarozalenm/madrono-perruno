@@ -482,3 +482,14 @@ body {
   background: #fff7ed;
   border-width: 2px;
 }
+
+/* iOS Safari auto-zooms (and breaks the layout) when focusing a form field
+   whose font-size is < 16px. Force every input to 16px on phones to stop it.
+   !important beats Tailwind text-sm/text-xs utilities. */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
