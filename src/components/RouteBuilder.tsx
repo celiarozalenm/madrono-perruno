@@ -39,7 +39,7 @@ export default function RouteBuilder({ data, locale, onRoute, onLocate }: Props)
   const [route, setRoute] = useState<RouteResult | null>(null)
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const geo = useGeolocation()
+  const geo = useGeolocation(locale)
 
   async function handleBuild(e?: React.FormEvent) {
     e?.preventDefault()
@@ -210,6 +210,11 @@ export default function RouteBuilder({ data, locale, onRoute, onLocate }: Props)
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg px-3 py-2 text-sm flex items-center gap-2">
           <AlertCircle size={16} /> {error}
+        </div>
+      )}
+      {geo.error && !error && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-3 py-2 text-sm flex items-center gap-2">
+          <AlertCircle size={16} /> {geo.error}
         </div>
       )}
 

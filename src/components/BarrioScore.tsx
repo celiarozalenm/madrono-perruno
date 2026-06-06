@@ -59,7 +59,7 @@ export default function BarrioScore({ data, locale, onLocate }: Props) {
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [point, setPoint] = useState<Geocoded | null>(null)
-  const geo = useGeolocation()
+  const geo = useGeolocation(locale)
 
   async function runSearch(query?: string) {
     const q = (query ?? address).trim()
